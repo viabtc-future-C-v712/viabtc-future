@@ -1,0 +1,9 @@
+FROM mysql:5.7
+
+# COPY ./viabtc_exchange_server/sql /usr/src/sql
+# WORKDIR /usr/src/sql
+# RUN mysql -h172.18.0.3 -uroot -ppass trade_history < create_trade_history.sql
+# RUN mysql -h172.18.0.3 -uroot -ppass trade_log < create_trade_log.sql
+# RUN init_trade_history.sh
+
+LABEL Name=viabtcdb Version=0.0.1

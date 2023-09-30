@@ -1,0 +1,11 @@
+FROM viabtcdealbase
+
+COPY . /usr/src/myapp
+WORKDIR /usr/src/myapp
+RUN cd depends/hiredis && make install && cd ../../
+# RUN tar -xf mpdecimal-2.5.1.tar.gz && cd mpdecimal-2.5.1 && ./configure && make -j install && cd ..
+
+# git clone https://github.com/confluentinc/librdkafka.git
+# RUN export http_proxy=socks5://172.26.96.209:1082 && export https_proxy=socks5://172.26.96.209:1082 && cd librdkafka && mkdir build && cd build && cmake .. -DRDKAFKA_BUILD_STATIC=ON && make -j && make install && cd ../../
+WORKDIR /viabtc-deal
+LABEL Name=viabtcdealdev Version=0.0.1
