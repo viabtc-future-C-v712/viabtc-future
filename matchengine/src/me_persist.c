@@ -82,7 +82,7 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
         sdsfree(table);
         return -__LINE__;
     }
-    sdsfree(table);
+    sdsclear(table);
 
     table = sdscatprintf(table, "slice_position_%ld", timestamp);
     log_stderr("load position from: %s", table);
@@ -192,6 +192,22 @@ static int dump_order_to_db(MYSQL *conn, time_t end)
     int ret = dump_orders(conn, table);
     if (ret < 0) {
         log_error("dump_orders to %s fail: %d", table, ret);
+        sdsfree(table);
+        return -__LINE__;
+    }
+    sdsfree(table);
+
+    return 0;
+}
+
+static int dump_balance_to_db(MYSQL *conn, time_t end)
+{
+    sds table = sdsempty();
+    table = sdscatprintf(table, "slice_balance_%ld", end);
+    log_info("dump balance to: %s", table);
+    int ret = dump_balance(conn, table);
+    if (ret < 0) {
+        log_error("dump_balance to %s fail: %d", table, ret);
         sdsfree(table);
         return -__LINE__;
     }

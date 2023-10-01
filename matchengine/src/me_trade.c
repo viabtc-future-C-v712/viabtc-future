@@ -43,6 +43,7 @@ int init_trade(void)
 
     for (size_t i = 0; i < settings.market_num; ++i) {
         market_t *m = market_create(&settings.markets[i]);
+        log_trace("%s %p %s", __FUNCTION__, (void*)m, m->name);
         if (m == NULL) {
             return -__LINE__;
         }
@@ -56,8 +57,9 @@ int init_trade(void)
 market_t *get_market(const char *name)
 {
     dict_entry *entry = dict_find(dict_market, name);
-    if (entry)
-        return entry->val;
+    if (entry){
+        return (market_t *)entry->val;
+    }
     return NULL;
 }
 

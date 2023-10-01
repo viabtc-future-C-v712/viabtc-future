@@ -1,4 +1,5 @@
 #include "me_args.h"
+#include "me_trade.h"
 
 #define CODE_PIECES_CHECK_JSON_STRING(X,Y,Z) \
     if (!json_is_string(json_array_get(X, Y))) \
@@ -21,34 +22,35 @@
         return NULL;
 
 args_t* initOpenArgs(json_t *params){
-    if (json_array_size(params) != 11) return NULL;
+    if (json_array_size(params) != 12) return NULL;
     CODE_PIECES_CHECK_JSON_INTEGER(params, 0, user_id)
     CODE_PIECES_CHECK_JSON_STRING(params, 1, market_name)
     CODE_PIECES_CHECK_JSON_INTEGER(params, 2, direction)
     CODE_PIECES_CHECK_JSON_INTEGER(params, 3, type)
-    CODE_PIECES_CHECK_JSON_MDP(params, 4, markPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 5, triggerPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 6, entrustPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 7, leverage)
-    CODE_PIECES_CHECK_JSON_MDP(params, 8, volume)
-    CODE_PIECES_CHECK_JSON_MDP(params, 9, taker_fee)
-    CODE_PIECES_CHECK_JSON_MDP(params, 10, maker_fee)
+    CODE_PIECES_CHECK_JSON_INTEGER(params, 4, pattern)
+    CODE_PIECES_CHECK_JSON_MDP(params, 5, markPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 6, triggerPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 7, entrustPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 8, leverage)
+    CODE_PIECES_CHECK_JSON_MDP(params, 9, volume)
+    CODE_PIECES_CHECK_JSON_MDP(params, 10, taker_fee)
+    CODE_PIECES_CHECK_JSON_MDP(params, 11, maker_fee)
 
-        // 检查币对
+    // 检查币对
     CODE_PIECES_CHECK_MARKET(market_name, market)
-
     args_t *args = (args_t*)malloc(sizeof(args_t));
     args->user_id = user_id;
     args->market = market;
     args->direction = direction;
-    args->type = type;
+    args->Type = type;
+    args->pattern = pattern;
     args->markPrice = markPrice;
     args->triggerPrice = triggerPrice;
-    args->triggerPrice = entrustPrice;
-    args->triggerPrice = leverage;
-    args->triggerPrice = volume;
-    args->triggerPrice = taker_fee;
-    args->triggerPrice = maker_fee;
+    args->entrustPrice = entrustPrice;
+    args->leverage = leverage;
+    args->volume = volume;
+    args->taker_fee_rate = taker_fee;
+    args->maker_fee_rate = maker_fee;
     args->priAmount = mpd_new(&mpd_ctx);
     args->fee = mpd_new(&mpd_ctx);
     args->priAndFee = mpd_new(&mpd_ctx);
@@ -61,12 +63,13 @@ args_t* initCloseArgs(json_t *params){
     CODE_PIECES_CHECK_JSON_STRING(params, 1, market_name)
     CODE_PIECES_CHECK_JSON_INTEGER(params, 2, direction)
     CODE_PIECES_CHECK_JSON_INTEGER(params, 3, type)
-    CODE_PIECES_CHECK_JSON_MDP(params, 4, markPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 5, triggerPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 6, entrustPrice)
-    CODE_PIECES_CHECK_JSON_MDP(params, 7, volume)
-    CODE_PIECES_CHECK_JSON_MDP(params, 8, taker_fee)
-    CODE_PIECES_CHECK_JSON_MDP(params, 9, maker_fee)
+    CODE_PIECES_CHECK_JSON_INTEGER(params, 4, pattern)
+    CODE_PIECES_CHECK_JSON_MDP(params, 5, markPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 6, triggerPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 7, entrustPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 8, volume)
+    CODE_PIECES_CHECK_JSON_MDP(params, 9, taker_fee)
+    CODE_PIECES_CHECK_JSON_MDP(params, 10, maker_fee)
 
         // 检查币对
     CODE_PIECES_CHECK_MARKET(market_name, market)
@@ -75,14 +78,15 @@ args_t* initCloseArgs(json_t *params){
     args->user_id = user_id;
     args->market = market;
     args->direction = direction;
-    args->type = type;
+    args->Type = type;
+    args->pattern = pattern;
     args->markPrice = markPrice;
     args->triggerPrice = triggerPrice;
-    args->triggerPrice = entrustPrice;
+    args->entrustPrice = entrustPrice;
     args->triggerPrice = NULL;
-    args->triggerPrice = volume;
-    args->triggerPrice = taker_fee;
-    args->triggerPrice = maker_fee;
+    args->volume = volume;
+    args->taker_fee_rate = taker_fee;
+    args->maker_fee_rate = maker_fee;
     args->priAmount = mpd_new(&mpd_ctx);
     args->fee = mpd_new(&mpd_ctx);
     args->priAndFee = mpd_new(&mpd_ctx);

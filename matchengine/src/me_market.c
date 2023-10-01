@@ -1040,14 +1040,17 @@ static int execute_market_bid_order(bool real, market_t *m, order_t *taker)
 }
 
 int market_put_order_common(void* args_){
+    log_trace("%s", __FUNCTION__);
     args_t *args = (args_t*)args_;
     // 限价单及计划委托单需要输入委托价格
-    if(args->type == 1 || args->type == 2){
-        if (mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0) {
+    if(args->Type == 1 || args->Type == 2){
+        if (!args->entrustPrice  || mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0) {
+            log_trace("%s", __FUNCTION__);
             return -1;
         }
-        if(args->type ==  2){
-            if (mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0) {
+        if(args->Type ==  2){
+            if (!args->triggerPrice || mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0) {
+                log_trace("%s", __FUNCTION__);
                 return -1;
             }
         }
@@ -1213,6 +1216,7 @@ int adjustBalance(deal_t* deal){
 }
 
 int execute_order_open_imp(deal_t* deal){
+    log_trace("%s", __FUNCTION__);
     // 调整order
     adjustOrder(deal);
     // 调整position
@@ -1281,6 +1285,7 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
 }
 
 static int execute_order(args_t* args){
+    log_trace("%s", __FUNCTION__);
     bool save_db = true;
 
     skiplist_node *node;
@@ -1331,7 +1336,7 @@ static int execute_order(args_t* args){
 order_t* initOrder(args_t* args){
     order_t *order = malloc(sizeof(order_t));
     order->id           = ++order_id_start;
-    order->type         = args->type + 1;
+    order->type         = args->Type + 1;
     order->side         = args->direction;
     order->oper_type    = 1;
     order->create_time  = current_timestamp();
@@ -1366,6 +1371,7 @@ order_t* initOrder(args_t* args){
 }
 
 int market_put_order_open(void* args_){
+    log_trace("%s", __FUNCTION__);
     args_t* args = (args_t*)args_;
     // 检查钱包
     mpd_t *balance = balance_get(args->user_id, BALANCE_TYPE_AVAILABLE, args->market->money);
@@ -1382,6 +1388,7 @@ int market_put_order_open(void* args_){
     }
     else{
         mpd_div(args->priAmount, args->volume, args->leverage, &mpd_ctx);
+        log_trace("%s %s", __FUNCTION__, mpd_to_sci(args->priAmount, 0));
     }
 
     // 计算开仓手续费
@@ -1389,12 +1396,14 @@ int market_put_order_open(void* args_){
 
     // 计算余额 是否大于保证金加手续费
     mpd_add(args->priAndFee, args->priAmount, args->fee, &mpd_ctx);
-    if(position->pattern == 1){//逐仓
+    if(args->pattern == 1){//逐仓
+        log_trace("%s", __FUNCTION__);
         if(mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0)
             return -1;
     }
-    if(position->pattern == 2){//全仓
+    if(args->pattern == 2){//全仓
         if(getSumCrossCount(args->user_id)){
+            log_trace("%s", __FUNCTION__);
             mpd_t* totalPNL = getSumPNL(args->user_id);
             if(mpd_cmp(totalPNL, mpd_zero, &mpd_ctx) < 0){
                 mpd_add(totalPNL, totalPNL, balance, &mpd_ctx);
@@ -1403,10 +1412,10 @@ int market_put_order_open(void* args_){
                 if(mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0) return -1;
             }
         }else{
+            log_trace("%s", __FUNCTION__);
             if(mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0) return -1;
         }
     }
-
     args->taker = initOrder(args);
     if (args->taker == NULL) return -__LINE__;
 
@@ -1414,6 +1423,7 @@ int market_put_order_open(void* args_){
     balance_freeze(args->user_id, args->market->money, args->priAndFee);
 
     execute_order(args);
+    log_trace("%s", __FUNCTION__);
     return 0;
 }
 
@@ -1434,7 +1444,7 @@ int market_put_order_close(void* args_){
     mpd_mul(args->fee, args->volume, args->taker_fee_rate, &mpd_ctx);
 
     //计算平仓应该扣除多少保证金(平仓量/（可平仓量+冻结平仓量） *  保证金总量）
-    if(args->type != 2){
+    if(args->Type != 2){
         mpd_t* amount = mpd_new(&mpd_ctx);
         mpd_add(amount, position->position, position->frozen, &mpd_ctx);
         mpd_mul(amount, amount, position->principal, &mpd_ctx);
@@ -1442,7 +1452,7 @@ int market_put_order_close(void* args_){
     }
 
     // 限价或市价下单时，需要冻结仓位，计划委托下单则无需冻结
-    if(args->type == 0 || args->type == 1){
+    if(args->Type == 0 || args->Type == 1){
         mpd_add(position->frozen, position->frozen, args->volume, &mpd_ctx);
         mpd_sub(position->position, position->position, args->volume, &mpd_ctx);
     }

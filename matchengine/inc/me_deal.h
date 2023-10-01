@@ -13,8 +13,4 @@ typedef struct deal_t{
     mpd_t *deal; // 成交额
 }deal_t;
 
-args_t* initOpenArgs(json_t *params);
-
-args_t* initCloseArgs(json_t *params);
-
 # endif

@@ -2046,8 +2046,8 @@ static int on_cmd_make_slice(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params){
     args_t* args = initOpenArgs(params);
     if(!args) return reply_error_invalid_argument(ses, pkg);
-    args->real = true;
-    args->bOpen = true;
+    args->real = 1;
+    args->bOpen = 1;
     int ret = market_put_order_common(args);
 
     if(ret){
@@ -2060,8 +2060,8 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params){
 static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params){
     args_t* args = initCloseArgs(params);
     if(!args) return reply_error_invalid_argument(ses, pkg);
-    args->real = true;
-    args->bOpen = false;
+    args->real = 1;
+    args->bOpen = 0;
     int ret = market_put_order_common(args);
 
     if(ret){

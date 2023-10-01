@@ -210,7 +210,6 @@ mpd_t *balance_get(uint32_t user_id, uint32_t type, const char *asset)
     if (entry) {
         return entry->val;
     }
-
     return NULL;
 }
 

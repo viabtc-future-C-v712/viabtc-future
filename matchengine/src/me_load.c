@@ -27,7 +27,7 @@ int load_orders(MYSQL *conn, const char *table)
         `market`, \
         `relate_order`, \
         `price`,\
-        `amout`,\
+        `amount`,\
         `leverage`, \
         `trigger`, \
         `taker_fee`, \

@@ -151,6 +151,6 @@
         }
     ],
     "brokers": "172.19.0.6:9092",
-    "slice_interval": 3600,
+    "slice_interval": 60,
     "slice_keeptime": 259200 
 }
