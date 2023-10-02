@@ -15,6 +15,7 @@
 # include "me_history.h"
 # include "me_message.h"
 # include "me_persist.h"
+# include "me_cli.h"
 
 static rpc_svr *svr;
 static dict_t *dict_cache;
@@ -1902,7 +1903,7 @@ static int on_cmd_market_del_asset(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         // update config file
         del_asset_from_config(asset);
 
-        make_slice(time(NULL));
+        make_slice(time(NULL), 600);
     } else {
         return reply_error_invalid_argument(ses, pkg);
     }
@@ -2031,14 +2032,14 @@ static int on_cmd_market_del_market(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     // update config file
     del_market_from_config(market_name);
 
-    make_slice(time(NULL));
+    make_slice(time(NULL), 600);
 
     return reply_success(ses, pkg);
 }
 
 static int on_cmd_make_slice(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
-    make_slice(time(NULL));
+    make_slice(time(NULL), 1);
 
     return reply_success(ses, pkg);
 }

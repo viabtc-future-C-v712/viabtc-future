@@ -43,6 +43,7 @@ args_t* initOpenArgs(json_t *params){
     args->market = market;
     args->direction = direction;
     args->Type = type;
+    log_trace("%s  %d", __FUNCTION__, args->Type);
     args->pattern = pattern;
     args->markPrice = markPrice;
     args->triggerPrice = triggerPrice;

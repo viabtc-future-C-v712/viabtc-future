@@ -216,14 +216,14 @@ static int dump_balance_to_db(MYSQL *conn, time_t end)
     return 0;
 }
 
-static int dump_balance_to_db(MYSQL *conn, time_t end)
+static int dump_position_to_db(MYSQL *conn, time_t end)
 {
     sds table = sdsempty();
-    table = sdscatprintf(table, "slice_balance_%ld", end);
-    log_info("dump balance to: %s", table);
-    int ret = dump_balance(conn, table);
+    table = sdscatprintf(table, "slice_position_%ld", end);
+    log_info("dump position to: %s", table);
+    int ret = dump_position(conn, table);
     if (ret < 0) {
-        log_error("dump_balance to %s fail: %d", table, ret);
+        log_error("dump_position to %s fail: %d", table, ret);
         sdsfree(table);
         return -__LINE__;
     }
@@ -268,6 +268,11 @@ int dump_to_db(time_t timestamp)
     }
 
     ret = dump_order_to_db(conn, timestamp);
+    if (ret < 0) {
+        goto cleanup;
+    }
+
+    ret = dump_position_to_db(conn, timestamp);
     if (ret < 0) {
         goto cleanup;
     }
@@ -403,9 +408,9 @@ cleanup:
     return ret;
 }
 
-int make_slice(time_t timestamp)
+int make_slice(time_t timestamp, int inter)
 {
-    if (timestamp - last_run_slice_time < 10*60)
+    if (timestamp - last_run_slice_time < inter)
         return 0;
     last_run_slice_time = timestamp;
 
@@ -437,7 +442,7 @@ static void on_timer(nw_timer *timer, void *privdata)
     time_t now = time(NULL);
     if ((now - last_slice_time) >= settings.slice_interval && (now % settings.slice_interval) <= 5) {
         now = now - (now % settings.slice_interval);
-        make_slice(now);
+        make_slice(now, 600);
         last_slice_time = now;
     }
 }

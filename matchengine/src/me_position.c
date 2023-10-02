@@ -5,6 +5,7 @@
 
 # include "me_config.h"
 # include "me_position.h"
+# include "ut_dict.h"
 
 dict_t *dict_position;
 
@@ -42,8 +43,8 @@ static int init_dict(void){
     type.key_compare    = position_dict_key_compare;
     type.key_dup        = position_dict_key_dup;
     type.key_destructor = position_dict_key_free;
-    type.val_dup        = position_dict_val_dup;
-    type.val_destructor = position_dict_val_free;
+    // type.val_dup        = position_dict_val_dup;
+    // type.val_destructor = position_dict_val_free;
 
     dict_position = dict_create(&type, 64);
     if (dict_position == NULL)
@@ -63,8 +64,9 @@ int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p){
     key.user_id = user_id;
     key.side = side;
     strncpy(key.market, market, sizeof(key.market));
-    dict_add(dict_position, &key, p);
-
+    dict_entry *entry = dict_add(dict_position, &key, p);
+    position_t *tmp = entry->val;
+    log_trace("%s %p %p", __FUNCTION__, (void*)p, (void*)tmp);
     return 0;
 }
 
@@ -95,4 +97,20 @@ position_t* get_position(uint32_t user_id, char* market, uint32_t side){
     }
 
     return NULL;
+}
+
+position_t* initPosition(uint32_t user_id, const char* market, uint32_t pattern){
+    position_t *position = malloc(sizeof(position_t));
+    memset(position, 0, sizeof(position_t));
+    position->id = 0;
+    position->user_id = user_id;
+    position->market = market;
+    position->side = 0;
+    position->pattern = pattern;
+    position->leverage = mpd_new(&mpd_ctx);;
+    position->position = mpd_new(&mpd_ctx);;
+    position->frozen = mpd_new(&mpd_ctx);;
+    position->price = mpd_new(&mpd_ctx);;
+    position->principal = mpd_new(&mpd_ctx);;
+    return position;
 }

@@ -173,7 +173,7 @@ error:
 static sds on_cmd_makeslice(const char *cmd, int argc, sds *argv)
 {
     time_t now = time(NULL);
-    make_slice(now);
+    make_slice(now, 600);
     return sdsnew("OK\n");
 }
 

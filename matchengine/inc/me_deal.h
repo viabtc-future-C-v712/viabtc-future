@@ -13,4 +13,5 @@ typedef struct deal_t{
     mpd_t *deal; // 成交额
 }deal_t;
 
+deal_t* initDeal();
 # endif

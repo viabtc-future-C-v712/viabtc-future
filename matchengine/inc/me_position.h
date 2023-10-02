@@ -33,6 +33,6 @@ int init_position(void);
 int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p);
 position_t* get_position(uint32_t user_id, char* market, uint32_t side);
 int del_position(uint32_t user_id, char* market, uint32_t side);
-
+position_t *initPosition(uint32_t user_id, const char* market, uint32_t pattern);
 # endif
 

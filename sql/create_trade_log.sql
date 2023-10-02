@@ -39,7 +39,7 @@ CREATE TABLE `slice_order_example` (
     `maker_fee`     DECIMAL(8,6) NOT NULL,
     `left`          DECIMAL(35,16) NOT NULL, -- 买卖的单位 U 既 volume
     `freeze`        DECIMAL(35,16) NOT NULL, -- 买卖的单位 U 既 volume
-    `deal_stock`    DECIMAL(35,16) NOT NULL, -- 已交易的U
+    `deal_stock`    DECIMAL(35,16) NOT NULL, -- 已交易的币
     `deal_money`    DECIMAL(35,16) NOT NULL, -- 已交易的余额
     `deal_fee`      DECIMAL(35,16) NOT NULL, -- 已交易的费用
     `source`        VARCHAR(30) NOT NULL

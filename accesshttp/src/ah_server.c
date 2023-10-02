@@ -304,6 +304,7 @@ static int init_methods_handler(void)
 
     ERR_RET_LN(add_handler("order.open", matchengine, CMD_ORDER_OPEN));
     ERR_RET_LN(add_handler("order.close", matchengine, CMD_ORDER_CLOSE));
+    ERR_RET_LN(add_handler("make.slice", matchengine, CMD_MAKE_SLICE));
     return 0;
 }
 
