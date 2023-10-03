@@ -22,6 +22,7 @@ static sds sql_append_mpd(sds sql, mpd_t *val, bool comma)
 
 static int dump_orders_list(MYSQL *conn, const char *table, skiplist_t *list)
 {
+    log_trace("%s", __FUNCTION__);
     sds sql = sdsempty();
 
     size_t insert_limit = 1000;
@@ -84,6 +85,7 @@ static int dump_orders_list(MYSQL *conn, const char *table, skiplist_t *list)
 
 int dump_orders(MYSQL *conn, const char *table)
 {
+    log_trace("%s", __FUNCTION__);
     sds sql = sdsempty();
     sql = sdscatprintf(sql, "DROP TABLE IF EXISTS `%s`", table);
     log_trace("exec sql: %s", sql);
@@ -104,18 +106,20 @@ int dump_orders(MYSQL *conn, const char *table)
         return -__LINE__;
     }
     sdsfree(sql);
-
+    log_trace("%s", __FUNCTION__);
     for (int i = 0; i < settings.market_num; ++i) {
         market_t *market = get_market(settings.markets[i].name);
         if (market == NULL) {
             return -__LINE__;
         }
         int ret;
+        log_trace("%s", __FUNCTION__);
         ret = dump_orders_list(conn, table, market->asks);
         if (ret < 0) {
             log_error("dump market: %s asks orders list fail: %d", market->name, ret);
             return -__LINE__;
         }
+        log_trace("%s", __FUNCTION__);
         ret = dump_orders_list(conn, table, market->bids);
         if (ret < 0) {
             log_error("dump market: %s bids orders list fail: %d", market->name, ret);

@@ -346,6 +346,7 @@ static int order_put_future(market_t *m, order_t *order)
         return -__LINE__;
     }
     mpd_del(priAmount);
+    log_trace("%s %d", __FUNCTION__, order->type);
     return 0;
 }
 
@@ -1194,28 +1195,27 @@ mpd_t* getSumPNL(uint32_t user_id){
 int adjustOrder(deal_t* deal){
     mpd_t* money = mpd_new(&mpd_ctx);
     mpd_t* fee = mpd_new(&mpd_ctx);
+    mpd_t* deal_stock = mpd_new(&mpd_ctx);
     // taker order
     mpd_sub(deal->args->taker->left, deal->args->taker->left, deal->amount, &mpd_ctx);
-    mpd_add(deal->args->taker->deal_stock, deal->args->taker->deal_stock, deal->amount, &mpd_ctx);
+    mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
+    mpd_add(deal->args->taker->deal_stock, deal->args->taker->deal_stock, deal_stock, &mpd_ctx);
     mpd_div(money, deal->amount, deal->args->taker->leverage, &mpd_ctx);
     mpd_add(deal->args->taker->deal_money, deal->args->taker->deal_money, money, &mpd_ctx);
-    if(deal->args->taker->side == 1)
-        mpd_mul(fee, deal->amount, deal->args->taker->maker_fee, &mpd_ctx);
-    else
-        mpd_mul(fee, deal->amount, deal->args->taker->taker_fee, &mpd_ctx);
+    mpd_mul(fee, deal->amount, deal->args->taker->taker_fee, &mpd_ctx);
     mpd_add(deal->args->taker->deal_fee, deal->args->taker->deal_fee, fee, &mpd_ctx);
     // maker order
     mpd_sub(deal->args->maker->left, deal->args->maker->left, deal->amount, &mpd_ctx);
-    mpd_add(deal->args->maker->deal_stock, deal->args->maker->deal_stock, deal->amount, &mpd_ctx);
+    mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
+    mpd_add(deal->args->maker->deal_stock, deal->args->maker->deal_stock, deal_stock, &mpd_ctx);
     mpd_div(money, deal->amount, deal->args->maker->leverage, &mpd_ctx);
     mpd_add(deal->args->maker->deal_money, deal->args->maker->deal_money, money, &mpd_ctx);
-    if(deal->args->maker->side == 1)
-        mpd_mul(fee, deal->amount, deal->args->maker->maker_fee, &mpd_ctx);
-    else
-        mpd_mul(fee, deal->amount, deal->args->maker->taker_fee, &mpd_ctx);
+    mpd_mul(fee, deal->amount, deal->args->maker->maker_fee, &mpd_ctx);
     mpd_add(deal->args->maker->deal_fee, deal->args->maker->deal_fee, fee, &mpd_ctx);
+
     mpd_del(money);
     mpd_del(fee);
+    mpd_del(deal_stock);
     return 0;
 }
 
@@ -1230,9 +1230,7 @@ int adjustPosition(deal_t* deal){
     // taker position
     position = get_position(deal->args->taker->user_id, deal->args->taker->market, deal->args->taker->side);
     if(!position){
-        position = initPosition(deal->args->taker->user_id,
-            deal->args->taker->market,
-            deal->args->pattern);
+        position = initPosition(deal->args->taker->user_id, deal->args->taker->market, deal->args->pattern);
         mpd_copy(position->leverage, deal->args->taker->leverage, &mpd_ctx);
         mpd_copy(position->position, deal->amount, &mpd_ctx);
         mpd_copy(position->price, deal->price, &mpd_ctx);
@@ -1253,9 +1251,7 @@ int adjustPosition(deal_t* deal){
     // maker position
     position = get_position(deal->args->maker->user_id, deal->args->maker->market, deal->args->maker->side);
     if(!position){
-        position = initPosition(deal->args->maker->user_id,
-            deal->args->maker->market,
-            deal->args->pattern);
+        position = initPosition(deal->args->maker->user_id, deal->args->maker->market, deal->args->pattern);
         mpd_copy(position->leverage, deal->args->maker->leverage, &mpd_ctx);
         mpd_copy(position->position, deal->amount, &mpd_ctx);
         mpd_copy(position->price, deal->price, &mpd_ctx);
@@ -1263,6 +1259,7 @@ int adjustPosition(deal_t* deal){
         add_position(deal->args->maker->user_id, deal->args->maker->market, deal->args->maker->side, position);
         log_trace("%s", __FUNCTION__);
     }else{
+        mpd_mul(deal->deal, deal->price, deal->amount, &mpd_ctx);
         mpd_mul(sum, position->price, position->position, &mpd_ctx);
         mpd_add(total, deal->deal, sum, &mpd_ctx);
         mpd_add(totalPosition, deal->amount, position->position, &mpd_ctx);
@@ -1283,7 +1280,8 @@ int adjustPosition(deal_t* deal){
 int adjustBalance(deal_t* deal){
     // taker
     if(deal->args->taker->oper_type == 1){// open
-        balance_sub( deal->args->taker->user_id, BALANCE_TYPE_FREEZE, deal->args->market->money, deal->args->priAndFee);
+        log_trace("%s %s", __FUNCTION__, mpd_to_sci(deal->args->priAndFee, 0));
+        balance_unfreeze(deal->args->taker->user_id, deal->args->market->money, deal->args->priAndFee);
     }else{// close
         position_t *position = get_position(deal->args->taker->user_id, deal->args->taker->market, deal->args->taker->side);
         mpd_t *PNL = getPNL(position);
@@ -1294,7 +1292,9 @@ int adjustBalance(deal_t* deal){
 
     // maker
     if(deal->args->maker->oper_type == 1){// open
-        balance_sub( deal->args->maker->user_id, BALANCE_TYPE_FREEZE, deal->args->market->money, deal->args->priAndFee);
+        log_trace("%s %s", __FUNCTION__, mpd_to_sci(deal->args->priAndFee, 0));
+        // mpd_t *tmp = decimal("0.33", 0);
+        balance_unfreeze(deal->args->maker->user_id, deal->args->market->money, deal->args->priAndFee);
     }else{// close
         position_t *position = get_position(deal->args->maker->user_id, deal->args->maker->market, deal->args->maker->side);
         mpd_t *PNL = getPNL(position);
@@ -1302,7 +1302,7 @@ int adjustBalance(deal_t* deal){
         balance_sub( deal->args->maker->user_id, BALANCE_TYPE_AVAILABLE, deal->args->market->money, deal->maker_fee);
         mpd_del(PNL);
     }
-
+    log_trace("%s", __FUNCTION__);
     append_balance_trade_sub(deal->args->taker, deal->args->market->stock, deal->amount, deal->price, deal->amount, deal->args->maker);
     append_balance_trade_add(deal->args->taker, deal->args->market->stock, deal->amount, deal->price, deal->amount, deal->args->maker);
     append_balance_trade_fee(deal->args->taker, deal->args->market->stock, deal->amount, deal->price, deal->amount, deal->args->maker_fee_rate, deal->args->maker);
@@ -1428,9 +1428,14 @@ static int execute_order(args_t* args){
     }
     // 处理未完成的order
     if (args->taker != 0) {
-        int ret = order_put_future(args->market, args->taker);
-        if (ret < 0) {
-            log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
+        if (args->taker->type == MARKET_ORDER_TYPE_LIMIT){
+            int ret = order_put_future(args->market, args->taker);
+            if (ret < 0) {
+                log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
+            }
+        }else{
+            order_free(args->taker);
+            args->taker = NULL;
         }
     }
     skiplist_release_iterator(iter);
@@ -1481,10 +1486,10 @@ int market_put_order_open(void* args_){
     // 检查钱包
     mpd_t *balance = balance_get(args->user_id, BALANCE_TYPE_AVAILABLE, args->market->money);
     if (!balance || mpd_cmp(balance, mpd_zero, &mpd_ctx) < 0) return -1;
-
+    log_trace("%s", __FUNCTION__);
     // 检查买入数量
     if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume) ) return -1;
-
+    log_trace("%s", __FUNCTION__);
     // 计算保证金
     position_t *position = get_position(args->user_id, args->market->name, args->direction);
     if(position){
@@ -1499,8 +1504,8 @@ int market_put_order_open(void* args_){
     // 计算开仓手续费
     mpd_mul(args->fee, args->volume, args->taker_fee_rate, &mpd_ctx);
 
-    // 计算余额 是否大于保证金加手续费
-    mpd_add(args->priAndFee, args->priAmount, args->fee, &mpd_ctx);
+    // 计算余额 是否大于保证金
+    mpd_copy(args->priAndFee, args->priAmount, &mpd_ctx);
     if(args->pattern == 1){//逐仓
         log_trace("%s", __FUNCTION__);
         if(mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0)

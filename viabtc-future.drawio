@@ -1,0 +1,546 @@
+<mxfile host="Electron" modified="2023-10-03T08:57:27.390Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.1 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="dKc_5GacJv0x_OAk7W3c" version="22.0.1" type="device" pages="13">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="存款流程">
+    <mxGraphModel dx="1195" dy="697" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-3" target="Sq97uapRwJ5jGGzzT9ax-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-3" value="存款流程" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="350" y="50" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="15" y="237" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Sq97uapRwJ5jGGzzT9ax-0" target="Sq97uapRwJ5jGGzzT9ax-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="457.16666666666674" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Sq97uapRwJ5jGGzzT9ax-0" target="Sq97uapRwJ5jGGzzT9ax-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-0" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;800000&lt;/span&gt;&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="215" y="417" width="390" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="WIyWlLk6GJQsqaUBKTNV-7" target="2SrjfweAHcNtA57tX44i-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="310" y="467" as="sourcePoint" />
+            <mxPoint x="360" y="417" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Sq97uapRwJ5jGGzzT9ax-3" target="WIyWlLk6GJQsqaUBKTNV-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-3" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="295" y="130" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-9" value="通过" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="350" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Sq97uapRwJ5jGGzzT9ax-10" value="不通过" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="680" y="427" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="2SrjfweAHcNtA57tX44i-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="2SrjfweAHcNtA57tX44i-1" target="Sq97uapRwJ5jGGzzT9ax-0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="2SrjfweAHcNtA57tX44i-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="350" y="320" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="3MGE1OOMy7jt_cy3Wj9E" name="市价开多(未成交)">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lMI4UvQa6q4Pm5I1Z-Eb-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="rbJ9cEMvZ1Gvb8DK0B3H-1" target="lMI4UvQa6q4Pm5I1Z-Eb-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rbJ9cEMvZ1Gvb8DK0B3H-1" value="市价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a8j1dCwnZCp-dxz07i_v-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="lMI4UvQa6q4Pm5I1Z-Eb-1" target="a8j1dCwnZCp-dxz07i_v-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lMI4UvQa6q4Pm5I1Z-Eb-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;div style=&quot;line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #d4d4d4;&quot;&gt;${&lt;/span&gt;&lt;span style=&quot;color: #9cdcfe;&quot;&gt;Alice&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4;&quot;&gt;}&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #d4d4d4;&quot;&gt;${&lt;/span&gt;&lt;span style=&quot;color: #9cdcfe;&quot;&gt;可用余额&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4;&quot;&gt;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="190" width="370" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kd3FOBplPCtbYwyOkJkm-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a8j1dCwnZCp-dxz07i_v-1" target="kd3FOBplPCtbYwyOkJkm-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a8j1dCwnZCp-dxz07i_v-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp;&amp;nbsp;${&lt;span style=&quot;color: rgb(156, 220, 254);&quot;&gt;Alice&lt;/span&gt;&lt;span style=&quot;color: rgb(212, 212, 212);&quot;&gt;}&lt;/span&gt;&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="27_pX3K9ktezt6GrJTnq-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kd3FOBplPCtbYwyOkJkm-1" target="27_pX3K9ktezt6GrJTnq-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kd3FOBplPCtbYwyOkJkm-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Bm1Q4_9AggAPPPRYUA2q-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="27_pX3K9ktezt6GrJTnq-1" target="Bm1Q4_9AggAPPPRYUA2q-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27_pX3K9ktezt6GrJTnq-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Bm1Q4_9AggAPPPRYUA2q-1" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="市价开多(部份成交) " id="kWJWj07GqmS7MaOLpC4v">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-0" />
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-1" parent="OOIZemQGUUK8yOi1jhIq-0" />
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="OOIZemQGUUK8yOi1jhIq-1" source="OOIZemQGUUK8yOi1jhIq-3" target="OOIZemQGUUK8yOi1jhIq-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-3" value="市价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="OOIZemQGUUK8yOi1jhIq-1" source="OOIZemQGUUK8yOi1jhIq-5" target="OOIZemQGUUK8yOi1jhIq-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-5" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="290" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="OOIZemQGUUK8yOi1jhIq-1" source="OOIZemQGUUK8yOi1jhIq-7" target="OOIZemQGUUK8yOi1jhIq-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="OOIZemQGUUK8yOi1jhIq-1" source="OOIZemQGUUK8yOi1jhIq-9" target="OOIZemQGUUK8yOi1jhIq-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="OOIZemQGUUK8yOi1jhIq-1" source="OOIZemQGUUK8yOi1jhIq-11" target="OOIZemQGUUK8yOi1jhIq-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="OOIZemQGUUK8yOi1jhIq-12" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="OOIZemQGUUK8yOi1jhIq-1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="市价开多(成交)" id="51uR79YdODfLBCOlkCrs">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="px77xecM5OwUzepxtMWb-0" />
+        <mxCell id="px77xecM5OwUzepxtMWb-1" parent="px77xecM5OwUzepxtMWb-0" />
+        <mxCell id="px77xecM5OwUzepxtMWb-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="px77xecM5OwUzepxtMWb-1" source="px77xecM5OwUzepxtMWb-3" target="px77xecM5OwUzepxtMWb-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-3" value="市价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="px77xecM5OwUzepxtMWb-1" source="px77xecM5OwUzepxtMWb-5" target="px77xecM5OwUzepxtMWb-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-5" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="290" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="px77xecM5OwUzepxtMWb-1" source="px77xecM5OwUzepxtMWb-7" target="px77xecM5OwUzepxtMWb-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="px77xecM5OwUzepxtMWb-1" source="px77xecM5OwUzepxtMWb-9" target="px77xecM5OwUzepxtMWb-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="px77xecM5OwUzepxtMWb-1" source="px77xecM5OwUzepxtMWb-11" target="px77xecM5OwUzepxtMWb-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="px77xecM5OwUzepxtMWb-12" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="px77xecM5OwUzepxtMWb-1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="4s0YwI_F1REToEyDLn1Q" name="市价开空(未成交)">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Qagbi1XAwrGn2MHAE4GD-2" target="Qagbi1XAwrGn2MHAE4GD-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-2" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Qagbi1XAwrGn2MHAE4GD-4" target="Qagbi1XAwrGn2MHAE4GD-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-4" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Qagbi1XAwrGn2MHAE4GD-6" target="Qagbi1XAwrGn2MHAE4GD-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-6" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Qagbi1XAwrGn2MHAE4GD-8" target="Qagbi1XAwrGn2MHAE4GD-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-8" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Qagbi1XAwrGn2MHAE4GD-10" target="Qagbi1XAwrGn2MHAE4GD-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-10" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Qagbi1XAwrGn2MHAE4GD-11" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="市价开空(部份成交) " id="WnVocVl_dr1kpBG0uesx">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-0" />
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-1" parent="YoaaRP2wqOH0zhxNuvKi-0" />
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YoaaRP2wqOH0zhxNuvKi-1" source="YoaaRP2wqOH0zhxNuvKi-3" target="YoaaRP2wqOH0zhxNuvKi-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-3" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YoaaRP2wqOH0zhxNuvKi-1" source="YoaaRP2wqOH0zhxNuvKi-5" target="YoaaRP2wqOH0zhxNuvKi-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-5" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YoaaRP2wqOH0zhxNuvKi-1" source="YoaaRP2wqOH0zhxNuvKi-7" target="YoaaRP2wqOH0zhxNuvKi-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YoaaRP2wqOH0zhxNuvKi-1" source="YoaaRP2wqOH0zhxNuvKi-9" target="YoaaRP2wqOH0zhxNuvKi-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YoaaRP2wqOH0zhxNuvKi-1" source="YoaaRP2wqOH0zhxNuvKi-11" target="YoaaRP2wqOH0zhxNuvKi-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="YoaaRP2wqOH0zhxNuvKi-12" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="YoaaRP2wqOH0zhxNuvKi-1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="市价开空(成交)" id="rMusjKL9SZQc1gbE5ybj">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-0" />
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-1" parent="lqKTXRWTn3rcy9RcBd8J-0" />
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="lqKTXRWTn3rcy9RcBd8J-1" source="lqKTXRWTn3rcy9RcBd8J-3" target="lqKTXRWTn3rcy9RcBd8J-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-3" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="lqKTXRWTn3rcy9RcBd8J-1" source="lqKTXRWTn3rcy9RcBd8J-5" target="lqKTXRWTn3rcy9RcBd8J-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-5" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="lqKTXRWTn3rcy9RcBd8J-1" source="lqKTXRWTn3rcy9RcBd8J-7" target="lqKTXRWTn3rcy9RcBd8J-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="lqKTXRWTn3rcy9RcBd8J-1" source="lqKTXRWTn3rcy9RcBd8J-9" target="lqKTXRWTn3rcy9RcBd8J-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="lqKTXRWTn3rcy9RcBd8J-1" source="lqKTXRWTn3rcy9RcBd8J-11" target="lqKTXRWTn3rcy9RcBd8J-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lqKTXRWTn3rcy9RcBd8J-12" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="lqKTXRWTn3rcy9RcBd8J-1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开多(未成交) " id="pwvXgC5Jrk8tFOS77f4R">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-0" />
+        <mxCell id="oeiuWWFecrITHGBeJIQx-1" parent="oeiuWWFecrITHGBeJIQx-0" />
+        <mxCell id="oeiuWWFecrITHGBeJIQx-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="oeiuWWFecrITHGBeJIQx-1" source="oeiuWWFecrITHGBeJIQx-3" target="oeiuWWFecrITHGBeJIQx-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-3" value="限价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="oeiuWWFecrITHGBeJIQx-1" source="oeiuWWFecrITHGBeJIQx-5" target="oeiuWWFecrITHGBeJIQx-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-5" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="290" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="oeiuWWFecrITHGBeJIQx-1" source="oeiuWWFecrITHGBeJIQx-7" target="oeiuWWFecrITHGBeJIQx-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="oeiuWWFecrITHGBeJIQx-1" source="oeiuWWFecrITHGBeJIQx-9" target="oeiuWWFecrITHGBeJIQx-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="oeiuWWFecrITHGBeJIQx-1" source="oeiuWWFecrITHGBeJIQx-11" target="oeiuWWFecrITHGBeJIQx-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oeiuWWFecrITHGBeJIQx-12" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="oeiuWWFecrITHGBeJIQx-1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开多(部份成交)" id="EHdjp9BKSQUjRQYy6MuM">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-0" />
+        <mxCell id="VylRmlfY69TFQJQIvvNR-1" parent="VylRmlfY69TFQJQIvvNR-0" />
+        <mxCell id="VylRmlfY69TFQJQIvvNR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="VylRmlfY69TFQJQIvvNR-1" source="VylRmlfY69TFQJQIvvNR-3" target="VylRmlfY69TFQJQIvvNR-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-3" value="市价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="VylRmlfY69TFQJQIvvNR-1" source="VylRmlfY69TFQJQIvvNR-5" target="VylRmlfY69TFQJQIvvNR-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-5" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="290" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="VylRmlfY69TFQJQIvvNR-1" source="VylRmlfY69TFQJQIvvNR-7" target="VylRmlfY69TFQJQIvvNR-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="VylRmlfY69TFQJQIvvNR-1" source="VylRmlfY69TFQJQIvvNR-9" target="VylRmlfY69TFQJQIvvNR-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="VylRmlfY69TFQJQIvvNR-1" source="VylRmlfY69TFQJQIvvNR-11" target="VylRmlfY69TFQJQIvvNR-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VylRmlfY69TFQJQIvvNR-12" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="VylRmlfY69TFQJQIvvNR-1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开多(成交)" id="n1sgh365VDcR4If4_HM1">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-0" />
+        <mxCell id="b5N6Iismcqumn1E-CzI3-1" parent="b5N6Iismcqumn1E-CzI3-0" />
+        <mxCell id="b5N6Iismcqumn1E-CzI3-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="b5N6Iismcqumn1E-CzI3-1" source="b5N6Iismcqumn1E-CzI3-3" target="b5N6Iismcqumn1E-CzI3-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-3" value="市价开多(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="345" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="b5N6Iismcqumn1E-CzI3-1" source="b5N6Iismcqumn1E-CzI3-5" target="b5N6Iismcqumn1E-CzI3-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-5" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;init balance &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;BCH&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="290" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="b5N6Iismcqumn1E-CzI3-1" source="b5N6Iismcqumn1E-CzI3-7" target="b5N6Iismcqumn1E-CzI3-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Alice&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;female&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="10" y="300" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="b5N6Iismcqumn1E-CzI3-1" source="b5N6Iismcqumn1E-CzI3-9" target="b5N6Iismcqumn1E-CzI3-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open &amp;nbsp; &amp;nbsp; &lt;span style=&quot;color: #ce9178;&quot;&gt;1, &quot;BTCBCH&quot;, 2, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="45" y="400" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="b5N6Iismcqumn1E-CzI3-1" source="b5N6Iismcqumn1E-CzI3-11" target="b5N6Iismcqumn1E-CzI3-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="345" y="490" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b5N6Iismcqumn1E-CzI3-12" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;check order &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;1&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;2&lt;/span&gt; &amp;nbsp; &amp;nbsp;&lt;span style=&quot;color: #ce9178;&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="b5N6Iismcqumn1E-CzI3-1">
+          <mxGeometry x="212.5" y="590" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开空(未成交)" id="N-NLfdNjsvsAEsIvLGQ_">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-0" />
+        <mxCell id="S_azEYow3jVFlmGV_bRk-1" parent="S_azEYow3jVFlmGV_bRk-0" />
+        <mxCell id="S_azEYow3jVFlmGV_bRk-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="S_azEYow3jVFlmGV_bRk-1" source="S_azEYow3jVFlmGV_bRk-3" target="S_azEYow3jVFlmGV_bRk-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-3" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="S_azEYow3jVFlmGV_bRk-1" source="S_azEYow3jVFlmGV_bRk-5" target="S_azEYow3jVFlmGV_bRk-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-5" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="S_azEYow3jVFlmGV_bRk-1" source="S_azEYow3jVFlmGV_bRk-7" target="S_azEYow3jVFlmGV_bRk-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="S_azEYow3jVFlmGV_bRk-1" source="S_azEYow3jVFlmGV_bRk-9" target="S_azEYow3jVFlmGV_bRk-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="S_azEYow3jVFlmGV_bRk-1" source="S_azEYow3jVFlmGV_bRk-11" target="S_azEYow3jVFlmGV_bRk-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="S_azEYow3jVFlmGV_bRk-12" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="S_azEYow3jVFlmGV_bRk-1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开空(部份成交)" id="PJkou4ftXiLXwmMBOZU8">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-0" />
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-1" parent="tdiV5kzU0b7fx6gKDCWx-0" />
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="tdiV5kzU0b7fx6gKDCWx-1" source="tdiV5kzU0b7fx6gKDCWx-3" target="tdiV5kzU0b7fx6gKDCWx-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-3" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="tdiV5kzU0b7fx6gKDCWx-1" source="tdiV5kzU0b7fx6gKDCWx-5" target="tdiV5kzU0b7fx6gKDCWx-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-5" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="tdiV5kzU0b7fx6gKDCWx-1" source="tdiV5kzU0b7fx6gKDCWx-7" target="tdiV5kzU0b7fx6gKDCWx-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="tdiV5kzU0b7fx6gKDCWx-1" source="tdiV5kzU0b7fx6gKDCWx-9" target="tdiV5kzU0b7fx6gKDCWx-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="tdiV5kzU0b7fx6gKDCWx-1" source="tdiV5kzU0b7fx6gKDCWx-11" target="tdiV5kzU0b7fx6gKDCWx-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tdiV5kzU0b7fx6gKDCWx-12" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="tdiV5kzU0b7fx6gKDCWx-1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="限价开空(成交)" id="_z9pws6-dGqo2U2ftJsz">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="a2KT7UFPOPEew606cJ97-0" />
+        <mxCell id="a2KT7UFPOPEew606cJ97-1" parent="a2KT7UFPOPEew606cJ97-0" />
+        <mxCell id="a2KT7UFPOPEew606cJ97-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="a2KT7UFPOPEew606cJ97-1" source="a2KT7UFPOPEew606cJ97-3" target="a2KT7UFPOPEew606cJ97-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-3" value="市价开空流程(未成交)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="355" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="a2KT7UFPOPEew606cJ97-1" source="a2KT7UFPOPEew606cJ97-5" target="a2KT7UFPOPEew606cJ97-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-5" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;init balance&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;BCH&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="300" y="140" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="a2KT7UFPOPEew606cJ97-1" source="a2KT7UFPOPEew606cJ97-7" target="a2KT7UFPOPEew606cJ97-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-7" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;balance update&amp;nbsp; &amp;nbsp; 2&lt;span style=&quot;color: #ce9178;&quot;&gt;, &quot;BCH&quot;, &quot;deposit&quot;, 1, &quot;800000&quot;, {&quot;name&quot;: &quot;Bob&quot;, &quot;age&quot;: 25, &quot;gender&quot;: &quot;male&quot;}&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;glass=0;strokeWidth=1;shadow=0;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="20" y="250" width="790" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="a2KT7UFPOPEew606cJ97-1" source="a2KT7UFPOPEew606cJ97-9" target="a2KT7UFPOPEew606cJ97-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-9" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;put open&amp;nbsp; &amp;nbsp; &amp;nbsp;2, &quot;BTCBCH&quot;, 1, 1, 1, &quot;8000&quot;, &quot;8000&quot;, &quot;8000&quot;, &quot;100&quot;, &quot;10000&quot;, &quot;0.002&quot;, &quot;0.001&quot;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="55" y="350" width="720" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="a2KT7UFPOPEew606cJ97-1" source="a2KT7UFPOPEew606cJ97-11" target="a2KT7UFPOPEew606cJ97-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-11" value="&lt;div style=&quot;color: rgb(204, 204, 204); background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;make slice&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="355" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2KT7UFPOPEew606cJ97-12" value="&lt;div style=&quot;background-color: rgb(31, 31, 31); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(204, 204, 204);&quot;&gt;check order&amp;nbsp; &amp;nbsp; &lt;/span&gt;&lt;font color=&quot;#ce9178&quot;&gt;2&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;&quot;BTCBCH&quot;&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;1&lt;/span&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;/font&gt;&lt;font color=&quot;#ce9178&quot;&gt;1&lt;/font&gt;&lt;font color=&quot;#cccccc&quot;&gt;&amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;color: rgb(206, 145, 120);&quot;&gt;10000&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="a2KT7UFPOPEew606cJ97-1">
+          <mxGeometry x="222.5" y="540" width="385" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

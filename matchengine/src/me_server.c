@@ -2039,7 +2039,7 @@ static int on_cmd_market_del_market(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
 static int on_cmd_make_slice(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
-    make_slice(time(NULL), 1);
+    make_slice(time(NULL), 0);
 
     return reply_success(ses, pkg);
 }

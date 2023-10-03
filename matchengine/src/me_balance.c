@@ -290,23 +290,19 @@ mpd_t *balance_sub(uint32_t user_id, uint32_t type, const char *asset, mpd_t *am
     struct asset_type *at = get_asset_type(asset);
     if (at == NULL)
         return NULL;
-
     if (mpd_cmp(amount, mpd_zero, &mpd_ctx) < 0)
         return NULL;
-
     mpd_t *result = balance_get(user_id, type, asset);
     if (result == NULL)
         return NULL;
     if (mpd_cmp(result, amount, &mpd_ctx) < 0)
         return NULL;
-
     mpd_sub(result, result, amount, &mpd_ctx);
     if (mpd_cmp(result, mpd_zero, &mpd_ctx) == 0) {
         balance_del(user_id, type, asset);
         return mpd_zero;
     }
     mpd_rescale(result, result, -at->prec_save, &mpd_ctx);
-
     return result;
 }
 
