@@ -81,6 +81,11 @@ static int reply_error_service_unavailable(nw_ses *ses, rpc_pkg *pkg)
     return reply_error(ses, pkg, 3, "service unavailable");
 }
 
+static int reply_error_other(nw_ses *ses, rpc_pkg *pkg, const char* msg)
+{
+    return reply_error(ses, pkg, 4, msg);
+}
+
 static int reply_result(nw_ses *ses, rpc_pkg *pkg, json_t *result)
 {
     json_t *reply = json_object();
@@ -2052,7 +2057,7 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params){
     int ret = market_put_order_common(args);
 
     if(ret){
-        return reply_error_invalid_argument(ses, pkg);
+        return reply_error_other(ses, pkg, args->msg);
     }else{
         return reply_success(ses, pkg);
     }
@@ -2066,10 +2071,60 @@ static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params){
     int ret = market_put_order_common(args);
 
     if(ret){
-        return reply_error_invalid_argument(ses, pkg);
+        return reply_error_other(ses, pkg, args->msg);
     }else{
         return reply_success(ses, pkg);
     }
+}
+
+static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params){
+    size_t request_size = json_array_size(params);
+    if (request_size != 3)
+        return reply_error_invalid_argument(ses, pkg);
+
+    if (!json_is_integer(json_array_get(params, 0)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t user_id = json_integer_value(json_array_get(params, 0));
+    if (user_id == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    // market
+    if (!json_is_string(json_array_get(params, 1)))
+        return reply_error_invalid_argument(ses, pkg);
+    const char *market_name = json_string_value(json_array_get(params, 1));
+    market_t *market = get_market(market_name);
+    if (market == NULL)
+        return reply_error_other(ses, pkg, "market不存在");
+
+    if (!json_is_integer(json_array_get(params, 2)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t side = json_integer_value(json_array_get(params, 2));
+    if (side == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    json_t *result = json_object();
+
+    position_t* position = get_position(user_id, market_name, side);
+    if (position) {
+        json_t *unit = json_object();
+        json_object_set_new(unit, "user_id", json_integer(position->user_id));
+        json_object_set_new(unit, "market", json_string(position->market));
+        json_object_set_new(unit, "side", json_integer(position->side));
+        json_object_set_new(unit, "pattern", json_integer(position->pattern));
+        json_object_set_new_mpd(unit, "leverage", position->leverage);
+        json_object_set_new_mpd(unit, "position", position->position);
+        json_object_set_new_mpd(unit, "frozen", position->frozen);
+        json_object_set_new_mpd(unit, "price", position->price);
+        json_object_set_new_mpd(unit, "principal", position->principal);
+        json_object_set_new(result, market_name, unit);
+        json_object_set_new(result, "count", json_integer(1));
+    }else{
+        json_object_set_new(result, "count", json_integer(0));
+    }
+
+    int ret = reply_result(ses, pkg, result);
+    json_decref(result);
+    return ret;
 }
 
 static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
@@ -2337,6 +2392,13 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
         ret = on_cmd_order_close(ses, pkg, params);
         if (ret < 0) {
             log_error("on_cmd_order_close %s fail: %d", params_str, ret);
+        }
+        break;
+    case CMD_POSITION_QUERY:
+        log_trace("from: %s cmd matchengine position query, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        ret = on_cmd_position_query(ses, pkg, params);
+        if (ret < 0) {
+            log_error("on_cmd_position_query %s fail: %d", params_str, ret);
         }
         break;
     default:

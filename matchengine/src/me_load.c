@@ -170,11 +170,12 @@ int load_position(MYSQL *conn, const char *table)
 
         MYSQL_RES *result = mysql_store_result(conn);
         size_t num_rows = mysql_num_rows(result);
+        log_trace("%s %d", __FUNCTION__, num_rows);
         for (size_t i = 0; i < num_rows; ++i) {
             MYSQL_ROW row = mysql_fetch_row(result);
             last_id = strtoull(row[0], NULL, 0);
             uint32_t user_id = strtoul(row[1], NULL, 0);
-            market_t *market = get_market(row[6]);
+            market_t *market = get_market(row[2]);
             if (market == NULL)
                 continue;
 
@@ -190,6 +191,7 @@ int load_position(MYSQL *conn, const char *table)
             position->frozen = decimal(row[7], 0);
             position->price = decimal(row[8], 0);
             position->principal = decimal(row[9], 0);
+            log_trace("%s %d %s %d", __FUNCTION__, user_id, position->market, position->side);
             add_position(user_id, position->market, position->side, position);
         }
         mysql_free_result(result);

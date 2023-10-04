@@ -7,6 +7,8 @@ deal_t* initDeal(){
     deal->price = mpd_new(&mpd_ctx);
     deal->taker_fee = mpd_new(&mpd_ctx);
     deal->maker_fee = mpd_new(&mpd_ctx);
+    deal->taker_priAmount = mpd_new(&mpd_ctx);
+    deal->maker_priAmount = mpd_new(&mpd_ctx);
     deal->deal = mpd_new(&mpd_ctx);
     return deal;
 }

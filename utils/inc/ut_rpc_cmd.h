@@ -39,7 +39,8 @@
 // 合约
 # define CMD_ORDER_OPEN             250
 # define CMD_ORDER_CLOSE            251
-# define CMD_MAKE_SLICE             252
+
+# define CMD_POSITION_QUERY         260
 
 // market
 # define CMD_MARKET_STATUS          301

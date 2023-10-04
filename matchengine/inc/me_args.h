@@ -23,6 +23,7 @@ typedef struct args_t{
     mpd_t *priAndFee;
     order_t *taker;
     order_t *maker;
+    char *msg;
 }args_t;
 
 args_t* initOpenArgs(json_t *params);

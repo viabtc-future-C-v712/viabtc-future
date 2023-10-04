@@ -10,6 +10,8 @@ typedef struct deal_t{
     mpd_t *price;
     mpd_t *taker_fee;
     mpd_t *maker_fee;
+    mpd_t *taker_priAmount;
+    mpd_t *maker_priAmount;
     mpd_t *deal; // 成交额
 }deal_t;
 

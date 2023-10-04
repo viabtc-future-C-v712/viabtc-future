@@ -433,7 +433,7 @@ int make_slice(time_t timestamp, int inter)
         log_fatal("clear_slice fail: %d", ret);
     }
 
-    // exit(0);
+    exit(0);
     return 0;
 }
 
