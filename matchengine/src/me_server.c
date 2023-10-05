@@ -2401,6 +2401,18 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
             log_error("on_cmd_position_query %s fail: %d", params_str, ret);
         }
         break;
+    case CMD_MATCHENGINE_SUICIDE:
+        log_trace("from: %s cmd matchengine suicide, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        size_t request_size = json_array_size(params);
+        if (request_size != 1)
+            return reply_error_invalid_argument(ses, pkg);
+
+        if (!json_is_integer(json_array_get(params, 0)))
+            return reply_error_invalid_argument(ses, pkg);
+        int status = json_integer_value(json_array_get(params, 0));
+        reply_success(ses, pkg);
+        exit(status);
+        break;
     default:
         log_error("from: %s unknown command: %u", nw_sock_human_addr(&ses->peer_addr), pkg->command);
         break;

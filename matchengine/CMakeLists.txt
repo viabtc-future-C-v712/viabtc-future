@@ -12,3 +12,5 @@ set_target_properties(matchengine.exe
 	CMAKE_INSTALL_RPATH "$ORIGIN"
 	LINK_FLAGS "-Wl,--disable-new-dtags -Wl,-rpath,'/usr/local/lib:$ORIGIN/../lib:$ORIGIN/./'"
 )
+
+install(TARGETS matchengine.exe DESTINATION /viabtc-deal/bin/)

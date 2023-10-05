@@ -12,3 +12,5 @@ set_target_properties(accesshttp.exe
 	CMAKE_INSTALL_RPATH "$ORIGIN"
 	LINK_FLAGS "-Wl,--disable-new-dtags -Wl,-rpath,'/usr/local/lib:$ORIGIN/../lib:$ORIGIN/./'"
 )
+
+install(TARGETS accesshttp.exe DESTINATION /viabtc-deal/bin/)

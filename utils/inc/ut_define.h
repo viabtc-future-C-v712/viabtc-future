@@ -8,7 +8,7 @@
 # define _UT_DEFINE_H_
 
 # define MARKET_ORDER_TYPE_LIMIT    1
-# define MARKET_ORDER_TYPE_MARKET   2
+# define MARKET_ORDER_TYPE_MARKET   0
 
 # define MARKET_ORDER_SIDE_ASK      1
 # define MARKET_ORDER_SIDE_BID      2

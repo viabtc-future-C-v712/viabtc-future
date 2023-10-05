@@ -42,6 +42,8 @@
 
 # define CMD_POSITION_QUERY         260
 
+# define CMD_MATCHENGINE_SUICIDE    270
+
 // market
 # define CMD_MARKET_STATUS          301
 # define CMD_MARKET_KLINE           302

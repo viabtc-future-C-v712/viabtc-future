@@ -282,8 +282,6 @@ static int order_put(market_t *m, order_t *order)
 static int order_put_future(market_t *m, order_t *order)
 {
     log_trace("%s %d", __FUNCTION__, order->type);
-    if (order->type != MARKET_ORDER_TYPE_LIMIT)
-        return -__LINE__;
 
     struct dict_order_key order_key = { .order_id = order->id };
     if (dict_add(m->orders, &order_key, order) == NULL)
@@ -341,9 +339,11 @@ static int order_put_future(market_t *m, order_t *order)
     // mpd_mul(fee, order->left, order->maker_fee, &mpd_ctx);
     mpd_div(priAmount, order->left, order->leverage, &mpd_ctx);
     // mpd_add(priAmount, priAmount, fee, &mpd_ctx);
-    if (balance_freeze(order->user_id, m->money, priAmount) == NULL){
-        mpd_del(priAmount);
-        return -__LINE__;
+    if(order->oper_type == 1){
+        if (balance_freeze(order->user_id, m->money, priAmount) == NULL){
+            mpd_del(priAmount);
+            return -__LINE__;
+        }
     }
     mpd_del(priAmount);
     log_trace("%s %d", __FUNCTION__, order->type);
@@ -1396,11 +1396,34 @@ static int execute_order(args_t* args){
         order_t *maker = node->value;
         deal_t *deal = initDeal();
         deal->args = args;
-        // 先出价优先
-        mpd_copy(deal->price, maker->price, &mpd_ctx);
 
-        // 判断价格 (买入市价 或 买入不低于卖出就成交)
-        if(args->taker->type == 1 && mpd_cmp(args->taker->price, maker->price, &mpd_ctx) > 0) break;
+        // 判断价格
+        if(args->taker->type == 0){//taker 市价
+            if(maker->type == 0){//maker 市价
+                continue;
+            }else if(maker->type == 1){//maker 限价
+                mpd_copy(deal->price, maker->price, &mpd_ctx);
+            }
+        }
+        else if(args->taker->type == 1){//taker 限价
+            if(maker->type == 0){//maker 市价
+                mpd_copy(deal->price, args->taker->price, &mpd_ctx);
+            }else if(maker->type == 1){//maker 限价
+                if(args->direction == 1){//taker 卖出
+                    if(mpd_cmp(args->taker->price, maker->price, &mpd_ctx) <= 0){//卖出价要不大于买入价
+                        mpd_copy(deal->price, maker->price, &mpd_ctx);// 先出价优先
+                    }else{
+                        break;
+                    }
+                }else {//taker 买入
+                    if(mpd_cmp(args->taker->price, maker->price, &mpd_ctx) >= 0){//卖出价要不大于买入价
+                        mpd_copy(deal->price, maker->price, &mpd_ctx);// 先出价优先
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
         log_trace("%s %d", __FUNCTION__, args->direction);
         // 判断数量 (买入和卖出中的小者)
         if (mpd_cmp(args->taker->left, maker->left, &mpd_ctx) < 0) {
@@ -1434,7 +1457,7 @@ static int execute_order(args_t* args){
     skiplist_release_iterator(iter);
     // 处理未完成的order
     if (args->taker != 0) {
-        if (args->taker->type == MARKET_ORDER_TYPE_LIMIT){
+        if (args->taker->type == MARKET_ORDER_TYPE_LIMIT || args->taker->type == MARKET_ORDER_TYPE_MARKET){
             int ret = order_put_future(args->market, args->taker);
             if (ret < 0) {
                 log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
@@ -1452,7 +1475,7 @@ order_t* initOrder(args_t* args){
     order->id           = ++order_id_start;
     order->type         = args->Type;
     order->side         = args->direction;
-    order->oper_type    = 1;
+    order->oper_type    = 0;
     order->create_time  = current_timestamp();
     order->update_time  = order->create_time;
     order->user_id      = args->user_id;
@@ -1533,6 +1556,7 @@ int market_put_order_open(void* args_){
         }
     }
     args->taker = initOrder(args);
+    args->taker->oper_type = 1;
     if (args->taker == NULL) return -__LINE__;
 
     // // 冻结
@@ -1580,6 +1604,7 @@ int market_put_order_close(void* args_){
     }
     mpd_copy(args->leverage, position->leverage, &mpd_ctx);
     args->taker = initOrder(args);
+    args->taker->oper_type = 2;
     if (args->taker == NULL) return -__LINE__;
 
     execute_order(args);

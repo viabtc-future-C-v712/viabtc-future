@@ -140,10 +140,10 @@ services:
       - zookeeper
     healthcheck:
       test: ["CMD-SHELL", "(echo 'hello' | kafka-console-producer --bootstrap-server localhost:9092 --topic test) && (timeout 5 kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning | grep -q 'hello')"]
-      interval: 5s
-      timeout: 5s
+      interval: 1s
+      timeout: 10s
       retries: 30
-      start_period: 10s
+      start_period: 5s
     ports:
       - "9092:9092"
     environment:

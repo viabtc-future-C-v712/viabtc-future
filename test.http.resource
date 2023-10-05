@@ -32,6 +32,11 @@ put close
 make slice
     call    'matchengine.makeslice'    ""
     sleep    1
+init balance all
+    init balance    ${Alice}    BCH
+    balance update    ${Alice}    BCH    800000
+    init balance    ${Alice}    BCH
+    balance update    ${Alice}    BCH    800000
 init balance
     [Arguments]  ${id}    ${asset}
     ${ret} =  call    'balance.query'    ${id}, "${asset}"
@@ -55,9 +60,11 @@ check balance
     END
 check order
     [Arguments]  ${id}    ${oper_type}    ${side}    ${amount}
-    ${ret} =  call    'order.pending'    ${id}, "BTCBCH", 0, 2
-    IF    '${amount}' == '0'
-        Should Be Equal As Numbers    ${ret.json()["result"]["total"]}    0
+    ${ret} =  call    'order.pending'    ${id}, "BTCBCH", 0, ${side}
+    IF    '${ret.json()["result"]["total"]}' == '0'
+        Should Be Equal As Numbers    0    ${amount}
+    ELSE
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
     END
 balance update
     [Arguments]  ${user}    ${asset}    ${amount}
@@ -69,17 +76,21 @@ balance unfreeze
     [Arguments]  ${user}    ${asset}    ${amount}
     call    'balance.unfreeze'    ${user}, "${asset}", "${amount}"
 check position
-    [Arguments]  ${id}    ${side}    ${amount}
+    [Arguments]  ${id}    ${side}    ${type}    ${amount}
     ${ret} =  call    'position.query'    ${id}, "BTCBCH", ${side}, 
     IF    '${ret.json()["result"]["count"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE
         IF    '${amount}' == '0'
-            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["position"]}    0
+            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["${type}"]}    0
         ELSE
-            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["position"]}    ${amount}
+            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["${type}"]}    ${amount}
         END
     END
+重启
+    call    'matchengine.suicide'    -1
+退出
+    call    'matchengine.suicide'    0
 call
     [Arguments]  ${method}    ${data}
     Create Session    user    ${BASE_URL}

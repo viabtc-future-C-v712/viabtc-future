@@ -77,7 +77,8 @@ int process_keepalive(void)
                 }
             }
             if (WIFEXITED(status)) {
-                exit(EXIT_SUCCESS);
+                if(WEXITSTATUS(status)==0)
+                    exit(EXIT_SUCCESS);
             } else if (WIFSIGNALED(status)) {
                 log_fatal("process: %d, name: %s terminated by signal: '%s'", \
                         pid, program_invocation_short_name, strsignal(WTERMSIG(status)));
