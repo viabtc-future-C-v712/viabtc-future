@@ -1514,7 +1514,10 @@ int market_put_order_open(void* args_){
     args_t* args = (args_t*)args_;
     // 检查钱包
     mpd_t *balance = balance_get(args->user_id, BALANCE_TYPE_AVAILABLE, args->market->money);
-    if (!balance || mpd_cmp(balance, mpd_zero, &mpd_ctx) < 0) return -1;
+    if (!balance || mpd_cmp(balance, mpd_zero, &mpd_ctx) < 0){
+        args->msg = "balance not enough";
+        return -1;
+    }
     log_trace("%s", __FUNCTION__);
     // 检查买入数量
     if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume) ) return -1;

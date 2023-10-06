@@ -8,7 +8,7 @@ Resource   test.http.resource
 Test Setup   init balance all
 Test Teardown   重启
 *** Variables ***
-${BOOTSTRAP_SERVERS}    192.168.1.3:9092
+${BOOTSTRAP_SERVERS}    127.0.0.1:9092
 ${GROUP_ID}             test-group
 ${Alice}                1
 ${Bob}                  2

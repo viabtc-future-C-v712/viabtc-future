@@ -4,7 +4,7 @@ Library    RequestsLibrary
 Library    test
 
 *** Variables ***
-${BASE_URL}             http://192.168.1.3:8080/
+${BASE_URL}             http://127.0.0.1:8080/
 ${file_path}            file.txt
 ${Alice}                1
 ${Bob}                  2
