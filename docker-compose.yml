@@ -38,10 +38,14 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - viabtcdealbase
-      - sentinel
-      - viabtcdb
-      - kafka
+      viabtcdealbase:
+        condition: service_started
+      sentinel: 
+        condition: service_healthy
+      viabtcdb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
   viabtcdb:
     image: viabtcdb
     networks:

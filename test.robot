@@ -27,51 +27,38 @@ ${冻结仓位}              frozen
 *** Test Cases ***
 市价开多(未成交)
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
-
-    check order    ${Alice}    ${open}    ${多}    10000
+    check order    ${Alice}    ${open}    ${多}    0
 市价开空(未成交)
     put open     ${Alice}    ${空}    ${市价}    ${逐仓}    10000
-
-    check order    ${Alice}    ${open}    ${空}    10000
+    check order    ${Alice}    ${open}    ${空}    0
 限价开空(未成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    10000
-
     check order    ${Bob}    ${open}    ${空}    10000
     check balance    ${Bob}    BCH    ${可用余额}    799900
     check position    ${Bob}    ${空}    ${可用仓位}    0
 市价开多(部份成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
-
-    check order    ${Alice}    ${open}    ${多}    5000
-    check balance    ${Alice}    BCH    ${可用余额}    799900
+    check order    ${Alice}    ${open}    ${多}    0
+    check balance    ${Alice}    BCH    ${可用余额}    799950
     check position    ${Alice}    ${多}    ${可用仓位}    5000
 市价平多(未成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
-    # 成交了5000 所以还剩下 10000 - 5000
-    check order    ${Alice}    ${open}    ${空}    5000
-    # 开多5000,成交5000 (-50), 平多5000未成交(0) 余额 是800000 - 50
-    check balance    ${Alice}    BCH    ${可用余额}    799950
-    # 开多成交了5000 (+5000), 平多未成交冻结了(-5000) 结果是 0
-    check position    ${Alice}    ${多}    ${可用仓位}    0
+    check order    ${Alice}    ${open}    ${空}    0  # 市价不挂单
+    check balance    ${Alice}    BCH    ${可用余额}    799950  # 开多5000,成交5000 (-50), 平多5000未成交(0) 余额 是800000 - 50
+    check position    ${Alice}    ${多}    ${可用仓位}    0  # 开多成交了5000 (+5000), 平多未成交冻结了(-5000) 结果是 0
     check position    ${Alice}    ${多}    ${冻结仓位}    5000
 市价平多(部份成交)
-    init balance    ${Bob}    BCH
-    balance update    ${Bob}    BCH    800000
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
-
-    init balance    ${Alice}    BCH
-    balance update    ${Alice}    BCH    800000
-    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
-
-    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500
-    put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
-
-    check order    ${Alice}    ${open}    ${空}    0
-    check balance    ${Alice}    BCH    ${可用余额}    799950
-    check position    ${Alice}    ${多}    ${可用仓位}    200
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
+    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500  #新挂买单
+    put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
+    check order    ${Alice}    ${open}    ${空}    0  # 市价不挂单
+    # -50， +25 -7.5 (-32.5)
+    check balance    ${Alice}    BCH    ${可用余额}    799967.5
+    check position    ${Alice}    ${多}    ${冻结仓位}    200
 保存数据库
     make slice
 重启1

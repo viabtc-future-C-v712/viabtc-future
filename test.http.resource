@@ -35,8 +35,8 @@ make slice
 init balance all
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
-    init balance    ${Alice}    BCH
-    balance update    ${Alice}    BCH    800000
+    init balance    ${Bob}    BCH
+    balance update    ${Bob}    BCH    800000
 init balance
     [Arguments]  ${id}    ${asset}
     ${ret} =  call    'balance.query'    ${id}, "${asset}"

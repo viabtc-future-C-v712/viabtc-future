@@ -104,7 +104,7 @@ position_t* initPosition(uint32_t user_id, const char* market, uint32_t pattern)
     memset(position, 0, sizeof(position_t));
     position->id = 0;
     position->user_id = user_id;
-    position->market = market;
+    position->market = strdup(market);
     position->side = 0;
     position->pattern = pattern;
     position->leverage = mpd_new(&mpd_ctx);;
