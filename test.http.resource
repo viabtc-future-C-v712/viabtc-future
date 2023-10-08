@@ -2,41 +2,34 @@
 Documentation     An example resource file
 Library    RequestsLibrary
 Library    test
+Resource   test.kafka.resource
+Variables  test_variable.py
 
 *** Variables ***
-${BASE_URL}             http://127.0.0.1:8080/
-${file_path}            file.txt
-${Alice}                1
-${Bob}                  2
-${可用余额}              1
-${冻结余额}              2
-${卖}                   1
-${买}                   2
-${市价}                 0
-${限价}                 1
-${逐仓}                 1
-${全仓}                 2
-${close}                2
-${open}                 1
+
 
 *** Keywords ***
 put limit
     [Arguments]  ${data}
     call    'order.put_limit'    ${data}
 put open
-    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}
-    call    'order.open'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "8000", "100", "${张}", "0.002", "0.001"
+    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000
+    call    'order.open'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "100", "${张}", "0.002", "0.001"
 put close
-    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}
-    call    'order.close'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "8000", "${张}", "0.002", "0.001"
+    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000
+    call    'order.close'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "${张}", "0.002", "0.001"
 make slice
     call    'matchengine.makeslice'    ""
     sleep    1
 init balance all
+    ${max_offset}=    Evaluate    test.get_max_offset('balances')
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
+    kafka balances    ${Alice}    800000    ${max_offset + 2}
     init balance    ${Bob}    BCH
     balance update    ${Bob}    BCH    800000
+    sleep    50us
+    kafka balances    ${Bob}    800000    ${max_offset + 4}
 init balance
     [Arguments]  ${id}    ${asset}
     ${ret} =  call    'balance.query'    ${id}, "${asset}"
