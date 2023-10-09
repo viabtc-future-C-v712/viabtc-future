@@ -31,6 +31,7 @@ target_link_libraries(utils network)
 
 add_subdirectory(accesshttp)
 add_subdirectory(matchengine)
+add_subdirectory(marketprice)
 
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${GIT_TAG_VERSION}-${BUILD_LOG_VERSION}")

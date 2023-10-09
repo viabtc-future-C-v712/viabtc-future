@@ -1251,6 +1251,63 @@ static int on_cmd_order_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     return ret;
 }
 
+static int on_cmd_order_query_alluser(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    if (json_array_size(params) != 2)
+        return reply_error_invalid_argument(ses, pkg);
+    // offset
+    if (!json_is_integer(json_array_get(params, 0)))
+        return reply_error_invalid_argument(ses, pkg);
+    size_t offset = json_integer_value(json_array_get(params, 0));
+
+    // limit
+    if (!json_is_integer(json_array_get(params, 1)))
+        return reply_error_invalid_argument(ses, pkg);
+    size_t limit = json_integer_value(json_array_get(params, 1));
+    if (limit > ORDER_LIST_MAX_LEN)
+        return reply_error_invalid_argument(ses, pkg);
+
+    json_t *result = json_object();
+    json_object_set_new(result, "limit", json_integer(limit));
+    json_object_set_new(result, "offset", json_integer(offset));
+
+    json_t *orders = json_array();
+
+    dict_iterator *user_orders_iter = dict_get_iterator(user_orders);
+    dict_entry *user_orders_entry;
+    size_t index = 0;
+    size_t total = 0;
+    while((user_orders_entry = dict_next(user_orders_iter)) != NULL){
+        skiplist_t *order_list = user_orders_entry->val;
+        if (order_list) {total += order_list->len;}
+    }
+    dict_release_iterator(user_orders_iter);
+    json_object_set_new(result, "total", json_integer(total));
+
+    user_orders_iter = dict_get_iterator(user_orders);
+    while((user_orders_entry = dict_next(user_orders_iter)) != NULL){
+        skiplist_t *order_list = user_orders_entry->val;
+        if (order_list) {
+            skiplist_iter *iter = skiplist_get_iterator(order_list);
+            skiplist_node *node;
+            for (; index < offset; index++) {
+                if (skiplist_next(iter) == NULL) break;
+            }
+            while ((node = skiplist_next(iter)) != NULL && index < offset + limit) {
+                index++;
+                order_t *order = node->value;
+                json_array_append_new(orders, get_order_info(order));
+            }
+            skiplist_release_iterator(iter);
+        }
+    }
+    dict_release_iterator(user_orders_iter);
+    json_object_set_new(result, "records", orders);
+    int ret = reply_result(ses, pkg, result);
+    json_decref(result);
+    return ret;
+}
+
 static int on_cmd_order_cancel(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     if (json_array_size(params) != 3)
@@ -2392,6 +2449,13 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
         ret = on_cmd_order_close(ses, pkg, params);
         if (ret < 0) {
             log_error("on_cmd_order_close %s fail: %d", params_str, ret);
+        }
+        break;
+    case CMD_ORDER_QUERY_ALLUSER:
+        log_trace("from: %s cmd order query alluser, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        ret = on_cmd_order_query_alluser(ses, pkg, params);
+        if (ret < 0) {
+            log_error("on_cmd_order_query_alluser %s fail: %d", params_str, ret);
         }
         break;
     case CMD_POSITION_QUERY:

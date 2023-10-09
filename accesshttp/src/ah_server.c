@@ -304,6 +304,7 @@ static int init_methods_handler(void)
 
     ERR_RET_LN(add_handler("order.open", matchengine, CMD_ORDER_OPEN));
     ERR_RET_LN(add_handler("order.close", matchengine, CMD_ORDER_CLOSE));
+    ERR_RET_LN(add_handler("order.pending_alluser", matchengine, CMD_ORDER_QUERY_ALLUSER));
     ERR_RET_LN(add_handler("position.query", matchengine, CMD_POSITION_QUERY));
     ERR_RET_LN(add_handler("matchengine.suicide", matchengine, CMD_MATCHENGINE_SUICIDE));
     return 0;

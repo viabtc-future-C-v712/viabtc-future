@@ -11,7 +11,7 @@
 
 extern uint64_t order_id_start;
 extern uint64_t deals_id_start;
-
+extern dict_t *user_orders;
 #define MM_SOURCE_STR "mm" // mm order, do not save db
 #define MM_SOURCE_STR_LEN 2
 #define MM_SOURCE_STR_CANCEL "mmc" // mm order cancel auto, do not save db

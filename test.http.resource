@@ -25,10 +25,11 @@ init balance all
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
+    sleep    50ms
     kafka balances    ${Alice}    800000    ${max_offset + 2}
     init balance    ${Bob}    BCH
     balance update    ${Bob}    BCH    800000
-    sleep    50us
+    sleep    50ms
     kafka balances    ${Bob}    800000    ${max_offset + 4}
 init balance
     [Arguments]  ${id}    ${asset}
@@ -52,8 +53,36 @@ check balance
         Should Be Equal As Numbers    ${ret.json()["result"]["${asset}"]["freeze"]}    ${amount}
     END
 check order
-    [Arguments]  ${id}    ${oper_type}    ${side}    ${amount}
-    ${ret} =  call    'order.pending'    ${id}, "BTCBCH", 0, ${side}
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${offset}=0    ${limit}=1
+    ${ret} =  call    'order.pending'    ${id}, "${market}", ${offset}, ${limit}
+    IF    '${ret.json()["result"]["total"]}' == '0'
+        Should Be Equal As Numbers    0    ${amount}
+    ELSE
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
+    END
+check order brief
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${offset}=0    ${limit}=1
+    ${ret} =  call    'order.pending_brief'    ${id}, "${market}", ${offset}, ${limit}
+    IF    '${ret.json()["result"]["total"]}' == '0'
+        Should Be Equal As Numbers    0    ${amount}
+    ELSE
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["amount"]}    ${amount}
+    END
+check order detail
+    [Arguments]  ${market}=BTCBCH    ${amount}=0    ${orderid}=1
+    ${ret} =  call    'order.pending_detail'    "${market}", ${orderid}
+    Should Be Equal As Numbers    ${ret.json()["result"]["left"]}    ${amount}
+check order all
+    [Arguments]  ${id}    ${amount}=0    ${offset}=0    ${limit}=1
+    ${ret} =  call    'order.pending_all'    ${id}, ${offset}, ${limit}
+    IF    '${ret.json()["result"]["total"]}' == '0'
+        Should Be Equal As Numbers    0    ${amount}
+    ELSE
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
+    END
+check order alluser
+    [Arguments]  ${amount}=0    ${offset}=0    ${limit}=1
+    ${ret} =  call    'order.pending_alluser'    ${offset}, ${limit}
     IF    '${ret.json()["result"]["total"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE

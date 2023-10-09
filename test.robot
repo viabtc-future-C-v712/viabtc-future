@@ -18,17 +18,19 @@ Test Teardown   重启
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
     ${max_offset2}=    Evaluate    test.get_max_offset('orders')
     Should Be Equal As Numbers    ${max_offset1}    ${max_offset2}    # 相等说明没有发Order信息
-    check order    ${Alice}    ${开仓}    ${多}    0
+    check order    ${Alice}
 市价开空(未成交)
     put open     ${Alice}    ${空}    ${市价}    ${逐仓}    10000
-    check order    ${Alice}    ${开仓}    ${空}    0
+    check order    ${Alice}
 限价开空(未成交)
     ${orders_offset1}=    Evaluate    test.get_max_offset('orders')
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    10000
     ${orders_offset2}=    Evaluate    test.get_max_offset('orders')
     Should Be Equal As Numbers    ${orders_offset1 + 1}    ${orders_offset2}   #说明这里发了一条order信息
     kafka orders    ${Bob}    10000    ${orders_offset1 + 1}
-    check order    ${Bob}    ${开仓}    ${空}    10000
+    check order brief    ${Bob}    10000
+    check order detail    amount=10000    
+    check order alluser    amount=10000
     check balance    ${Bob}    BCH    ${可用余额}    799900
     check position    ${Bob}    ${空}    ${可用仓位}    0
 市价开多(部份成交)
@@ -39,14 +41,17 @@ Test Teardown   重启
     kafka orders    ${Bob}    5000    ${orders_offset1 + 1}
     kafka orders    ${Alice}    10000    ${orders_offset1 + 2}
     kafka deals    ${Bob}    ${Alice}    5000    ${deals_offset1 + 1}  #发了一条deal信息
-    check order    ${Alice}    ${开仓}    ${多}    0
+    check order    ${Alice}
+    check order brief    ${Alice}
+    check order detail    amount=10000
+    check order alluser    amount=10000
     check balance    ${Alice}    BCH    ${可用余额}    799950
     check position    ${Alice}    ${多}    ${可用仓位}    5000
 市价平多(未成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
-    check order    ${Alice}    ${开仓}    ${空}    0  # 市价不挂单
+    check order    ${Alice}  # 市价不挂单
     check balance    ${Alice}    BCH    ${可用余额}    799950  # 开多5000,成交5000 (-50), 平多5000未成交(0) 余额 是800000 - 50
     check position    ${Alice}    ${多}    ${可用仓位}    5000  # 开多成交了5000 (+5000), 平多未成交不会冻结了 结果是 5000
     check position    ${Alice}    ${多}    ${冻结仓位}    0
@@ -55,7 +60,7 @@ Test Teardown   重启
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
     put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500  #新挂买单
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
-    check order    ${Alice}    ${开仓}    ${空}    0  # 市价不挂单
+    check order    ${Alice}  # 市价不挂单
     # -50， +20 -5 (800000 -35)
     check balance    ${Alice}    BCH    ${可用余额}    799965
     check position    ${Alice}    ${多}    ${可用仓位}    2500
@@ -65,7 +70,7 @@ Test Teardown   重启
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
     put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    7999  #新挂买单
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
-    check order    ${Alice}    ${开仓}    ${空}    0  # 市价不挂单
+    check order    ${Alice}  # 市价不挂单
     # -50， +20 -5 (800000 -35)
     check balance    ${Alice}    BCH    ${可用余额}    799964.6875
     check position    ${Alice}    ${多}    ${可用仓位}    2500
@@ -75,7 +80,7 @@ Test Teardown   重启
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
     put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    8001  #新挂买单
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
-    check order    ${Alice}    ${开仓}    ${空}    0  # 市价不挂单
+    check order    ${Alice}  # 市价不挂单
     # -50， +20 -5 (800000 -35)
     check balance    ${Alice}    BCH    ${可用余额}    799965.3125
     check position    ${Alice}    ${多}    ${可用仓位}    2500
