@@ -5,6 +5,7 @@ Library    OperatingSystem
 Library    test
 Resource   test.db.resource
 Resource   test.http.resource
+Resource   test.ws.resource
 Resource   test.kafka.resource
 Variables  test_variable.py
 
@@ -13,6 +14,8 @@ Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
+echo1 
+    kline.query
 市价开多(未成交)
     ${max_offset1}=    Evaluate    test.get_max_offset('orders')
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
@@ -29,8 +32,11 @@ Test Teardown   重启
     Should Be Equal As Numbers    ${orders_offset1 + 1}    ${orders_offset2}   #说明这里发了一条order信息
     kafka orders    ${Bob}    10000    ${orders_offset1 + 1}
     check order brief    ${Bob}    10000
-    check order detail    amount=10000    
+    check order detail    amount=10000
+    order cancel    ${Bob}
+    check order detail    amount=10000
     check order alluser    amount=10000
+    check order book    side=${空}
     check balance    ${Bob}    BCH    ${可用余额}    799900
     check position    ${Bob}    ${空}    ${可用仓位}    0
 市价开多(部份成交)
@@ -51,6 +57,7 @@ Test Teardown   重启
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000
     check order    ${Alice}  # 市价不挂单
+    check order book
     check balance    ${Alice}    BCH    ${可用余额}    799950  # 开多5000,成交5000 (-50), 平多5000未成交(0) 余额 是800000 - 50
     check position    ${Alice}    ${多}    ${可用仓位}    5000  # 开多成交了5000 (+5000), 平多未成交不会冻结了 结果是 5000
     check position    ${Alice}    ${多}    ${冻结仓位}    0

@@ -30,6 +30,7 @@ add_library(utils STATIC ${sources} network)
 target_link_libraries(utils network)
 
 add_subdirectory(accesshttp)
+add_subdirectory(accessws)
 add_subdirectory(matchengine)
 add_subdirectory(marketprice)
 

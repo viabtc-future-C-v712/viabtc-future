@@ -25,11 +25,11 @@ init balance all
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
-    sleep    50ms
+    sleep    100ms
     kafka balances    ${Alice}    800000    ${max_offset + 2}
     init balance    ${Bob}    BCH
     balance update    ${Bob}    BCH    800000
-    sleep    50ms
+    sleep    100ms
     kafka balances    ${Bob}    800000    ${max_offset + 4}
 init balance
     [Arguments]  ${id}    ${asset}
@@ -88,6 +88,12 @@ check order alluser
     ELSE
         Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
     END
+check order book
+    [Arguments]  ${market}=BTCBCH    ${side}=2    ${offset}=0    ${limit}=1
+    ${ret} =  call    'order.book'    "${market}", ${side}, ${offset}, ${limit}
+order cancel
+    [Arguments]  ${id}    ${market}=BTCBCH    ${orderid}=1
+    ${ret} =  call    'order.cancel'    ${id}, "${market}", ${orderid}
 balance update
     [Arguments]  ${user}    ${asset}    ${amount}
     ${BUSSESSID}  Read Increment Variable    ${file_path}
