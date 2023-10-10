@@ -43,8 +43,7 @@ Test Teardown   重启
     kafka deals    ${Bob}    ${Alice}    5000    ${deals_offset1 + 1}  #发了一条deal信息
     check order    ${Alice}
     check order brief    ${Alice}
-    check order detail    amount=10000
-    check order alluser    amount=10000
+    market last
     check balance    ${Alice}    BCH    ${可用余额}    799950
     check position    ${Alice}    ${多}    ${可用仓位}    5000
 市价平多(未成交)

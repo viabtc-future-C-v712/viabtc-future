@@ -1485,8 +1485,10 @@ static int execute_order(args_t* args){
         }else{
             if (args->real) push_order_message(ORDER_EVENT_UPDATE, args->taker, args->market);
         }
-        if (mpd_cmp(maker->left, mpd_zero, &mpd_ctx) == 0) {
-            push_order_message(ORDER_EVENT_FINISH, maker, args->market);
+        if (mpd_cmp(args->maker->left, mpd_zero, &mpd_ctx) == 0) {
+            if (args->real) push_order_message(ORDER_EVENT_FINISH, args->maker, args->market);
+        }else{
+            if (args->real) push_order_message(ORDER_EVENT_UPDATE, args->maker, args->market);
         }
         log_trace("%s %d", __FUNCTION__, args->direction);
         // 清理处理完毕的order
@@ -1504,10 +1506,12 @@ static int execute_order(args_t* args){
     // 处理未完成的order
     if (args->taker != 0) {
         if (args->taker->type == MARKET_ORDER_TYPE_LIMIT){// || args->taker->type == MARKET_ORDER_TYPE_MARKET
-            push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
-            int ret = order_put_future(args->market, args->taker);
-            if (ret < 0) {
-                log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
+            if (args->real){
+                push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
+                int ret = order_put_future(args->market, args->taker);
+                if (ret < 0) {
+                    log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
+                }
             }
         }else{
             order_free(args->taker);

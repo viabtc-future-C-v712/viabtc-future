@@ -109,6 +109,8 @@ check position
             Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["${type}"]}    ${amount}
         END
     END
+market last
+    call    'market.last'    "BTCBCH"
 重启
     call    'matchengine.suicide'    -1
 退出
