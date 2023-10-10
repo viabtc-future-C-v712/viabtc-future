@@ -1,37 +1,41 @@
 /*
- * Description: 
+ * Description:
  *     History: yang@haipo.me, 2017/03/16, create
  */
 
-# include "me_config.h"
-# include "me_server.h"
-# include "me_balance.h"
-# include "me_position.h"
-# include "me_deal.h"
-# include "me_update.h"
-# include "me_market.h"
-# include "me_trade.h"
-# include "me_operlog.h"
-# include "me_history.h"
-# include "me_message.h"
-# include "me_persist.h"
-# include "me_cli.h"
+#include "me_config.h"
+#include "me_server.h"
+#include "me_balance.h"
+#include "me_position.h"
+#include "me_deal.h"
+#include "me_update.h"
+#include "me_market.h"
+#include "me_trade.h"
+#include "me_operlog.h"
+#include "me_history.h"
+#include "me_message.h"
+#include "me_persist.h"
+#include "me_cli.h"
 
 static rpc_svr *svr;
 static dict_t *dict_cache;
 static nw_timer cache_timer;
 
-struct cache_val {
-    double      time;
-    json_t      *result;
+struct cache_val
+{
+    double time;
+    json_t *result;
 };
 
 static int reply_json(nw_ses *ses, rpc_pkg *pkg, const json_t *json)
 {
     char *message_data;
-    if (settings.debug) {
+    if (settings.debug)
+    {
         message_data = json_dumps(json, JSON_INDENT(4));
-    } else {
+    }
+    else
+    {
         message_data = json_dumps(json, 0);
     }
     if (message_data == NULL)
@@ -81,7 +85,7 @@ static int reply_error_service_unavailable(nw_ses *ses, rpc_pkg *pkg)
     return reply_error(ses, pkg, 3, "service unavailable");
 }
 
-static int reply_error_other(nw_ses *ses, rpc_pkg *pkg, const char* msg)
+static int reply_error_other(nw_ses *ses, rpc_pkg *pkg, const char *msg)
 {
     return reply_error(ses, pkg, 4, msg);
 }
@@ -90,7 +94,7 @@ static int reply_result(nw_ses *ses, rpc_pkg *pkg, json_t *result)
 {
     json_t *reply = json_object();
     json_object_set_new(reply, "error", json_null());
-    json_object_set    (reply, "result", result);
+    json_object_set(reply, "result", result);
     json_object_set_new(reply, "id", json_integer(pkg->req_id));
 
     int ret = reply_json(ses, pkg, reply);
@@ -115,14 +119,16 @@ static bool process_cache(nw_ses *ses, rpc_pkg *pkg, sds *cache_key)
     key = sdscatprintf(key, "%u", pkg->command);
     key = sdscatlen(key, pkg->body, pkg->body_size);
     dict_entry *entry = dict_find(dict_cache, key);
-    if (entry == NULL) {
+    if (entry == NULL)
+    {
         *cache_key = key;
         return false;
     }
 
     struct cache_val *cache = entry->val;
     double now = current_timestamp();
-    if ((now - cache->time) > settings.cache_timeout) {
+    if ((now - cache->time) > settings.cache_timeout)
+    {
         dict_delete(dict_cache, key);
         *cache_key = key;
         return false;
@@ -157,47 +163,65 @@ static int on_cmd_balance_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_invalid_argument(ses, pkg);
 
     json_t *result = json_object();
-    if (request_size == 1) {
-        for (size_t i = 0; i < settings.asset_num; ++i) {
+    if (request_size == 1)
+    {
+        for (size_t i = 0; i < settings.asset_num; ++i)
+        {
             const char *asset = settings.assets[i].name;
             json_t *unit = json_object();
             int prec_save = asset_prec(asset);
             int prec_show = asset_prec_show(asset);
 
             mpd_t *available = balance_get(user_id, BALANCE_TYPE_AVAILABLE, asset);
-            if (available) {
-                if (prec_save != prec_show) {
+            if (available)
+            {
+                if (prec_save != prec_show)
+                {
                     mpd_t *show = mpd_qncopy(available);
                     mpd_rescale(show, show, -prec_show, &mpd_ctx);
                     json_object_set_new_mpd(unit, "available", show);
                     mpd_del(show);
-                } else {
+                }
+                else
+                {
                     json_object_set_new_mpd(unit, "available", available);
                 }
-            } else {
+            }
+            else
+            {
                 json_object_set_new(unit, "available", json_string("0"));
             }
 
             mpd_t *freeze = balance_get(user_id, BALANCE_TYPE_FREEZE, asset);
-            if (freeze) {
-                if (prec_save != prec_show) {
+            if (freeze)
+            {
+                if (prec_save != prec_show)
+                {
                     mpd_t *show = mpd_qncopy(freeze);
                     mpd_rescale(show, show, -prec_show, &mpd_ctx);
                     json_object_set_new_mpd(unit, "freeze", show);
                     mpd_del(show);
-                } else {
+                }
+                else
+                {
                     json_object_set_new_mpd(unit, "freeze", freeze);
                 }
-            } else {
+            }
+            else
+            {
                 json_object_set_new(unit, "freeze", json_string("0"));
             }
 
             json_object_set_new(result, asset, unit);
         }
-    } else {
-        for (size_t i = 1; i < request_size; ++i) {
+    }
+    else
+    {
+        for (size_t i = 1; i < request_size; ++i)
+        {
             const char *asset = json_string_value(json_array_get(params, i));
-            if (!asset || !asset_exist(asset)) {
+            if (!asset || !asset_exist(asset))
+            {
                 json_decref(result);
                 return reply_error_invalid_argument(ses, pkg);
             }
@@ -206,30 +230,42 @@ static int on_cmd_balance_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
             int prec_show = asset_prec_show(asset);
 
             mpd_t *available = balance_get(user_id, BALANCE_TYPE_AVAILABLE, asset);
-            if (available) {
-                if (prec_save != prec_show) {
+            if (available)
+            {
+                if (prec_save != prec_show)
+                {
                     mpd_t *show = mpd_qncopy(available);
                     mpd_rescale(show, show, -prec_show, &mpd_ctx);
                     json_object_set_new_mpd(unit, "available", show);
                     mpd_del(show);
-                } else {
+                }
+                else
+                {
                     json_object_set_new_mpd(unit, "available", available);
                 }
-            } else {
+            }
+            else
+            {
                 json_object_set_new(unit, "available", json_string("0"));
             }
 
             mpd_t *freeze = balance_get(user_id, BALANCE_TYPE_FREEZE, asset);
-            if (freeze) {
-                if (prec_save != prec_show) {
+            if (freeze)
+            {
+                if (prec_save != prec_show)
+                {
                     mpd_t *show = mpd_qncopy(freeze);
                     mpd_rescale(show, show, -prec_show, &mpd_ctx);
                     json_object_set_new_mpd(unit, "freeze", show);
                     mpd_del(show);
-                } else {
+                }
+                else
+                {
                     json_object_set_new_mpd(unit, "freeze", freeze);
                 }
-            } else {
+            }
+            else
+            {
                 json_object_set_new(unit, "freeze", json_string("0"));
             }
 
@@ -244,8 +280,9 @@ static int on_cmd_balance_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
 static int on_cmd_balance_update(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
-            log_vip("on_cmd_balance_update");
-    if (json_array_size(params) != 6){
+    log_vip("on_cmd_balance_update");
+    if (json_array_size(params) != 6)
+    {
         log_vip("reply_error_invalid_argument");
         return reply_error_invalid_argument(ses, pkg);
     }
@@ -255,43 +292,50 @@ static int on_cmd_balance_update(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     uint32_t user_id = json_integer_value(json_array_get(params, 0));
 
     // asset
-    if (!json_is_string(json_array_get(params, 1))){
+    if (!json_is_string(json_array_get(params, 1)))
+    {
         log_vip("reply_error_invalid_argument");
         return reply_error_invalid_argument(ses, pkg);
     }
     const char *asset = json_string_value(json_array_get(params, 1));
     int prec = asset_prec_show(asset);
-    if (prec < 0){
+    if (prec < 0)
+    {
         log_vip("reply_error_invalid_argument");
         return reply_error_invalid_argument(ses, pkg);
     }
     // business
-    if (!json_is_string(json_array_get(params, 2))){
+    if (!json_is_string(json_array_get(params, 2)))
+    {
         log_vip("reply_error_invalid_argument b");
         return reply_error_invalid_argument(ses, pkg);
     }
     const char *business = json_string_value(json_array_get(params, 2));
 
     // business_id
-    if (!json_is_integer(json_array_get(params, 3))){
+    if (!json_is_integer(json_array_get(params, 3)))
+    {
         log_vip("reply_error_invalid_argument bid");
         return reply_error_invalid_argument(ses, pkg);
     }
     uint64_t business_id = json_integer_value(json_array_get(params, 3));
 
     // change
-    if (!json_is_string(json_array_get(params, 4))){
+    if (!json_is_string(json_array_get(params, 4)))
+    {
         log_vip("reply_error_invalid_argument c");
         return reply_error_invalid_argument(ses, pkg);
     }
     mpd_t *change = decimal(json_string_value(json_array_get(params, 4)), prec);
-    if (change == NULL){
+    if (change == NULL)
+    {
         log_vip("reply_error_invalid_argument cd");
         return reply_error_invalid_argument(ses, pkg);
     }
     // detail
     json_t *detail = json_array_get(params, 5);
-    if (!json_is_object(detail)) {
+    if (!json_is_object(detail))
+    {
         mpd_del(change);
         log_vip("reply_error_invalid_argument d");
         return reply_error_invalid_argument(ses, pkg);
@@ -299,11 +343,16 @@ static int on_cmd_balance_update(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     int ret = update_user_balance(true, user_id, asset, business, business_id, change, detail);
     mpd_del(change);
-    if (ret == -1) {
+    if (ret == -1)
+    {
         return reply_error(ses, pkg, 10, "repeat update");
-    } else if (ret == -2) {
+    }
+    else if (ret == -2)
+    {
         return reply_error(ses, pkg, 11, "balance not enough");
-    } else if (ret < 0) {
+    }
+    else if (ret < 0)
+    {
         return reply_error_internal_error(ses, pkg);
     }
 
@@ -337,7 +386,8 @@ static int on_cmd_balance_unfreeze(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_invalid_argument(ses, pkg);
 
     mpd_t *res = balance_unfreeze(user_id, asset, amount);
-    if (!res) {
+    if (!res)
+    {
         return reply_error_internal_error(ses, pkg);
     }
 
@@ -347,7 +397,8 @@ static int on_cmd_balance_unfreeze(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 static int on_cmd_asset_list(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     json_t *result = json_array();
-    for (int i = 0; i < settings.asset_num; ++i) {
+    for (int i = 0; i < settings.asset_num; ++i)
+    {
         json_t *asset = json_object();
         json_object_set_new(asset, "name", json_string(settings.assets[i].name));
         json_object_set_new(asset, "prec", json_integer(settings.assets[i].prec_show));
@@ -386,12 +437,17 @@ static json_t *get_asset_summary(const char *name)
 static int on_cmd_asset_summary(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     json_t *result = json_array();
-    if (json_array_size(params) == 0) {
-        for (int i = 0; i < settings.asset_num; ++i) {
+    if (json_array_size(params) == 0)
+    {
+        for (int i = 0; i < settings.asset_num; ++i)
+        {
             json_array_append_new(result, get_asset_summary(settings.assets[i].name));
         }
-    } else {
-        for (int i = 0; i < json_array_size(params); ++i) {
+    }
+    else
+    {
+        for (int i = 0; i < json_array_size(params); ++i)
+        {
             const char *asset = json_string_value(json_array_get(params, i));
             if (asset == NULL)
                 goto invalid_argument;
@@ -409,7 +465,6 @@ invalid_argument:
     json_decref(result);
     return reply_error_invalid_argument(ses, pkg);
 }
-
 
 static int on_cmd_push_deals(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
@@ -436,8 +491,8 @@ static int on_cmd_push_deals(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     if (side != MARKET_ORDER_SIDE_ASK && side != MARKET_ORDER_SIDE_BID)
         return reply_error_invalid_argument(ses, pkg);
 
-    mpd_t *amount    = NULL;
-    mpd_t *price     = NULL;
+    mpd_t *amount = NULL;
+    mpd_t *price = NULL;
     mpd_t *taker_fee = NULL;
     mpd_t *maker_fee = NULL;
 
@@ -473,7 +528,7 @@ static int on_cmd_push_deals(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     uint64_t bid = ++order_id_start;
     uint64_t dealId = ++deals_id_start;
     push_deal_message_extra(current_timestamp(), market->name, aid, bid, user_id, user_id, price, amount,
-        maker_fee, taker_fee, side, dealId, market->stock, market->money);
+                            maker_fee, taker_fee, side, dealId, market->stock, market->money);
 
     mpd_del(amount);
     mpd_del(price);
@@ -501,8 +556,8 @@ invalid_argument:
 // int market_put_limit_order_extra(bool real, json_t *result, market_t *m, uint32_t user_id, json_t *row, mpd_t *taker_fee, mpd_t *maker_fee, const char *source)
 int market_put_limit_order_extra(bool real, json_t *result, market_t *m, uint32_t user_id, json_t *row, mpd_t *taker_fee, mpd_t *maker_fee)
 {
-    mpd_t *amount    = NULL;
-    mpd_t *price     = NULL;
+    mpd_t *amount = NULL;
+    mpd_t *price = NULL;
     uint32_t side = 0;
     json_t *info = json_object();
 
@@ -537,24 +592,34 @@ int market_put_limit_order_extra(bool real, json_t *result, market_t *m, uint32_
 
     json_t *o_i = NULL;
     int ret = market_put_limit_order(real, &o_i, m, user_id, side, amount, price, taker_fee, maker_fee, source);
-    if (result) {
-        if (ret == 0) {
+    if (result)
+    {
+        if (ret == 0)
+        {
             json_object_set_new(info, "code", json_integer(0));
             json_object_set_new(info, "message", json_string("success"));
             json_object_set_new(info, "order", o_i);
-        } else if (ret == -1) {
+        }
+        else if (ret == -1)
+        {
             json_object_set_new(info, "code", json_integer(10));
             json_object_set_new(info, "message", json_string("balance not enough"));
-        } else if (ret == -2) {
+        }
+        else if (ret == -2)
+        {
             json_object_set_new(info, "code", json_integer(11));
             json_object_set_new(info, "message", json_string("amount too small"));
-        } else if (ret < 0) {
+        }
+        else if (ret < 0)
+        {
             json_object_set_new(info, "code", json_integer(2));
             json_object_set_new(info, "message", json_string("internal error"));
         }
 
         json_array_append_new(result, info);
-    } else {
+    }
+    else
+    {
         json_decref(info);
     }
 
@@ -571,12 +636,15 @@ invalid_argument:
     if (price)
         mpd_del(price);
 
-    if (result) {
+    if (result)
+    {
         json_object_set_new(info, "code", json_integer(1));
         json_object_set_new(info, "message", json_string("invalid argument"));
 
         json_array_append_new(result, info);
-    } else {
+    }
+    else
+    {
         json_decref(info);
     }
 
@@ -634,7 +702,8 @@ static int on_cmd_order_put_limit_batch(nw_ses *ses, rpc_pkg *pkg, json_t *param
     //     goto invalid_argument;
 
     json_t *result = json_array();
-    for (uint32_t i = 0; i < a_size; ++i) {
+    for (uint32_t i = 0; i < a_size; ++i)
+    {
         market_put_limit_order_extra(true, result, market, user_id, json_array_get(aps_list, i), taker_fee, maker_fee);
     }
 
@@ -685,8 +754,8 @@ static int on_cmd_order_update_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     if (side != MARKET_ORDER_SIDE_ASK && side != MARKET_ORDER_SIDE_BID)
         return reply_error_invalid_argument(ses, pkg);
 
-    mpd_t *amount    = NULL;
-    mpd_t *price     = NULL;
+    mpd_t *amount = NULL;
+    mpd_t *price = NULL;
     mpd_t *taker_fee = NULL;
     mpd_t *maker_fee = NULL;
 
@@ -726,7 +795,8 @@ static int on_cmd_order_update_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         goto invalid_argument;
 
     order_t *order = market_get_order(market, order_id);
-    if (order != NULL && order->user_id != user_id) {
+    if (order != NULL && order->user_id != user_id)
+    {
         market_cancel_order(true, NULL, market, order);
     }
 
@@ -738,11 +808,16 @@ static int on_cmd_order_update_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     mpd_del(taker_fee);
     mpd_del(maker_fee);
 
-    if (ret == -1) {
+    if (ret == -1)
+    {
         return reply_error(ses, pkg, 10, "balance not enough");
-    } else if (ret == -2) {
+    }
+    else if (ret == -2)
+    {
         return reply_error(ses, pkg, 11, "amount too small");
-    } else if (ret < 0) {
+    }
+    else if (ret < 0)
+    {
         log_fatal("market_update_limit_order fail: %d", ret);
         return reply_error_internal_error(ses, pkg);
     }
@@ -820,18 +895,22 @@ static int on_cmd_order_update_limit_batch(nw_ses *ses, rpc_pkg *pkg, json_t *pa
     //     goto invalid_argument;
 
     // cancel orders list
-    if (json_array_size(order_id_list) > 0) {
-        for (uint32_t i = 0; i < json_array_size(order_id_list); ++i) {
+    if (json_array_size(order_id_list) > 0)
+    {
+        for (uint32_t i = 0; i < json_array_size(order_id_list); ++i)
+        {
             json_t *row = json_array_get(order_id_list, i);
             if (!json_is_integer(row))
                 continue;
 
             uint64_t o_id = json_integer_value(row);
             order_t *order = market_get_order(market, o_id);
-            if (order == NULL) {
+            if (order == NULL)
+            {
                 continue;
             }
-            if (order->user_id != user_id) {
+            if (order->user_id != user_id)
+            {
                 continue;
             }
 
@@ -840,7 +919,8 @@ static int on_cmd_order_update_limit_batch(nw_ses *ses, rpc_pkg *pkg, json_t *pa
     }
 
     json_t *result = json_array();
-    for (uint32_t i = 0; i < a_size; ++i) {
+    for (uint32_t i = 0; i < a_size; ++i)
+    {
         market_put_limit_order_extra(true, result, market, user_id, json_array_get(aps_list, i), taker_fee, maker_fee);
     }
 
@@ -864,84 +944,98 @@ invalid_argument:
 static int on_cmd_order_put_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     log_vip("on_cmd_order_put_limit");
-    if (json_array_size(params) != 8){
+    if (json_array_size(params) != 8)
+    {
         log_vip("on_cmd_order_put_limit 0");
         return reply_error_invalid_argument(ses, pkg);
     }
     // user_id
-    if (!json_is_integer(json_array_get(params, 0))){
+    if (!json_is_integer(json_array_get(params, 0)))
+    {
         log_vip("on_cmd_order_put_limit 1");
         return reply_error_invalid_argument(ses, pkg);
     }
     uint32_t user_id = json_integer_value(json_array_get(params, 0));
 
     // market
-    if (!json_is_string(json_array_get(params, 1))){
+    if (!json_is_string(json_array_get(params, 1)))
+    {
         log_vip("on_cmd_order_put_limit 2");
         return reply_error_invalid_argument(ses, pkg);
     }
     const char *market_name = json_string_value(json_array_get(params, 1));
     market_t *market = get_market(market_name);
-    if (market == NULL){
+    if (market == NULL)
+    {
         log_vip("on_cmd_order_put_limit 3");
         return reply_error_invalid_argument(ses, pkg);
     }
     // side
-    if (!json_is_integer(json_array_get(params, 2))){
+    if (!json_is_integer(json_array_get(params, 2)))
+    {
         log_vip("on_cmd_order_put_limit 4");
         return reply_error_invalid_argument(ses, pkg);
     }
     uint32_t side = json_integer_value(json_array_get(params, 2));
-    if (side != MARKET_ORDER_SIDE_ASK && side != MARKET_ORDER_SIDE_BID){
+    if (side != MARKET_ORDER_SIDE_ASK && side != MARKET_ORDER_SIDE_BID)
+    {
         log_vip("on_cmd_order_put_limit 5");
         return reply_error_invalid_argument(ses, pkg);
     }
 
-    mpd_t *amount    = NULL;
-    mpd_t *price     = NULL;
+    mpd_t *amount = NULL;
+    mpd_t *price = NULL;
     mpd_t *taker_fee = NULL;
     mpd_t *maker_fee = NULL;
 
     // amount
-    if (!json_is_string(json_array_get(params, 3))){
+    if (!json_is_string(json_array_get(params, 3)))
+    {
         log_vip("on_cmd_order_put_limit 5.1");
         goto invalid_argument;
     }
     amount = decimal(json_string_value(json_array_get(params, 3)), market->stock_prec);
-    if (amount == NULL || mpd_cmp(amount, mpd_zero, &mpd_ctx) <= 0){
+    if (amount == NULL || mpd_cmp(amount, mpd_zero, &mpd_ctx) <= 0)
+    {
         log_vip("on_cmd_order_put_limit 6");
         goto invalid_argument;
     }
 
-    // price 
-    if (!json_is_string(json_array_get(params, 4))){
+    // price
+    if (!json_is_string(json_array_get(params, 4)))
+    {
         log_vip("on_cmd_order_put_limit 6.1");
         goto invalid_argument;
     }
     price = decimal(json_string_value(json_array_get(params, 4)), market->money_prec);
-    if (price == NULL || mpd_cmp(price, mpd_zero, &mpd_ctx) <= 0){
+    if (price == NULL || mpd_cmp(price, mpd_zero, &mpd_ctx) <= 0)
+    {
         log_vip("on_cmd_order_put_limit 7");
         goto invalid_argument;
     }
 
     // taker fee
-    if (!json_is_string(json_array_get(params, 5))){
+    if (!json_is_string(json_array_get(params, 5)))
+    {
         log_vip("on_cmd_order_put_limit 7.1");
         goto invalid_argument;
     }
     taker_fee = decimal(json_string_value(json_array_get(params, 5)), market->fee_prec);
-    if (taker_fee == NULL || mpd_cmp(taker_fee, mpd_zero, &mpd_ctx) < 0 || mpd_cmp(taker_fee, mpd_one, &mpd_ctx) >= 0){
+    if (taker_fee == NULL || mpd_cmp(taker_fee, mpd_zero, &mpd_ctx) < 0 || mpd_cmp(taker_fee, mpd_one, &mpd_ctx) >= 0)
+    {
         log_vip("on_cmd_order_put_limit 8");
         goto invalid_argument;
     }
 
     // maker fee
-    if (!json_is_string(json_array_get(params, 6))){
+    if (!json_is_string(json_array_get(params, 6)))
+    {
         log_vip("on_cmd_order_put_limit 8.1");
         goto invalid_argument;
     }
     maker_fee = decimal(json_string_value(json_array_get(params, 6)), market->fee_prec);
-    if (maker_fee == NULL || mpd_cmp(maker_fee, mpd_zero, &mpd_ctx) < 0 || mpd_cmp(maker_fee, mpd_one, &mpd_ctx) >= 0){
+    if (maker_fee == NULL || mpd_cmp(maker_fee, mpd_zero, &mpd_ctx) < 0 || mpd_cmp(maker_fee, mpd_one, &mpd_ctx) >= 0)
+    {
         log_vip("on_cmd_order_put_limit 9");
         goto invalid_argument;
     }
@@ -950,7 +1044,8 @@ static int on_cmd_order_put_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     if (!json_is_string(json_array_get(params, 7)))
         goto invalid_argument;
     const char *source = json_string_value(json_array_get(params, 7));
-    if (strlen(source) >= SOURCE_MAX_LEN){
+    if (strlen(source) >= SOURCE_MAX_LEN)
+    {
         log_vip("on_cmd_order_put_limit 10");
         goto invalid_argument;
     }
@@ -963,11 +1058,16 @@ static int on_cmd_order_put_limit(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     mpd_del(taker_fee);
     mpd_del(maker_fee);
 
-    if (ret == -1) {
+    if (ret == -1)
+    {
         return reply_error(ses, pkg, 10, "balance not enough");
-    } else if (ret == -2) {
+    }
+    else if (ret == -2)
+    {
         return reply_error(ses, pkg, 11, "amount too small");
-    } else if (ret < 0) {
+    }
+    else if (ret < 0)
+    {
         log_fatal("market_put_limit_order fail: %d", ret);
         return reply_error_internal_error(ses, pkg);
     }
@@ -1045,13 +1145,20 @@ static int on_cmd_order_put_market(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     mpd_del(amount);
     mpd_del(taker_fee);
 
-    if (ret == -1) {
+    if (ret == -1)
+    {
         return reply_error(ses, pkg, 10, "balance not enough");
-    } else if (ret == -2) {
+    }
+    else if (ret == -2)
+    {
         return reply_error(ses, pkg, 11, "amount too small");
-    } else if (ret == -3) {
+    }
+    else if (ret == -3)
+    {
         return reply_error(ses, pkg, 12, "no enough trader");
-    } else if (ret < 0) {
+    }
+    else if (ret < 0)
+    {
         log_fatal("market_put_limit_order fail: %d", ret);
         return reply_error_internal_error(ses, pkg);
     }
@@ -1106,19 +1213,25 @@ static int on_cmd_order_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     json_t *orders = json_array();
     skiplist_t *order_list = market_get_order_list(market, user_id);
-    if (order_list == NULL) {
+    if (order_list == NULL)
+    {
         json_object_set_new(result, "total", json_integer(0));
-    } else {
+    }
+    else
+    {
         json_object_set_new(result, "total", json_integer(order_list->len));
-        if (offset < order_list->len) {
+        if (offset < order_list->len)
+        {
             skiplist_iter *iter = skiplist_get_iterator(order_list);
             skiplist_node *node;
-            for (size_t i = 0; i < offset; i++) {
+            for (size_t i = 0; i < offset; i++)
+            {
                 if (skiplist_next(iter) == NULL)
                     break;
             }
             size_t index = 0;
-            while ((node = skiplist_next(iter)) != NULL && index < limit) {
+            while ((node = skiplist_next(iter)) != NULL && index < limit)
+            {
                 index++;
                 order_t *order = node->value;
                 json_array_append_new(orders, get_order_info(order));
@@ -1169,19 +1282,25 @@ static int on_cmd_order_query_brief(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     json_t *orders = json_array();
     skiplist_t *order_list = market_get_order_list(market, user_id);
-    if (order_list == NULL) {
+    if (order_list == NULL)
+    {
         json_object_set_new(result, "total", json_integer(0));
-    } else {
+    }
+    else
+    {
         json_object_set_new(result, "total", json_integer(order_list->len));
-        if (offset < order_list->len) {
+        if (offset < order_list->len)
+        {
             skiplist_iter *iter = skiplist_get_iterator(order_list);
             skiplist_node *node;
-            for (size_t i = 0; i < offset; i++) {
+            for (size_t i = 0; i < offset; i++)
+            {
                 if (skiplist_next(iter) == NULL)
                     break;
             }
             size_t index = 0;
-            while ((node = skiplist_next(iter)) != NULL && index < limit) {
+            while ((node = skiplist_next(iter)) != NULL && index < limit)
+            {
                 index++;
                 // order_t *order = node->value;
                 json_array_append_new(orders, get_order_info_brief(node->value));
@@ -1224,19 +1343,25 @@ static int on_cmd_order_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     json_t *orders = json_array();
     skiplist_t *order_list = market_get_user_order_list(user_id);
-    if (order_list == NULL) {
+    if (order_list == NULL)
+    {
         json_object_set_new(result, "total", json_integer(0));
-    } else {
+    }
+    else
+    {
         json_object_set_new(result, "total", json_integer(order_list->len));
-        if (offset < order_list->len) {
+        if (offset < order_list->len)
+        {
             skiplist_iter *iter = skiplist_get_iterator(order_list);
             skiplist_node *node;
-            for (size_t i = 0; i < offset; i++) {
+            for (size_t i = 0; i < offset; i++)
+            {
                 if (skiplist_next(iter) == NULL)
                     break;
             }
             size_t index = 0;
-            while ((node = skiplist_next(iter)) != NULL && index < limit) {
+            while ((node = skiplist_next(iter)) != NULL && index < limit)
+            {
                 index++;
                 order_t *order = node->value;
                 json_array_append_new(orders, get_order_info(order));
@@ -1277,23 +1402,32 @@ static int on_cmd_order_query_alluser(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     dict_entry *user_orders_entry;
     size_t index = 0;
     size_t total = 0;
-    while((user_orders_entry = dict_next(user_orders_iter)) != NULL){
+    while ((user_orders_entry = dict_next(user_orders_iter)) != NULL)
+    {
         skiplist_t *order_list = user_orders_entry->val;
-        if (order_list) {total += order_list->len;}
+        if (order_list)
+        {
+            total += order_list->len;
+        }
     }
     dict_release_iterator(user_orders_iter);
     json_object_set_new(result, "total", json_integer(total));
 
     user_orders_iter = dict_get_iterator(user_orders);
-    while((user_orders_entry = dict_next(user_orders_iter)) != NULL){
+    while ((user_orders_entry = dict_next(user_orders_iter)) != NULL)
+    {
         skiplist_t *order_list = user_orders_entry->val;
-        if (order_list) {
+        if (order_list)
+        {
             skiplist_iter *iter = skiplist_get_iterator(order_list);
             skiplist_node *node;
-            for (; index < offset; index++) {
-                if (skiplist_next(iter) == NULL) break;
+            for (; index < offset; index++)
+            {
+                if (skiplist_next(iter) == NULL)
+                    break;
             }
-            while ((node = skiplist_next(iter)) != NULL && index < offset + limit) {
+            while ((node = skiplist_next(iter)) != NULL && index < offset + limit)
+            {
                 index++;
                 order_t *order = node->value;
                 json_array_append_new(orders, get_order_info(order));
@@ -1332,17 +1466,20 @@ static int on_cmd_order_cancel(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     uint64_t order_id = json_integer_value(json_array_get(params, 2));
 
     order_t *order = market_get_order(market, order_id);
-    if (order == NULL) {
+    if (order == NULL)
+    {
         return reply_error(ses, pkg, 10, "order not found");
     }
-    if (order->user_id != user_id) {
+    if (order->user_id != user_id)
+    {
         return reply_error(ses, pkg, 11, "user not match");
     }
 
     json_t *result = NULL;
     int ret = market_cancel_order(true, &result, market, order);
-    if (ret < 0) {
-        log_fatal("cancel order: %"PRIu64" fail: %d", order->id, ret);
+    if (ret < 0)
+    {
+        log_fatal("cancel order: %" PRIu64 " fail: %d", order->id, ret);
         return reply_error_internal_error(ses, pkg);
     }
 
@@ -1372,33 +1509,41 @@ static int on_cmd_order_cancel_batch(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_invalid_argument(ses, pkg);
 
     json_t *result = json_array();
-    if (param_size == 2) { // cancel all
+    if (param_size == 2)
+    { // cancel all
         market_get_order_list(market, user_id);
         skiplist_t *order_list = market_get_order_list(market, user_id);
-        if (order_list) {
+        if (order_list)
+        {
             skiplist_iter *iter = skiplist_get_iterator(order_list);
             skiplist_node *node;
-            while ((node = skiplist_next(iter)) != NULL) {
+            while ((node = skiplist_next(iter)) != NULL)
+            {
                 market_cancel_order(true, NULL, market, node->value);
             }
             skiplist_release_iterator(iter);
         }
-    } else { // cancel by order id list
+    }
+    else
+    { // cancel by order id list
         json_t *order_id_list = json_array_get(params, 2);
         if (!json_is_array(order_id_list))
             return reply_error_invalid_argument(ses, pkg);
 
-        for (uint32_t i = 0; i < json_array_size(order_id_list); ++i) {
+        for (uint32_t i = 0; i < json_array_size(order_id_list); ++i)
+        {
             json_t *row = json_array_get(order_id_list, i);
             if (!json_is_integer(row))
                 continue;
 
             uint64_t o_id = json_integer_value(row);
             order_t *order = market_get_order(market, o_id);
-            if (order == NULL) {
+            if (order == NULL)
+            {
                 continue;
             }
-            if (order->user_id != user_id) {
+            if (order->user_id != user_id)
+            {
                 continue;
             }
 
@@ -1452,25 +1597,31 @@ static int on_cmd_order_book(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     uint64_t total;
     skiplist_iter *iter;
-    if (side == MARKET_ORDER_SIDE_ASK) {
+    if (side == MARKET_ORDER_SIDE_ASK)
+    {
         iter = skiplist_get_iterator(market->asks);
         total = market->asks->len;
         json_object_set_new(result, "total", json_integer(total));
-    } else {
+    }
+    else
+    {
         iter = skiplist_get_iterator(market->bids);
         total = market->bids->len;
         json_object_set_new(result, "total", json_integer(total));
     }
 
     json_t *orders = json_array();
-    if (offset < total) {
-        for (size_t i = 0; i < offset; i++) {
+    if (offset < total)
+    {
+        for (size_t i = 0; i < offset; i++)
+        {
             if (skiplist_next(iter) == NULL)
                 break;
         }
         size_t index = 0;
         skiplist_node *node;
-        while ((node = skiplist_next(iter)) != NULL && index < limit) {
+        while ((node = skiplist_next(iter)) != NULL && index < limit)
+        {
             index++;
             order_t *order = node->value;
             json_array_append_new(orders, get_order_info(order));
@@ -1488,18 +1639,25 @@ static bool check_order_by_time(order_t *order, uint64_t start_time, uint64_t en
 {
     int cnt = 0;
 
-    if (order) {
-        if (start_time) {
+    if (order)
+    {
+        if (start_time)
+        {
             if (order->create_time >= start_time)
                 cnt++;
-        } else {
+        }
+        else
+        {
             cnt++;
         }
 
-        if (end_time) {
+        if (end_time)
+        {
             if (end_time > start_time && order->create_time <= end_time)
                 cnt++;
-        } else {
+        }
+        else
+        {
             cnt++;
         }
     }
@@ -1565,15 +1723,20 @@ static int on_cmd_order_book_ext(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     skiplist_node *node;
     order_t *order;
     skiplist_t *list;
-    if (side == MARKET_ORDER_SIDE_ASK) {
+    if (side == MARKET_ORDER_SIDE_ASK)
+    {
         list = market->asks;
-    } else {
+    }
+    else
+    {
         list = market->bids;
     }
     iter = skiplist_get_iterator(list);
-    while ((node = skiplist_next(iter)) != NULL) {
+    while ((node = skiplist_next(iter)) != NULL)
+    {
         order = node->value;
-        if (order->user_id == user_id && check_order_by_time(order, start_time, end_time)) {
+        if (order->user_id == user_id && check_order_by_time(order, start_time, end_time))
+        {
             total++;
         }
     }
@@ -1581,19 +1744,24 @@ static int on_cmd_order_book_ext(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     skiplist_release_iterator(iter);
 
     json_t *orders = json_array();
-    if (offset < total) {
+    if (offset < total)
+    {
         iter = skiplist_get_iterator(list);
         size_t index = 0;
-        while ((node = skiplist_next(iter)) != NULL && index < offset) {
+        while ((node = skiplist_next(iter)) != NULL && index < offset)
+        {
             order = node->value;
-            if (order->user_id == user_id && check_order_by_time(order, start_time, end_time)) {
+            if (order->user_id == user_id && check_order_by_time(order, start_time, end_time))
+            {
                 index++;
             }
         }
         index = 0;
-        while ((node = skiplist_next(iter)) != NULL && index < limit) {
+        while ((node = skiplist_next(iter)) != NULL && index < limit)
+        {
             order = node->value;
-            if (order->user_id == user_id && check_order_by_time(order, start_time, end_time)) {
+            if (order->user_id == user_id && check_order_by_time(order, start_time, end_time))
+            {
                 index++;
                 json_array_append_new(orders, get_order_info(order));
             }
@@ -1616,16 +1784,21 @@ static json_t *get_depth(market_t *market, size_t limit)
     skiplist_iter *iter = skiplist_get_iterator(market->asks);
     skiplist_node *node = skiplist_next(iter);
     size_t index = 0;
-    while (node && index < limit) {
+    while (node && index < limit)
+    {
         index++;
         order_t *order = node->value;
         mpd_copy(price, order->price, &mpd_ctx);
         mpd_copy(amount, order->left, &mpd_ctx);
-        while ((node = skiplist_next(iter)) != NULL) {
+        while ((node = skiplist_next(iter)) != NULL)
+        {
             order = node->value;
-            if (mpd_cmp(price, order->price, &mpd_ctx) == 0) {
+            if (mpd_cmp(price, order->price, &mpd_ctx) == 0)
+            {
                 mpd_add(amount, amount, order->left, &mpd_ctx);
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
@@ -1640,16 +1813,21 @@ static json_t *get_depth(market_t *market, size_t limit)
     iter = skiplist_get_iterator(market->bids);
     node = skiplist_next(iter);
     index = 0;
-    while (node && index < limit) {
+    while (node && index < limit)
+    {
         index++;
         order_t *order = node->value;
         mpd_copy(price, order->price, &mpd_ctx);
         mpd_copy(amount, order->left, &mpd_ctx);
-        while ((node = skiplist_next(iter)) != NULL) {
+        while ((node = skiplist_next(iter)) != NULL)
+        {
             order = node->value;
-            if (mpd_cmp(price, order->price, &mpd_ctx) == 0) {
+            if (mpd_cmp(price, order->price, &mpd_ctx) == 0)
+            {
                 mpd_add(amount, amount, order->left, &mpd_ctx);
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
@@ -1670,7 +1848,7 @@ static json_t *get_depth(market_t *market, size_t limit)
     return result;
 }
 
-static json_t *get_depth_merge(market_t* market, size_t limit, mpd_t *interval)
+static json_t *get_depth_merge(market_t *market, size_t limit, mpd_t *interval)
 {
     mpd_t *q = mpd_new(&mpd_ctx);
     mpd_t *r = mpd_new(&mpd_ctx);
@@ -1681,20 +1859,26 @@ static json_t *get_depth_merge(market_t* market, size_t limit, mpd_t *interval)
     skiplist_iter *iter = skiplist_get_iterator(market->asks);
     skiplist_node *node = skiplist_next(iter);
     size_t index = 0;
-    while (node && index < limit) {
+    while (node && index < limit)
+    {
         index++;
         order_t *order = node->value;
         mpd_divmod(q, r, order->price, interval, &mpd_ctx);
         mpd_mul(price, q, interval, &mpd_ctx);
-        if (mpd_cmp(r, mpd_zero, &mpd_ctx) != 0) {
+        if (mpd_cmp(r, mpd_zero, &mpd_ctx) != 0)
+        {
             mpd_add(price, price, interval, &mpd_ctx);
         }
         mpd_copy(amount, order->left, &mpd_ctx);
-        while ((node = skiplist_next(iter)) != NULL) {
+        while ((node = skiplist_next(iter)) != NULL)
+        {
             order = node->value;
-            if (mpd_cmp(price, order->price, &mpd_ctx) >= 0) {
+            if (mpd_cmp(price, order->price, &mpd_ctx) >= 0)
+            {
                 mpd_add(amount, amount, order->left, &mpd_ctx);
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
@@ -1709,17 +1893,22 @@ static json_t *get_depth_merge(market_t* market, size_t limit, mpd_t *interval)
     iter = skiplist_get_iterator(market->bids);
     node = skiplist_next(iter);
     index = 0;
-    while (node && index < limit) {
+    while (node && index < limit)
+    {
         index++;
         order_t *order = node->value;
         mpd_divmod(q, r, order->price, interval, &mpd_ctx);
         mpd_mul(price, q, interval, &mpd_ctx);
         mpd_copy(amount, order->left, &mpd_ctx);
-        while ((node = skiplist_next(iter)) != NULL) {
+        while ((node = skiplist_next(iter)) != NULL)
+        {
             order = node->value;
-            if (mpd_cmp(price, order->price, &mpd_ctx) <= 0) {
+            if (mpd_cmp(price, order->price, &mpd_ctx) <= 0)
+            {
                 mpd_add(amount, amount, order->left, &mpd_ctx);
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
@@ -1769,26 +1958,32 @@ static int on_cmd_order_book_depth(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     mpd_t *interval = decimal(json_string_value(json_array_get(params, 2)), market->money_prec);
     if (!interval)
         return reply_error_invalid_argument(ses, pkg);
-    if (mpd_cmp(interval, mpd_zero, &mpd_ctx) < 0) {
+    if (mpd_cmp(interval, mpd_zero, &mpd_ctx) < 0)
+    {
         mpd_del(interval);
         return reply_error_invalid_argument(ses, pkg);
     }
 
     sds cache_key = NULL;
-    if (process_cache(ses, pkg, &cache_key)) {
+    if (process_cache(ses, pkg, &cache_key))
+    {
         mpd_del(interval);
         return 0;
     }
 
     json_t *result = NULL;
-    if (mpd_cmp(interval, mpd_zero, &mpd_ctx) == 0) {
+    if (mpd_cmp(interval, mpd_zero, &mpd_ctx) == 0)
+    {
         result = get_depth(market, limit);
-    } else {
+    }
+    else
+    {
         result = get_depth_merge(market, limit, interval);
     }
     mpd_del(interval);
 
-    if (result == NULL) {
+    if (result == NULL)
+    {
         sdsfree(cache_key);
         return reply_error_internal_error(ses, pkg);
     }
@@ -1821,9 +2016,12 @@ static int on_cmd_order_detail(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     order_t *order = market_get_order(market, order_id);
     json_t *result = NULL;
-    if (order == NULL) {
+    if (order == NULL)
+    {
         result = json_null();
-    } else {
+    }
+    else
+    {
         result = get_order_info(order);
     }
 
@@ -1835,7 +2033,8 @@ static int on_cmd_order_detail(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 static int on_cmd_market_list(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     json_t *result = json_array();
-    for (int i = 0; i < settings.market_num; ++i) {
+    for (int i = 0; i < settings.market_num; ++i)
+    {
         json_t *market = json_object();
         json_object_set_new(market, "name", json_string(settings.markets[i].name));
         json_object_set_new(market, "stock", json_string(settings.markets[i].stock));
@@ -1860,7 +2059,7 @@ static json_t *get_market_summary(const char *name)
     mpd_t *bid_amount = mpd_new(&mpd_ctx);
     market_t *market = get_market(name);
     market_get_status(market, &ask_count, ask_amount, &bid_count, bid_amount);
-    
+
     json_t *obj = json_object();
     json_object_set_new(obj, "name", json_string(name));
     json_object_set_new(obj, "ask_count", json_integer(ask_count));
@@ -1877,12 +2076,17 @@ static json_t *get_market_summary(const char *name)
 static int on_cmd_market_summary(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     json_t *result = json_array();
-    if (json_array_size(params) == 0) {
-        for (int i = 0; i < settings.market_num; ++i) {
+    if (json_array_size(params) == 0)
+    {
+        for (int i = 0; i < settings.market_num; ++i)
+        {
             json_array_append_new(result, get_market_summary(settings.markets[i].name));
         }
-    } else {
-        for (int i = 0; i < json_array_size(params); ++i) {
+    }
+    else
+    {
+        for (int i = 0; i < json_array_size(params); ++i)
+        {
             const char *market = json_string_value(json_array_get(params, i));
             if (market == NULL)
                 goto invalid_argument;
@@ -1920,7 +2124,8 @@ static int on_cmd_market_add_asset(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     if (prec_show > MAX_ASSET_PREC_SHOW)
         return reply_error_invalid_argument(ses, pkg);
 
-    if (asset_exist(asset)) { // update
+    if (asset_exist(asset))
+    { // update
         // check prec of related market
         if (check_market_prec_by_asset(asset, prec_show) < 0)
             return reply_error_invalid_argument(ses, pkg);
@@ -1930,7 +2135,9 @@ static int on_cmd_market_add_asset(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
         // update config file
         add_asset_into_config(asset, MAX_ASSET_PREC_SAVE, prec_show, false);
-    } else { // add asset
+    }
+    else
+    { // add asset
         // add balance struct
         add_balance(asset, MAX_ASSET_PREC_SAVE, prec_show);
 
@@ -1953,7 +2160,8 @@ static int on_cmd_market_del_asset(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     if (strlen(asset) > ASSET_NAME_MAX_LEN)
         return reply_error_invalid_argument(ses, pkg);
 
-    if (asset_exist(asset)) { // delete
+    if (asset_exist(asset))
+    { // delete
         // cancel all related order
         // delete related market
         del_market_by_asset(asset);
@@ -1966,7 +2174,9 @@ static int on_cmd_market_del_asset(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         del_asset_from_config(asset);
 
         make_slice(time(NULL), 600);
-    } else {
+    }
+    else
+    {
         return reply_error_invalid_argument(ses, pkg);
     }
 
@@ -2028,12 +2238,13 @@ static int on_cmd_market_add_market(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     // min amount
     if (!json_is_string(json_array_get(params, 6)))
         return reply_error_invalid_argument(ses, pkg);
-    mpd_t* min_amount = decimal(json_string_value(json_array_get(params, 6)), 0);
+    mpd_t *min_amount = decimal(json_string_value(json_array_get(params, 6)), 0);
     if (min_amount == NULL || mpd_cmp(min_amount, mpd_zero, &mpd_ctx) < 0 || mpd_cmp(min_amount, mpd_one, &mpd_ctx) >= 0)
         return reply_error_invalid_argument(ses, pkg);
 
     market_t *market = get_market(market_name);
-    if (market) { // update
+    if (market)
+    { // update
         // cancel all related order
         market_cancel_all_order(market);
 
@@ -2053,12 +2264,14 @@ static int on_cmd_market_add_market(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
         // update config file
         add_market_into_config(market_name, stock, money, stock_prec, money_prec, fee_prec, min_amount, false);
-    } else { // add market
+    }
+    else
+    { // add market
         // add market struct
         struct market m_conf;
-        m_conf.name = (char*)market_name;
-        m_conf.stock = (char*)stock;
-        m_conf.money = (char*)money;
+        m_conf.name = (char *)market_name;
+        m_conf.stock = (char *)stock;
+        m_conf.money = (char *)money;
         m_conf.stock_prec = stock_prec;
         m_conf.money_prec = money_prec;
         m_conf.fee_prec = fee_prec;
@@ -2105,36 +2318,47 @@ static int on_cmd_make_slice(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
     return reply_success(ses, pkg);
 }
-
-static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params){
-    args_t* args = initOpenArgs(params);
-    if(!args) return reply_error_invalid_argument(ses, pkg);
+// todo:合约开仓代码入口
+static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    args_t *args = initOpenArgs(params); // 参数构造
+    if (!args)
+        return reply_error_invalid_argument(ses, pkg);
     args->real = 1;
     args->bOpen = 1;
     int ret = market_put_order_common(args);
 
-    if(ret){
+    if (ret)
+    {
         return reply_error_other(ses, pkg, args->msg);
-    }else{
+    }
+    else
+    {
         return reply_success(ses, pkg);
     }
 }
 
-static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params){
-    args_t* args = initCloseArgs(params);
-    if(!args) return reply_error_invalid_argument(ses, pkg);
+static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    args_t *args = initCloseArgs(params);
+    if (!args)
+        return reply_error_invalid_argument(ses, pkg);
     args->real = 1;
     args->bOpen = 0;
     int ret = market_put_order_common(args);
 
-    if(ret){
+    if (ret)
+    {
         return reply_error_other(ses, pkg, args->msg);
-    }else{
+    }
+    else
+    {
         return reply_success(ses, pkg);
     }
 }
 
-static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params){
+static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
     size_t request_size = json_array_size(params);
     if (request_size != 3)
         return reply_error_invalid_argument(ses, pkg);
@@ -2161,8 +2385,9 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params){
 
     json_t *result = json_object();
 
-    position_t* position = get_position(user_id, market_name, side);
-    if (position) {
+    position_t *position = get_position(user_id, market_name, side);
+    if (position)
+    {
         json_t *unit = json_object();
         json_object_set_new(unit, "user_id", json_integer(position->user_id));
         json_object_set_new(unit, "market", json_string(position->market));
@@ -2175,7 +2400,9 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params){
         json_object_set_new_mpd(unit, "principal", position->principal);
         json_object_set_new(result, market_name, unit);
         json_object_set_new(result, "count", json_integer(1));
-    }else{
+    }
+    else
+    {
         json_object_set_new(result, "count", json_integer(0));
     }
 
@@ -2187,281 +2414,323 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params){
 static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
 {
     json_t *params = json_loadb(pkg->body, pkg->body_size, 0, NULL);
-    if (params == NULL || !json_is_array(params)) {
+    if (params == NULL || !json_is_array(params))
+    {
         goto decode_error;
     }
     sds params_str = sdsnewlen(pkg->body, pkg->body_size);
 
     int ret;
-    switch (pkg->command) {
+    switch (pkg->command)
+    {
     case CMD_BALANCE_QUERY:
         log_trace("from: %s cmd balance query, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_balance_query(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_balance_query %s fail: %d", params_str, ret);
         }
         break;
     case CMD_BALANCE_UPDATE:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd balance update, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_balance_update(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_balance_update %s fail: %d", params_str, ret);
         }
         break;
     case CMD_BALANCE_UNFREEZE:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd balance unfreeze, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_balance_unfreeze(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_balance_unfreeze %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ASSET_LIST:
         log_trace("from: %s cmd asset list, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_asset_list(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_asset_list %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ASSET_SUMMARY:
         log_trace("from: %s cmd asset summary, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_asset_summary(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_asset_summary %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_PUSH_DEALS:
         log_trace("from: %s cmd push deals, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_push_deals(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_push_deals %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_PUT_LIMIT:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order put limit, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_put_limit(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_put_limit %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_PUT_LIMIT_BATCH:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order put limit batch, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_put_limit_batch(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_put_limit_batch %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_UPDATE_LIMIT:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order update limit, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_update_limit(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_update_limit %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_UPDATE_LIMIT_BATCH:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order update limit batch, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_update_limit_batch(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_update_limit_batch %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_PUT_MARKET:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order put market, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_put_market(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_put_market %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_QUERY:
         log_trace("from: %s cmd order query, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_query(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_query %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_QUERY_BRIEF:
         log_trace("from: %s cmd order query BRIEF, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_query_brief(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_query_brief %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_QUERY_ALL:
         log_trace("from: %s cmd order query all, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_query_all(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_query_all %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_CANCEL:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order cancel, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_cancel(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_cancel %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_CANCEL_BATCH:
-        if (is_operlog_block() || is_history_block() || is_message_block()) {
+        if (is_operlog_block() || is_history_block() || is_message_block())
+        {
             log_fatal("service unavailable, operlog: %d, history: %d, message: %d",
-                    is_operlog_block(), is_history_block(), is_message_block());
+                      is_operlog_block(), is_history_block(), is_message_block());
             reply_error_service_unavailable(ses, pkg);
             goto cleanup;
         }
         log_trace("from: %s cmd order cancel batch, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_cancel_batch(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_cancel_batch %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_BOOK:
         log_trace("from: %s cmd order book, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_book(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_book %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_BOOK_EXT:
         log_trace("from: %s cmd order book extra, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_book_ext(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_book_ext %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_BOOK_DEPTH:
         log_trace("from: %s cmd order book depth, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_book_depth(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_book_depth %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_DETAIL:
         log_trace("from: %s cmd order detail, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_detail(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_detail %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_LIST:
         log_trace("from: %s cmd market list, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_list(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_list %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_SUMMARY:
         log_trace("from: %s cmd market summary, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_summary(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_summary%s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_ADD_ASSET:
         log_trace("from: %s cmd market add asset, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_add_asset(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_add_asset %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_DEL_ASSET:
         log_trace("from: %s cmd market delete asset, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_del_asset(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_del_asset %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_ADD_MARKET:
         log_trace("from: %s cmd market add market, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_add_market(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_add_market %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MARKET_DEL_MARKET:
         log_trace("from: %s cmd market delete market, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_market_del_market(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_market_del_market %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MATCHENGINE_MAKE_SLICE:
         log_trace("from: %s cmd matchengine makeslice, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_make_slice(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_make_slice %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_OPEN:
         log_trace("from: %s cmd matchengine order open, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_open(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_open %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_CLOSE:
         log_trace("from: %s cmd matchengine order close, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_close(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_close %s fail: %d", params_str, ret);
         }
         break;
     case CMD_ORDER_QUERY_ALLUSER:
         log_trace("from: %s cmd order query alluser, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_query_alluser(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_order_query_alluser %s fail: %d", params_str, ret);
         }
         break;
     case CMD_POSITION_QUERY:
         log_trace("from: %s cmd matchengine position query, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_position_query(ses, pkg, params);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             log_error("on_cmd_position_query %s fail: %d", params_str, ret);
         }
         break;
@@ -2488,12 +2757,13 @@ cleanup:
     return;
 
 decode_error:
-    if (params) {
+    if (params)
+    {
         json_decref(params);
     }
     sds hex = hexdump(pkg->body, pkg->body_size);
-    log_error("connection: %s, cmd: %u decode params fail, params data: \n%s", \
-            nw_sock_human_addr(&ses->peer_addr), pkg->command, hex);
+    log_error("connection: %s, cmd: %u decode params fail, params data: \n%s",
+              nw_sock_human_addr(&ses->peer_addr), pkg->command, hex);
     sdsfree(hex);
     rpc_svr_close_clt(svr, ses);
 
@@ -2565,11 +2835,11 @@ int init_server(void)
 
     dict_types dt;
     memset(&dt, 0, sizeof(dt));
-    dt.hash_function  = cache_dict_hash_function;
-    dt.key_compare    = cache_dict_key_compare;
-    dt.key_dup        = cache_dict_key_dup;
+    dt.hash_function = cache_dict_hash_function;
+    dt.key_compare = cache_dict_key_compare;
+    dt.key_dup = cache_dict_key_dup;
     dt.key_destructor = cache_dict_key_free;
-    dt.val_dup        = cache_dict_val_dup;
+    dt.val_dup = cache_dict_val_dup;
     dt.val_destructor = cache_dict_val_free;
 
     dict_cache = dict_create(&dt, 64);
@@ -2581,4 +2851,3 @@ int init_server(void)
 
     return 0;
 }
-
