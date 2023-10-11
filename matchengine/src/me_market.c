@@ -1716,7 +1716,6 @@ static int execute_order(args_t *args)
         mpd_copy(args->market->latestPrice, deal->amount, &mpd_ctx);
         execute_order_open_imp(deal);
         log_trace("%s deal amount:%s", __FUNCTION__, mpd_to_sci(deal->amount, 0));
-<<<<<<< HEAD
         if (mpd_cmp(args->taker->left, mpd_zero, &mpd_ctx) == 0) {
             if (args->real) push_order_message(ORDER_EVENT_FINISH, args->taker, args->market);
         }else{
@@ -1726,21 +1725,6 @@ static int execute_order(args_t *args)
             if (args->real) push_order_message(ORDER_EVENT_FINISH, args->maker, args->market);
         }else{
             if (args->real) push_order_message(ORDER_EVENT_UPDATE, args->maker, args->market);
-=======
-        if (mpd_cmp(args->taker->left, mpd_zero, &mpd_ctx) == 0)
-        {
-            if (args->real)
-                push_order_message(ORDER_EVENT_FINISH, args->taker, args->market);
-        }
-        else
-        {
-            if (args->real)
-                push_order_message(ORDER_EVENT_UPDATE, args->taker, args->market);
-        }
-        if (mpd_cmp(maker->left, mpd_zero, &mpd_ctx) == 0)
-        {
-            push_order_message(ORDER_EVENT_FINISH, maker, args->market);
->>>>>>> 92973e4 (add market 注释)
         }
         log_trace("%s %d", __FUNCTION__, args->direction);
         // 清理处理完毕的order
@@ -1758,7 +1742,6 @@ static int execute_order(args_t *args)
     }
     skiplist_release_iterator(iter);
     // 处理未完成的order
-<<<<<<< HEAD
     if (args->taker != 0) {
         if (args->taker->type == MARKET_ORDER_TYPE_LIMIT){// || args->taker->type == MARKET_ORDER_TYPE_MARKET
             if (args->real){
@@ -1767,17 +1750,6 @@ static int execute_order(args_t *args)
                 if (ret < 0) {
                     log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
                 }
-=======
-    if (args->taker != 0)
-    {
-        if (args->taker->type == MARKET_ORDER_TYPE_LIMIT)
-        { // || args->taker->type == MARKET_ORDER_TYPE_MARKET
-            push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
-            int ret = order_put_future(args->market, args->taker);
-            if (ret < 0)
-            {
-                log_fatal("order_put_future fail: %d, order: %" PRIu64 "", ret, args->taker->id);
->>>>>>> 92973e4 (add market 注释)
             }
         }
         else
