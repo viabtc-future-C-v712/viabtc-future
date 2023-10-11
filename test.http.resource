@@ -31,6 +31,10 @@ init balance all
     balance update    ${Bob}    BCH    800000
     sleep    100ms
     kafka balances    ${Bob}    800000    ${max_offset + 4}
+    init balance    ${Carol}    BCH
+    balance update    ${Carol}    BCH    800000
+    sleep    100ms
+    kafka balances    ${Carol}    800000    ${max_offset + 6}
 init balance
     [Arguments]  ${id}    ${asset}
     ${ret} =  call    'balance.query'    ${id}, "${asset}"
@@ -91,6 +95,9 @@ check order alluser
 check order book
     [Arguments]  ${market}=BTCBCH    ${side}=2    ${offset}=0    ${limit}=1
     ${ret} =  call    'order.book'    "${market}", ${side}, ${offset}, ${limit}
+check order depth
+    [Arguments]  ${market}=BTCBCH    ${limit}=10    ${interval}=0.1
+    ${ret} =  call    'order.depth'    "${market}", ${limit}, "${interval}"
 order cancel
     [Arguments]  ${id}    ${market}=BTCBCH    ${orderid}=1
     ${ret} =  call    'order.cancel'    ${id}, "${market}", ${orderid}

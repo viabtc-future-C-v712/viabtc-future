@@ -5,6 +5,7 @@ file_path            =  'file.txt'
 BOOTSTRAP_SERVERS    = '127.0.0.1:9092'
 Alice                = 1
 Bob                  = 2
+Carol                = 3
 可用余额              = 1
 冻结余额              = 2
 空                   = 1

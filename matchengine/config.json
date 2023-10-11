@@ -68,6 +68,10 @@
             "name": "DSH",
             "prec_save": 12,
             "prec_show": 8
+        }, {
+            "name": "USDT",
+            "prec_save": 20,
+            "prec_show": 8
         }
     ],
     "markets": [
@@ -145,6 +149,17 @@
             },
             "money": {
                 "name": "BCH",
+                "prec": 8
+            },
+            "min_amount": "0.001"
+        }, {
+            "name": "BTCUSDT",
+            "stock": {
+                "name": "BTC",
+                "prec": 8
+            },
+            "money": {
+                "name": "USDT",
                 "prec": 8
             },
             "min_amount": "0.001"

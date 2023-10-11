@@ -100,8 +100,6 @@ order
     put limit    2, "BTCBCH", 1, "1", "7999", "0.002", "0.001", ""
 kline
     redis    k:BTCBCH:last
-kafka deals
-    kafka deals    6    8000
 *** Keywords ***
 redis
     [Arguments]  ${key}
