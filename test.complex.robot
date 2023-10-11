@@ -43,6 +43,14 @@ Test Teardown   重启
     kafka deals    ${Bob}    ${Carol}    10000    ${deals_offset1 + 2}  #发了一条deal信息
     kafka deals empty    ${deals_offset1 + 3}
     check order depth
+生成 order book 2
+    put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=32000
+    put open     ${Alice}    ${空}    ${限价}    ${逐仓}    20000    价格=31000
+    put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=30000
+    put open     ${Alice}    ${多}    ${限价}    ${逐仓}    5000    价格=29000
+    put open     ${Alice}    ${多}    ${限价}    ${逐仓}    10000    价格=28000
+    check balance    ${Alice}    BCH    ${可用余额}    799450
+    check balance    ${Alice}    BCH    ${冻结余额}    550
 *** Keywords ***
 生成 order book
     put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=8009
