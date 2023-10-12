@@ -2334,6 +2334,13 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     }
     else
     {
+        if(args->Type == 0){
+            append_operlog("market_order", params);
+        }else if(args->Type == 1){
+            append_operlog("limit_order", params);
+        }else{
+            append_operlog("entrust_order", params);
+        }
         return reply_success(ses, pkg);
     }
 }
@@ -2347,12 +2354,17 @@ static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     args->bOpen = 0;
     int ret = market_put_order_common(args);
 
-    if (ret)
-    {
+    if (ret){
         return reply_error_other(ses, pkg, args->msg);
     }
-    else
-    {
+    else{
+        if(args->Type == 0){
+            append_operlog("market_order", params);
+        }else if(args->Type == 1){
+            append_operlog("limit_order", params);
+        }else{
+            append_operlog("entrust_order", params);
+        }
         return reply_success(ses, pkg);
     }
 }

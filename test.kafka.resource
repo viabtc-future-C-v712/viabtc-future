@@ -14,7 +14,7 @@ kafka orders
     Should Be Equal As Numbers    ${amount}    ${value}
 kafka balances
     [Arguments]    ${id}    ${value}    ${max_offset}
-    ${messages}=    Evaluate    test.consume_from_offset('balances', 0, ${max_offset})
+    ${messages}=    Evaluate    test.consume_from_offset('balances', 0, ${max_offset}, 10000)
     ${itemValue} =  Evaluate  ${messages}\[4\]
     ${idValue} =  Evaluate  ${messages}\[1\]
     Should Be Equal As Numbers    ${idValue}    ${id}

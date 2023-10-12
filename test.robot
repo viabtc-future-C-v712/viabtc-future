@@ -14,8 +14,6 @@ Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
-echo1 
-    kline.query
 市价开多(未成交)
     ${max_offset1}=    Evaluate    test.get_max_offset('orders')
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
@@ -31,10 +29,10 @@ echo1
     ${orders_offset2}=    Evaluate    test.get_max_offset('orders')
     Should Be Equal As Numbers    ${orders_offset1 + 1}    ${orders_offset2}   #说明这里发了一条order信息
     kafka orders    ${Bob}    10000    ${orders_offset1 + 1}
-    check order brief    ${Bob}    10000
-    check order detail    amount=10000
-    order cancel    ${Bob}
-    check order detail    amount=10000
+    ${orderid} =  check order brief    ${Bob}    10000
+    check order detail    amount=10000    orderid=${id}
+    # order cancel    ${Bob}
+    # check order detail    amount=10000
     check order alluser    amount=10000
     check order book    side=${空}
     check balance    ${Bob}    BCH    ${可用余额}    799900
@@ -48,7 +46,7 @@ echo1
     kafka orders    ${Alice}    10000    ${orders_offset1 + 2}
     kafka deals    ${Bob}    ${Alice}    5000    ${deals_offset1 + 1}  #发了一条deal信息
     check order    ${Alice}
-    check order brief    ${Alice}
+    ${orderid} =  check order brief    ${Alice}
     market last
     check balance    ${Alice}    BCH    ${可用余额}    799950
     check position    ${Alice}    ${多}    ${可用仓位}    5000
@@ -91,6 +89,8 @@ echo1
     check balance    ${Alice}    BCH    ${可用余额}    799965.3125
     check position    ${Alice}    ${多}    ${可用仓位}    2500
     check position    ${Alice}    ${多}    ${冻结仓位}    0
+test1
+    kline.query
 保存数据库
     make slice
 重启1

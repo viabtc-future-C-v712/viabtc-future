@@ -9,6 +9,7 @@
 # include "me_update.h"
 # include "me_balance.h"
 # include "me_position.h"
+# include "me_args.h"
 
 int load_orders(MYSQL *conn, const char *table)
 {
@@ -789,10 +790,18 @@ static int load_oper(json_t *detail)
     int ret = 0;
     if (strcmp(method, "update_balance") == 0) {
         ret = load_update_balance(params);
-    } else if (strcmp(method, "limit_order") == 0) {
-        ret = load_limit_order(params);
-    } else if (strcmp(method, "market_order") == 0) {
-        ret = load_market_order(params);
+    } else if (strcmp(method, "order_open") == 0) {
+        args_t *args = initOpenArgs(params); // 参数构造
+        args->real = 0;
+        args->bOpen = 1;
+        ret = market_put_order_common(args);
+        // ret = load_limit_order(params);
+    } else if (strcmp(method, "order_close") == 0) {
+        args_t *args = initCloseArgs(params); // 参数构造
+        args->real = 0;
+        args->bOpen = 0;
+        ret = market_put_order_common(args);
+        // ret = load_market_order(params);
     } else if (strcmp(method, "cancel_order") == 0) {
         ret = load_cancel_order(params);
     } else if (strcmp(method, "cancel_order_batch") == 0){

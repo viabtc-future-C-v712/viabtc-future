@@ -15,5 +15,7 @@ int dump_to_db(time_t timestamp);
 int make_slice(time_t timestamp, int inter);
 int clear_slice(time_t timestamp);
 
+extern list_t *list;
+void flush_log(void);
 # endif
 

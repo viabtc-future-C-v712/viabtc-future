@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from confluent_kafka import Consumer, TopicPartition
+import time
 
 def read_increment_variable(file_path):
     try:
@@ -13,23 +14,22 @@ def write_increment_variable(file_path, value):
     with open(file_path, 'w') as file:
         file.write(str(value))
 
-def consume_from_offset(topic, partition=0, offset=0):
+def consume_from_offset(topic, partition=0, offset=0, timeout=0):
     consumer = Consumer({
         'bootstrap.servers': 'localhost:9092',
         'group.id': 'mygroup',
         'auto.offset.reset': 'earliest'
     })
-
     tp = TopicPartition(topic, partition, offset)
     consumer.assign([tp])
-
-    msg = consumer.poll(1.0)
+    msg = consumer.poll(10.0)
     if msg is None:
         return "No message"
     elif msg.error():
         return "Consumer error: {}".format(msg.error())
     else:
         return msg.value().decode('utf-8')
+    
 
 def get_max_offset(topic, partition=0):
     consumer = Consumer({

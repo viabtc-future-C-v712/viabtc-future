@@ -27,6 +27,7 @@ services:
   viabtcdeal:
     image: viabtcdeal
     tty: true
+    command: ["/bin/bash", "-c", "/usr/src/myapp/start.sh"]
     build:
       context: .
       dockerfile: ./Dockerfile.app

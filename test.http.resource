@@ -25,15 +25,12 @@ init balance all
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
-    sleep    100ms
     kafka balances    ${Alice}    800000    ${max_offset + 2}
     init balance    ${Bob}    BCH
     balance update    ${Bob}    BCH    800000
-    sleep    100ms
     kafka balances    ${Bob}    800000    ${max_offset + 4}
     init balance    ${Carol}    BCH
     balance update    ${Carol}    BCH    800000
-    sleep    100ms
     kafka balances    ${Carol}    800000    ${max_offset + 6}
 init balance
     [Arguments]  ${id}    ${asset}
@@ -72,6 +69,7 @@ check order brief
     ELSE
         Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["amount"]}    ${amount}
     END
+    [Return]    ${ret.json()["result"]["records"][0]["id"]}
 check order detail
     [Arguments]  ${market}=BTCBCH    ${amount}=0    ${orderid}=1
     ${ret} =  call    'order.pending_detail'    "${market}", ${orderid}

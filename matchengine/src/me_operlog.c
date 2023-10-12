@@ -10,7 +10,7 @@ uint64_t operlog_id_start;
 
 static MYSQL *mysql_conn;
 static nw_job *job;
-static list_t *list;
+list_t *list;
 static nw_timer timer;
 
 struct operlog {
@@ -57,7 +57,7 @@ static void on_list_free(void *value)
     free(log);
 }
 
-static void flush_log(void)
+void flush_log(void)
 {
     static sds table_last;
     if (table_last == NULL) {
