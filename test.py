@@ -16,7 +16,7 @@ def write_increment_variable(file_path, value):
 
 def consume_from_offset(topic, partition=0, offset=0, timeout=0):
     consumer = Consumer({
-        'bootstrap.servers': 'localhost:9092',
+        'bootstrap.servers': '127.0.0.1:9092',
         'group.id': 'mygroup',
         'auto.offset.reset': 'earliest'
     })
@@ -33,7 +33,7 @@ def consume_from_offset(topic, partition=0, offset=0, timeout=0):
 
 def get_max_offset(topic, partition=0):
     consumer = Consumer({
-        'bootstrap.servers': 'localhost:9092',
+        'bootstrap.servers': '127.0.0.1:9092',
         'group.id': 'mygroup',
         'auto.offset.reset': 'earliest'
     })

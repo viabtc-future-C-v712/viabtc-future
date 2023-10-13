@@ -66,7 +66,6 @@ int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p){
     strncpy(key.market, market, sizeof(key.market));
     dict_entry *entry = dict_add(dict_position, &key, p);
     position_t *tmp = entry->val;
-    log_trace("%s %p %p", __FUNCTION__, (void*)p, (void*)tmp);
     return 0;
 }
 

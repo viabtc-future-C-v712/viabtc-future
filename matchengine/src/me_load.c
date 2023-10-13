@@ -40,7 +40,7 @@ int load_orders(MYSQL *conn, const char *table)
         `deal_fee`, \
         `source` FROM `%s` "
         "WHERE `id` > %"PRIu64" ORDER BY `id` LIMIT %zu", table, last_id, query_limit);
-        log_trace("exec sql: %s", sql);
+        log_debug("exec sql: %s", sql);
         int ret = mysql_real_query(conn, sql, sdslen(sql));
         if (ret != 0) {
             log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
@@ -110,7 +110,7 @@ int load_balance(MYSQL *conn, const char *table)
         sds sql = sdsempty();
         sql = sdscatprintf(sql, "SELECT `id`, `user_id`, `asset`, `t`, `balance` FROM `%s` "
                 "WHERE `id` > %"PRIu64" ORDER BY id LIMIT %zu", table, last_id, query_limit);
-        log_trace("exec sql: %s", sql);
+        log_debug("exec sql: %s", sql);
         int ret = mysql_real_query(conn, sql, sdslen(sql));
         if (ret != 0) {
             log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
@@ -160,7 +160,7 @@ int load_position(MYSQL *conn, const char *table)
         `price`, \
         `principal` FROM `%s` "
                 "WHERE `id` > %"PRIu64" ORDER BY id LIMIT %zu", table, last_id, query_limit);
-        log_trace("exec sql: %s", sql);
+        log_debug("exec sql: %s", sql);
         int ret = mysql_real_query(conn, sql, sdslen(sql));
         if (ret != 0) {
             log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));

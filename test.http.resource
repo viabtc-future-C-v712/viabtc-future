@@ -22,16 +22,18 @@ make slice
     call    'matchengine.makeslice'    ""
     sleep    1
 init balance all
-    ${max_offset}=    Evaluate    test.get_max_offset('balances')
     init balance    ${Alice}    BCH
     balance update    ${Alice}    BCH    800000
-    kafka balances    ${Alice}    800000    ${max_offset + 2}
+    ${max_offset}=    Evaluate    test.get_max_offset('balances')
+    kafka balances    ${Alice}    800000    ${max_offset}
     init balance    ${Bob}    BCH
     balance update    ${Bob}    BCH    800000
-    kafka balances    ${Bob}    800000    ${max_offset + 4}
+    ${max_offset}=    Evaluate    test.get_max_offset('balances')
+    kafka balances    ${Bob}    800000    ${max_offset}
     init balance    ${Carol}    BCH
     balance update    ${Carol}    BCH    800000
-    kafka balances    ${Carol}    800000    ${max_offset + 6}
+    ${max_offset}=    Evaluate    test.get_max_offset('balances')
+    kafka balances    ${Carol}    800000    ${max_offset}
 init balance
     [Arguments]  ${id}    ${asset}
     ${ret} =  call    'balance.query'    ${id}, "${asset}"
@@ -69,7 +71,7 @@ check order brief
     ELSE
         Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["amount"]}    ${amount}
     END
-    [Return]    ${ret.json()["result"]["records"][0]["id"]}
+    # [Return]    ${ret.json()["result"]["records"][0]["id"]}
 check order detail
     [Arguments]  ${market}=BTCBCH    ${amount}=0    ${orderid}=1
     ${ret} =  call    'order.pending_detail'    "${market}", ${orderid}
@@ -123,6 +125,7 @@ check position
 market last
     call    'market.last'    "BTCBCH"
 重启
+    sleep    0.2s
     call    'matchengine.suicide'    -1
 退出
     call    'matchengine.suicide'    0

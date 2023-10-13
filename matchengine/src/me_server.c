@@ -40,7 +40,7 @@ static int reply_json(nw_ses *ses, rpc_pkg *pkg, const json_t *json)
     }
     if (message_data == NULL)
         return -__LINE__;
-    log_trace("connection: %s send: %s", nw_sock_human_addr(&ses->peer_addr), message_data);
+    log_debug("connection: %s send: %s", nw_sock_human_addr(&ses->peer_addr), message_data);
 
     rpc_pkg reply;
     memcpy(&reply, pkg, sizeof(reply));
@@ -2334,13 +2334,7 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     }
     else
     {
-        if(args->Type == 0){
-            append_operlog("market_order", params);
-        }else if(args->Type == 1){
-            append_operlog("limit_order", params);
-        }else{
-            append_operlog("entrust_order", params);
-        }
+        append_operlog("order_open", params);
         return reply_success(ses, pkg);
     }
 }
@@ -2358,13 +2352,7 @@ static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_other(ses, pkg, args->msg);
     }
     else{
-        if(args->Type == 0){
-            append_operlog("market_order", params);
-        }else if(args->Type == 1){
-            append_operlog("limit_order", params);
-        }else{
-            append_operlog("entrust_order", params);
-        }
+        append_operlog("order_close", params);
         return reply_success(ses, pkg);
     }
 }
@@ -2756,6 +2744,7 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
             return reply_error_invalid_argument(ses, pkg);
         int status = json_integer_value(json_array_get(params, 0));
         reply_success(ses, pkg);
+        sleep(1);//等待operlog数据写完
         exit(status);
         break;
     default:
