@@ -3,6 +3,7 @@ Documentation     An example resource file
 Library    RequestsLibrary
 Library    test
 Resource   test.kafka.resource
+Resource   test.db.resource
 Variables  test_variable.py
 
 *** Variables ***
@@ -71,7 +72,7 @@ check order brief
     ELSE
         Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["amount"]}    ${amount}
     END
-    # [Return]    ${ret.json()["result"]["records"][0]["id"]}
+    [Return]    ${ret.json()["result"]["records"][0]["id"]}
 check order detail
     [Arguments]  ${market}=BTCBCH    ${amount}=0    ${orderid}=1
     ${ret} =  call    'order.pending_detail'    "${market}", ${orderid}
@@ -126,6 +127,7 @@ market last
     call    'market.last'    "BTCBCH"
 重启
     sleep    0.2s
+    init oper Log
     call    'matchengine.suicide'    -1
 退出
     call    'matchengine.suicide'    0

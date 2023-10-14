@@ -28,6 +28,13 @@ kafka deals
     Should Be Equal As Numbers    ${买idValue}    ${买id}
     ${itemValue} =  Evaluate  ${deals}\[7\]
     Should Be Equal As Numbers    ${itemValue}    ${value}
+kafka positions
+    [Arguments]    ${id}    ${max_offset}
+    ${deals}=    Evaluate    test.consume_from_offset('positions', 0, ${max_offset})
+kafka positions empty
+    [Arguments]    ${max_offset}
+    ${positions}=    Evaluate    test.consume_from_offset('positions', 0, ${max_offset})
+    Should Be Equal As Strings    ${positions}    No message
 kafka deals empty
     [Arguments]    ${max_offset}
     ${deals}=    Evaluate    test.consume_from_offset('deals', 0, ${max_offset})

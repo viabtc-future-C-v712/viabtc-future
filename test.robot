@@ -37,6 +37,12 @@ Test Teardown   重启
     check order book    side=${空}
     check balance    ${Bob}    BCH    ${可用余额}    799900
     check position    ${Bob}    ${空}    ${可用仓位}    0
+限价开空(未成交)(撤销)
+    put open     ${Bob}    ${空}    ${限价}    ${逐仓}    10000
+    ${orderid} =  check order brief    ${Bob}    amount=10000
+    order cancel    ${Bob}    orderid=${orderid}
+    check balance    ${Bob}    BCH    ${可用余额}    800000
+    check position    ${Bob}    ${空}    ${可用仓位}    0
 市价开多(部份成交)
     ${orders_offset1}=    Evaluate    test.get_max_offset('orders')
     ${deals_offset1}=    Evaluate    test.get_max_offset('deals')
@@ -46,7 +52,6 @@ Test Teardown   重启
     kafka orders    ${Alice}    10000    ${orders_offset1 + 2}
     kafka deals    ${Bob}    ${Alice}    5000    ${deals_offset1 + 1}  #发了一条deal信息
     check order    ${Alice}
-    ${orderid} =  check order brief    ${Alice}
     market last
     check balance    ${Alice}    BCH    ${可用余额}    799950
     check position    ${Alice}    ${多}    ${可用仓位}    5000
@@ -69,6 +74,17 @@ Test Teardown   重启
     check balance    ${Alice}    BCH    ${可用余额}    799965
     check position    ${Alice}    ${多}    ${可用仓位}    2500
     check position    ${Alice}    ${多}    ${冻结仓位}    0
+限价平多(部份成交)
+    put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
+    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500  #新挂买单
+    put close     ${Alice}    ${多}    ${限价}    ${逐仓}    5000  #市价平多
+    check order    ${Alice}    amount=2500  # 市价不挂单
+    # -50
+    check balance    ${Alice}    BCH    ${可用余额}    799965
+    # 成交了2500单， 剩下的2500为冻结
+    check position    ${Alice}    ${多}    ${可用仓位}    0
+    check position    ${Alice}    ${多}    ${冻结仓位}    2500
 市价平多(部份成交,亏损)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
@@ -93,6 +109,8 @@ test1
     kline.query
 保存数据库
     make slice
+清理数据库
+    init oper Log
 重启1
     重启
 order

@@ -38,10 +38,16 @@ Test Teardown   重启
 限价开多(吃多个空单)
     生成 order book
     ${deals_offset1}=    Evaluate    test.get_max_offset('deals')
+    ${positions_offset1}=    Evaluate    test.get_max_offset('positions')
     put open     ${Carol}    ${多}    ${限价}    ${逐仓}    150000    价格=8002  #可以吃掉两个order
     kafka deals    ${Alice}    ${Carol}    10000    ${deals_offset1 + 1}  #发了一条deal信息
     kafka deals    ${Bob}    ${Carol}    10000    ${deals_offset1 + 2}  #发了一条deal信息
     kafka deals empty    ${deals_offset1 + 3}
+    kafka positions    ${Alice}    ${positions_offset1 + 1}
+    kafka positions    ${Alice}    ${positions_offset1 + 2}
+    kafka positions    ${Alice}    ${positions_offset1 + 3}
+    kafka positions    ${Alice}    ${positions_offset1 + 4}
+    kafka positions empty    ${positions_offset1 + 5}
     check order depth
 生成 order book 2
     put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=32000

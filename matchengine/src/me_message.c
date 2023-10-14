@@ -11,10 +11,12 @@
 static rd_kafka_t *rk;
 
 static rd_kafka_topic_t *rkt_deals;
+static rd_kafka_topic_t *rkt_positions;
 static rd_kafka_topic_t *rkt_orders;
 static rd_kafka_topic_t *rkt_balances;
 
 static list_t *list_deals;
+static list_t *list_positions;
 static list_t *list_orders;
 static list_t *list_balances;
 
@@ -64,7 +66,9 @@ static void on_timer(nw_timer *t, void *privdata)
     if (list_deals->len) {
         produce_list(list_deals, rkt_deals);
     }
-
+    if (list_positions->len) {
+        produce_list(list_positions, rkt_positions);
+    }
     rd_kafka_poll(rk, 0);
 }
 
@@ -109,6 +113,11 @@ int init_message(void)
         log_stderr("Failed to create topic object: %s", rd_kafka_err2str(rd_kafka_last_error()));
         return -__LINE__;
     }
+    rkt_positions = rd_kafka_topic_new(rk, "positions", NULL);
+    if (rkt_positions == NULL) {
+        log_stderr("Failed to create topic object: %s", rd_kafka_err2str(rd_kafka_last_error()));
+        return -__LINE__;
+    }
 
     list_type lt;
     memset(&lt, 0, sizeof(lt));
@@ -122,6 +131,9 @@ int init_message(void)
         return -__LINE__;
     list_balances = list_create(&lt);
     if (list_balances == NULL)
+        return -__LINE__;
+    list_positions = list_create(&lt);
+    if (list_positions == NULL)
         return -__LINE__;
 
     nw_timer_set(&timer, 0.1, true, on_timer, NULL);
@@ -138,6 +150,7 @@ int fini_message(void)
     rd_kafka_topic_destroy(rkt_balances);
     rd_kafka_topic_destroy(rkt_orders);
     rd_kafka_topic_destroy(rkt_deals);
+    rd_kafka_topic_destroy(rkt_positions);
     rd_kafka_destroy(rk);
 
     return 0;
@@ -254,6 +267,26 @@ int push_deal_message_extra(double t, const char *market, uint64_t aid, uint64_t
     return 0;
 }
 
+int push_position_message(position_t *position)
+{
+    json_t *message = json_array();
+    json_array_append_new(message, json_integer(position->id));
+    json_array_append_new(message, json_integer(position->user_id));
+    json_array_append_new(message, json_string(position->market));
+    json_array_append_new(message, json_integer(position->side));
+    json_array_append_new(message, json_integer(position->pattern));
+    json_array_append_mpd(message, position->leverage);
+    json_array_append_mpd(message, position->position);
+    json_array_append_mpd(message, position->frozen);
+    json_array_append_mpd(message, position->price);
+    json_array_append_mpd(message, position->principal);
+
+    push_message(json_dumps(message, 0), rkt_positions, list_positions);
+    json_decref(message);
+
+    return 0;
+}
+
 bool is_message_block(void)
 {
     if (list_deals->len >= MAX_PENDING_MESSAGE)
@@ -262,7 +295,8 @@ bool is_message_block(void)
         return true;
     if (list_balances->len >= MAX_PENDING_MESSAGE)
         return true;
-
+    if (list_positions->len >= MAX_PENDING_MESSAGE)
+        return true;
     return false;
 }
 
@@ -271,6 +305,7 @@ sds message_status(sds reply)
     reply = sdscatprintf(reply, "message deals pending: %lu\n", list_deals->len);
     reply = sdscatprintf(reply, "message orders pending: %lu\n", list_orders->len);
     reply = sdscatprintf(reply, "message balances pending: %lu\n", list_balances->len);
+    reply = sdscatprintf(reply, "message positions pending: %lu\n", list_positions->len);
     return reply;
 }
 

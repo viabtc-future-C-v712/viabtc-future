@@ -17,3 +17,5 @@ docker-compose exec viabtcdeal bash
 
 ## 运行
 ./start.sh
+
+## 宿主机 /etc/hosts 添加 host.docker.internal域名，用于在docker中访问
