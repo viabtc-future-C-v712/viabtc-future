@@ -39,8 +39,11 @@
 // 合约
 # define CMD_ORDER_OPEN             250
 # define CMD_ORDER_CLOSE            251
-# define CMD_ORDER_QUERY_ALLUSER    252    
+# define CMD_ORDER_QUERY_ALLUSER    252
+
 # define CMD_POSITION_QUERY         260
+# define CMD_POSITION_QUERY_ALL     261
+# define CMD_POSITION_ADJUST_PRINCIPAL         262
 
 # define CMD_MATCHENGINE_SUICIDE    270
 

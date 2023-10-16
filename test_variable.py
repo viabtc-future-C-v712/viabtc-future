@@ -18,6 +18,7 @@ Carol                = 3
 开仓                 = 1
 可用仓位              = 'position'
 冻结仓位              = 'frozen'
+保证金                = 'principal'
 
 # 创建列表变量
 pylist = ["大宗商品", "供应链金融", '2C电商']

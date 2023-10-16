@@ -14,25 +14,26 @@ put limit
     [Arguments]  ${data}
     call    'order.put_limit'    ${data}
 put open
-    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000
-    call    'order.open'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "100", "${张}", "0.002", "0.001"
+    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${market}=BTCBCH
+    call    'order.open'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "100", "${张}", "0.002", "0.001"
 put close
-    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000
-    call    'order.close'    ${用户}, "BTCBCH", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "${张}", "0.002", "0.001"
+    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${market}=BTCBCH
+    call    'order.close'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "8000", "${价格}", "${张}", "0.002", "0.001"
 make slice
     call    'matchengine.makeslice'    ""
     sleep    1
 init balance all
-    init balance    ${Alice}    BCH
-    balance update    ${Alice}    BCH    800000
+    [Arguments]  ${asset}=BCH
+    init balance    ${Alice}    ${asset}
+    balance update    ${Alice}    ${asset}    800000
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     kafka balances    ${Alice}    800000    ${max_offset}
-    init balance    ${Bob}    BCH
-    balance update    ${Bob}    BCH    800000
+    init balance    ${Bob}    ${asset}
+    balance update    ${Bob}    ${asset}    800000
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     kafka balances    ${Bob}    800000    ${max_offset}
-    init balance    ${Carol}    BCH
-    balance update    ${Carol}    BCH    800000
+    init balance    ${Carol}    ${asset}
+    balance update    ${Carol}    ${asset}    800000
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     kafka balances    ${Carol}    800000    ${max_offset}
 init balance
@@ -112,17 +113,32 @@ balance unfreeze
     [Arguments]  ${user}    ${asset}    ${amount}
     call    'balance.unfreeze'    ${user}, "${asset}", "${amount}"
 check position
-    [Arguments]  ${id}    ${side}    ${type}    ${amount}
+    [Arguments]  ${id}    ${side}    ${type}    ${amount}    
     ${ret} =  call    'position.query'    ${id}, "BTCBCH", ${side}, 
     IF    '${ret.json()["result"]["count"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE
         IF    '${amount}' == '0'
-            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["${type}"]}    0
+            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    0
         ELSE
-            Should Be Equal As Numbers    ${ret.json()["result"]["BTCBCH"]["${type}"]}    ${amount}
+            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    ${amount}
         END
     END
+check position all
+    [Arguments]  ${id}    ${market}=BTCBCH    ${type}=${可用仓位}    ${amount}=0
+    ${ret} =  call    'position.query_all'    ${id}, "${market}"
+    IF    '${ret.json()["result"]["count"]}' == '0'
+        Should Be Equal As Numbers    0    ${amount}
+    ELSE
+        IF    '${amount}' == '0'
+            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    0
+        ELSE
+            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    ${amount}
+        END
+    END
+position update
+    [Arguments]  ${id}    ${side}    ${amount}
+    ${ret} =  call    'position.adjust_principal'    ${id}, "BTCBCH", ${side}, "${amount}"
 market last
     call    'market.last'    "BTCBCH"
 重启

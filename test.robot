@@ -105,6 +105,35 @@ Test Teardown   重启
     check balance    ${Alice}    BCH    ${可用余额}    799965.3125
     check position    ${Alice}    ${多}    ${可用仓位}    2500
     check position    ${Alice}    ${多}    ${冻结仓位}    0
+调整保证金(增加)
+    init balance all    asset=USDT
+    put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
+    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    8001  #新挂买单
+    put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
+
+    put open     ${Alice}    ${空}    ${限价}    ${逐仓}    5000
+    put open     ${Bob}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
+    put open     ${Alice}    ${多}    ${限价}    ${逐仓}    2500    8001  #新挂买单
+    put close     ${Bob}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
+
+    put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000    market=BTCUSDT
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    market=BTCUSDT  # 成交5000
+    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    8001    market=BTCUSDT  #新挂买单
+    put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000    market=BTCUSDT  #市价平多 2500个
+
+    check order    ${Alice}  # 市价不挂单
+    check balance    ${Alice}    BCH    ${可用余额}    799890.3125
+    check position    ${Alice}    ${多}    ${可用仓位}    5000
+    check position    ${Alice}    ${多}    ${冻结仓位}    0
+    check position    ${Alice}    ${多}    ${保证金}    62.4875
+    position update    ${Alice}    ${多}    10
+    check balance    ${Alice}    BCH    ${可用余额}    799880.3125
+    check position    ${Alice}    ${多}    ${保证金}    72.4875
+    position update    ${Alice}    ${多}    -10
+    check balance    ${Alice}    BCH    ${可用余额}    799890.3125
+    check position    ${Alice}    ${多}    ${保证金}    62.4875
+    check position all    ${Alice}    amount=5000
 test1
     kline.query
 保存数据库

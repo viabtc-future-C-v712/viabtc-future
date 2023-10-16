@@ -2384,6 +2384,7 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_invalid_argument(ses, pkg);
 
     json_t *result = json_object();
+    json_t *positions = json_array();
 
     position_t *position = get_position(user_id, market_name, side);
     if (position)
@@ -2398,17 +2399,160 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         json_object_set_new_mpd(unit, "frozen", position->frozen);
         json_object_set_new_mpd(unit, "price", position->price);
         json_object_set_new_mpd(unit, "principal", position->principal);
-        json_object_set_new(result, market_name, unit);
+        json_array_append_new(positions, unit);
         json_object_set_new(result, "count", json_integer(1));
     }
     else
     {
         json_object_set_new(result, "count", json_integer(0));
     }
-
+    json_object_set_new(result, "postions", positions);
     int ret = reply_result(ses, pkg, result);
     json_decref(result);
     return ret;
+}
+
+static int on_cmd_position_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    size_t request_size = json_array_size(params);
+    if (request_size != 2)
+        return reply_error_invalid_argument(ses, pkg);
+
+    if (!json_is_integer(json_array_get(params, 0)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t user_id = json_integer_value(json_array_get(params, 0));
+    if (user_id == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    // market
+    if (!json_is_string(json_array_get(params, 1)))
+        return reply_error_invalid_argument(ses, pkg);
+    const char *market_name = json_string_value(json_array_get(params, 1));
+    market_t *market = NULL;
+    if(strlen(market_name) != 0){
+        market = get_market(market_name);
+        if (market == NULL)
+            return reply_error_other(ses, pkg, "market不存在");
+    }
+
+    json_t *result = json_object();
+    json_t *positions = json_array();
+    int count = 0;
+    for (size_t i = 0; i < settings.market_num; ++i) {
+        position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
+        if (position)
+        {
+            json_t *unit = json_object();
+            json_object_set_new(unit, "user_id", json_integer(position->user_id));
+            json_object_set_new(unit, "market", json_string(position->market));
+            json_object_set_new(unit, "side", json_integer(position->side));
+            json_object_set_new(unit, "pattern", json_integer(position->pattern));
+            json_object_set_new_mpd(unit, "leverage", position->leverage);
+            json_object_set_new_mpd(unit, "position", position->position);
+            json_object_set_new_mpd(unit, "frozen", position->frozen);
+            json_object_set_new_mpd(unit, "price", position->price);
+            json_object_set_new_mpd(unit, "principal", position->principal);
+            json_array_append_new(positions, unit);
+            count += 1;
+        }
+        position = get_position(user_id, settings.markets[i].name, BULL);
+        if (position)
+        {
+            json_t *unit = json_object();
+            json_object_set_new(unit, "user_id", json_integer(position->user_id));
+            json_object_set_new(unit, "market", json_string(position->market));
+            json_object_set_new(unit, "side", json_integer(position->side));
+            json_object_set_new(unit, "pattern", json_integer(position->pattern));
+            json_object_set_new_mpd(unit, "leverage", position->leverage);
+            json_object_set_new_mpd(unit, "position", position->position);
+            json_object_set_new_mpd(unit, "frozen", position->frozen);
+            json_object_set_new_mpd(unit, "price", position->price);
+            json_object_set_new_mpd(unit, "principal", position->principal);
+            json_array_append_new(positions, unit);
+            count += 1;
+        }
+    }
+    json_object_set_new(result, "postions", positions);
+    json_object_set_new(result, "count", json_integer(count));
+    int ret = reply_result(ses, pkg, result);
+    json_decref(result);
+    return ret;
+}
+
+static int on_cmd_position_adjust_principal(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    size_t request_size = json_array_size(params);
+    if (request_size != 4)
+        return reply_error_invalid_argument(ses, pkg);
+
+    if (!json_is_integer(json_array_get(params, 0)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t user_id = json_integer_value(json_array_get(params, 0));
+    if (user_id == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    // market
+    if (!json_is_string(json_array_get(params, 1)))
+        return reply_error_invalid_argument(ses, pkg);
+    const char *market_name = json_string_value(json_array_get(params, 1));
+    market_t *market = get_market(market_name);
+    if (market == NULL)
+        return reply_error_other(ses, pkg, "market不存在");
+
+    if (!json_is_integer(json_array_get(params, 2)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t side = json_integer_value(json_array_get(params, 2));
+    if (side == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    // change
+    if (!json_is_string(json_array_get(params, 3)))
+    {
+        log_vip("reply_error_invalid_argument c");
+        return reply_error_invalid_argument(ses, pkg);
+    }
+    mpd_t *change = decimal(json_string_value(json_array_get(params, 3)), market->money_prec);
+    if (change == NULL)
+    {
+        log_vip("reply_error_invalid_argument cd");
+        return reply_error_invalid_argument(ses, pkg);
+    }
+
+    position_t *position = get_position(user_id, market_name, side);
+    if (position){
+        int ret = mpd_cmp(change, mpd_zero, &mpd_ctx);
+        if( ret > 0 ){
+            //检查余额
+            mpd_t *balance = balance_get(user_id, BALANCE_TYPE_AVAILABLE, market->money);
+            if (!balance || mpd_cmp(balance, change, &mpd_ctx) < 0){
+                reply_error_other(ses, pkg, "balance not enough");
+            }
+            //调整余额
+            balance_sub(user_id, BALANCE_TYPE_AVAILABLE, market->money, change);
+            //调整保证金
+            mpd_add(position->principal, position->principal, change, &mpd_ctx);
+            reply_success(ses, pkg);
+        }else if(ret < 0){
+            mpd_abs(change, change, &mpd_ctx);
+            //检查保证金
+            mpd_t *principal = mpd_new(&mpd_ctx);
+            mpd_div(principal, position->position, position->leverage, &mpd_ctx);
+            mpd_add(principal, principal, change, &mpd_ctx);
+            if (!mpd_cmp(position->principal, principal, &mpd_ctx) < 0){
+                reply_error_other(ses, pkg, "balance not principal");
+            }
+            //调整余额
+            balance_add(user_id, BALANCE_TYPE_AVAILABLE, market->money, change);
+            //调整保证金
+            mpd_sub(position->principal, position->principal, change, &mpd_ctx);
+            reply_success(ses, pkg);
+        }else{
+            reply_success(ses, pkg);
+        }
+    }
+    else{
+        return reply_error_other(ses, pkg, "position 不存在");
+    }
 }
 
 static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
@@ -2732,6 +2876,22 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
         if (ret < 0)
         {
             log_error("on_cmd_position_query %s fail: %d", params_str, ret);
+        }
+        break;
+    case CMD_POSITION_QUERY_ALL:
+        log_trace("from: %s cmd matchengine position query all, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        ret = on_cmd_position_query_all(ses, pkg, params);
+        if (ret < 0)
+        {
+            log_error("on_cmd_position_query_all %s fail: %d", params_str, ret);
+        }
+        break;
+    case CMD_POSITION_ADJUST_PRINCIPAL:
+        log_trace("from: %s cmd matchengine position adjust principal, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        ret = on_cmd_position_adjust_principal(ses, pkg, params);
+        if (ret < 0)
+        {
+            log_error("on_cmd_position_adjust_principal %s fail: %d", params_str, ret);
         }
         break;
     case CMD_MATCHENGINE_SUICIDE:

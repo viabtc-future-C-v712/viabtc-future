@@ -3,12 +3,22 @@
 
 # include "me_market.h"
 
+#define BEAR    1
+#define BULL    2
+
+#define MARKET 0
+#define LIMIT 1
+#define ENTRUST 2
+
+#define CROSS_MARGIN    2
+#define ISOLATED_MARGIN  1
+
 typedef struct args_t{
     uint32_t user_id;
     market_t * market;
-    uint32_t direction;// 0：买（平空）  1：卖（平多）
-    uint32_t Type;// 0：市价 1：限价 2：计划委托
-    uint32_t pattern;// 1 逐仓, 2 全仓
+    uint32_t direction;// 1：空(BEAR)  2：多(BULL)
+    uint32_t Type;// 0：市价(MARKET) 1：限价(LIMIT) 2：计划委托(ENTRUST)
+    uint32_t pattern;// 1 逐仓(ISOLATED_MARGIN), 2 全仓(CROSS_MARGIN)
     mpd_t *markPrice;
     mpd_t *triggerPrice;
     mpd_t *entrustPrice;
