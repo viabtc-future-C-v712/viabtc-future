@@ -62,6 +62,11 @@
         "topic": "balances",
         "partition": 0
     },
+    "positions": {
+        "brokers": "172.19.0.6:9092",
+        "topic": "positions",
+        "partition": 0
+    },
     "backend_timeout": 1.0,
     "cache_timeout": 10.0,
     "auth_url": "https://www.biconomy.com/api/v1/internal/exchange/user/auth",

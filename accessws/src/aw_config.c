@@ -96,7 +96,11 @@ static int read_config_from_json(json_t *root)
         printf("load kafka balances config fail: %d\n", ret);
         return -__LINE__;
     }
-
+    ret = load_cfg_kafka_consumer(root, "positions", &settings.positions);
+    if (ret < 0) {
+        printf("load kafka positions config fail: %d\n", ret);
+        return -__LINE__;
+    }
     ERR_RET(read_cfg_int(root, "worker_num", &settings.worker_num, false, 1));
     ERR_RET(read_cfg_str(root, "auth_url", &settings.auth_url, NULL));
     ERR_RET(read_cfg_str(root, "sign_url", &settings.sign_url, NULL));

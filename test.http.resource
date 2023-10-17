@@ -114,7 +114,7 @@ balance unfreeze
     call    'balance.unfreeze'    ${user}, "${asset}", "${amount}"
 check position
     [Arguments]  ${id}    ${side}    ${type}    ${amount}    
-    ${ret} =  call    'position.query'    ${id}, "BTCBCH", ${side}, 
+    ${ret} =  call    'position.query'    ${id}, "BTCBCH", ${side}
     IF    '${ret.json()["result"]["count"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE

@@ -161,6 +161,10 @@ server:
     if (ret < 0) {
         error(EXIT_FAILURE, errno, "init asset fail: %d", ret);
     }
+    ret = init_position();
+    if (ret < 0) {
+        error(EXIT_FAILURE, errno, "init position fail: %d", ret);
+    }
     ret = init_message();
     if (ret < 0) {
         error(EXIT_FAILURE, errno, "init message fail: %d", ret);

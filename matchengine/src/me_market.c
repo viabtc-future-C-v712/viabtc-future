@@ -1446,15 +1446,9 @@ int adjustPosition(deal_t *deal)
             mpd_sub(position->principal, position->principal, deal->taker_priAmount, &mpd_ctx);
 
             mpd_div(newPrice, total, totalPosition, &mpd_ctx);
-            if(deal->args->taker->type == 1){
-                // 限价单下单时已冻结仓位，这里只需减少冻结仓位
-                mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
-                mpd_copy(position->price, newPrice, &mpd_ctx);
-            }else{
-                // 市价单下单时不冻结仓位
-                mpd_sub(position->position, position->position, deal->amount, &mpd_ctx);
-                mpd_copy(position->price, newPrice, &mpd_ctx);
-            }
+            // 下单时已冻结仓位，这里只需减少冻结仓位
+            mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
+            mpd_copy(position->price, newPrice, &mpd_ctx);
         }
     }
     if(deal->args->real){
@@ -1777,9 +1771,9 @@ static int execute_order(args_t *args)
                 log_fatal("order_put_future fail: %d, order: %"PRIu64"", ret, args->taker->id);
             }
         }
-        else
+        else if (args->taker->type == MARKET_ORDER_TYPE_MARKET)
         {
-            order_free(args->taker);
+            int ret = market_cancel_order(args->real, NULL, args->market, args->taker);
             args->taker = NULL;
         }
     }
@@ -1915,7 +1909,7 @@ int market_put_order_close(void *args_)
     }
 
     // 限价或市价下单时，需要冻结仓位，计划委托下单则无需冻结
-    if(args->Type == 1){
+    if(args->Type == 1 || args->Type == 0){
         mpd_add(position->frozen, position->frozen, args->volume, &mpd_ctx);
         mpd_sub(position->position, position->position, args->volume, &mpd_ctx);
     }
@@ -2068,6 +2062,9 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
             return -__LINE__;
         }
     }
+
+    // todo 解冻 仓位
+
     order_finish_future(real, m, order);
     return 0;
 }

@@ -4,21 +4,26 @@
  */
 
 # include "aw_config.h"
-# include "aw_asset.h"
+# include "aw_position.h"
 # include "aw_server.h"
 
 static dict_t *dict_sub;
 static rpc_clt *matchengine;
 static nw_state *state_context;
 
+struct position_key {
+    char        market[MARKET_NAME_MAX_LEN + 1];
+    uint32_t    side;
+};
+
 struct sub_unit {
     void *ses;
-    char asset[ASSET_NAME_MAX_LEN];
+    struct position_key position;
 };
 
 struct state_data {
     uint32_t user_id;
-    char asset[ASSET_NAME_MAX_LEN];
+    struct position_key position;
 };
 
 static uint32_t dict_sub_hash_func(const void *key)
@@ -55,7 +60,7 @@ static void list_node_free(void *value)
 
 static void on_timeout(nw_state_entry *entry)
 {
-    log_fatal("query balance timeout, state id: %u", entry->id);
+    log_fatal("query position timeout, state id: %u", entry->id);
 }
 
 static void on_backend_connect(nw_ses *ses, bool result)
@@ -68,7 +73,7 @@ static void on_backend_connect(nw_ses *ses, bool result)
     }
 }
 
-static int on_balance_query_reply(struct state_data *state, json_t *result)
+static int on_position_query_reply(struct state_data *state, json_t *result)
 {
     void *key = (void *)(uintptr_t)state->user_id;
     dict_entry *entry = dict_find(dict_sub, key);
@@ -83,8 +88,8 @@ static int on_balance_query_reply(struct state_data *state, json_t *result)
     list_node *node;
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
-        if (strcmp(unit->asset, state->asset) == 0) {
-            send_notify(unit->ses, "asset.update", params);
+        if (strcmp(unit->position.market, state->position.market) == 0 && unit->position.side, state->position.side) {
+            send_notify(unit->ses, "position.update", params);
         }
     }
     list_release_iterator(iter);
@@ -127,10 +132,10 @@ static void on_backend_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
 
     int ret;
     switch (pkg->command) {
-    case CMD_BALANCE_QUERY:
-        ret = on_balance_query_reply(state, result);
+    case CMD_POSITION_QUERY:
+        ret = on_position_query_reply(state, result);
         if (ret < 0) {
-            log_error("on_balance_query_reply fail: %d, reply: %s", ret, reply_str);
+            log_error("on_position_query_reply fail: %d, reply: %s", ret, reply_str);
         }
         break;
     default:
@@ -143,7 +148,7 @@ static void on_backend_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
     nw_state_del(state_context, pkg->sequence);
 }
 
-int init_asset(void)
+int init_position(void)
 {
     dict_types dt;
     memset(&dt, 0, sizeof(dt));
@@ -177,7 +182,7 @@ int init_asset(void)
     return 0;
 }
 
-int asset_subscribe(uint32_t user_id, nw_ses *ses, const char *asset)
+int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32_t side)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
@@ -199,7 +204,8 @@ int asset_subscribe(uint32_t user_id, nw_ses *ses, const char *asset)
     struct sub_unit unit;
     memset(&unit, 0, sizeof(unit));
     unit.ses = ses;
-    strncpy(unit.asset, asset, ASSET_NAME_MAX_LEN - 1);
+    strncpy(unit.position.market, market, ASSET_NAME_MAX_LEN - 1);
+    unit.position.side = side;
 
     if (list_find(list, &unit) != NULL)
         return 0;
@@ -209,7 +215,7 @@ int asset_subscribe(uint32_t user_id, nw_ses *ses, const char *asset)
     return 0;
 }
 
-int asset_unsubscribe(uint32_t user_id, nw_ses *ses)
+int position_unsubscribe(uint32_t user_id, nw_ses *ses)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
@@ -234,7 +240,7 @@ int asset_unsubscribe(uint32_t user_id, nw_ses *ses)
     return 0;
 }
 
-int asset_on_update(uint32_t user_id, const char *asset)
+int position_on_update(uint32_t user_id, const char *market, uint32_t side)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
@@ -247,7 +253,7 @@ int asset_on_update(uint32_t user_id, const char *asset)
     list_node *node;
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
-        if (strcmp(unit->asset, asset) == 0) {
+        if (strcmp(unit->position.market, market) == 0 && unit->position.side == side) {
             notify = true;
             break;
         }
@@ -258,17 +264,19 @@ int asset_on_update(uint32_t user_id, const char *asset)
 
     json_t *trade_params = json_array();
     json_array_append_new(trade_params, json_integer(user_id));
-    json_array_append_new(trade_params, json_string(asset));
+    json_array_append_new(trade_params, json_string(market));
+    json_array_append_new(trade_params, json_integer(side));
 
     nw_state_entry *state_entry = nw_state_add(state_context, settings.backend_timeout, 0);
     struct state_data *state = state_entry->data;
     state->user_id = user_id;
-    strncpy(state->asset, asset, ASSET_NAME_MAX_LEN - 1);
+    strncpy(state->position.market, market, ASSET_NAME_MAX_LEN - 1);
+    state->position.side = side;
 
     rpc_pkg pkg;
     memset(&pkg, 0, sizeof(pkg));
     pkg.pkg_type  = RPC_PKG_TYPE_REQUEST;
-    pkg.command   = CMD_BALANCE_QUERY;
+    pkg.command   = CMD_POSITION_QUERY;
     pkg.sequence  = state_entry->id;
     pkg.body      = json_dumps(trade_params, 0);
     pkg.body_size = strlen(pkg.body);

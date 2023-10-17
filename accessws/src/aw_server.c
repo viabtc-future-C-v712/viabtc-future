@@ -15,6 +15,7 @@
 # include "aw_deals.h"
 # include "aw_order.h"
 # include "aw_asset.h"
+# include "aw_position.h"
 
 static ws_svr *svr;
 static dict_t *method_map;
@@ -811,6 +812,42 @@ static int on_method_asset_query(nw_ses *ses, uint64_t id, struct clt_info *info
     return 0;
 }
 
+static int on_method_position_query(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
+{
+    // if (!info->auth)
+    //     return send_error_require_auth(ses, id);
+
+    if (!rpc_clt_connected(matchengine))
+        return send_error_internal_error(ses, id);
+
+    json_t *trade_params = json_array();
+    // json_array_append_new(trade_params, json_integer(info->user_id));
+    json_array_extend(trade_params, params);
+
+    nw_state_entry *entry = nw_state_add(state_context, settings.backend_timeout, 0);
+    struct state_data *state = entry->data;
+    state->ses = ses;
+    state->ses_id = ses->id;
+    state->request_id = id;
+
+    rpc_pkg pkg;
+    memset(&pkg, 0, sizeof(pkg));
+    pkg.pkg_type  = RPC_PKG_TYPE_REQUEST;
+    pkg.command   = CMD_POSITION_QUERY;
+    pkg.sequence  = entry->id;
+    pkg.req_id    = id;
+    pkg.body      = json_dumps(trade_params, 0);
+    pkg.body_size = strlen(pkg.body);
+
+    rpc_clt_send(matchengine, &pkg);
+    log_trace("send request to %s, cmd: %u, sequence: %u, params: %s",
+            nw_sock_human_addr(rpc_clt_peer_addr(matchengine)), pkg.command, pkg.sequence, (char *)pkg.body);
+    free(pkg.body);
+    json_decref(trade_params);
+
+    return 0;
+}
+
 static int on_method_asset_history(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
     if (!rpc_clt_connected(readhistory))
@@ -849,6 +886,44 @@ static int on_method_asset_history(nw_ses *ses, uint64_t id, struct clt_info *in
     return 0;
 }
 
+static int on_method_position_history(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
+{
+    if (!rpc_clt_connected(readhistory))
+        return send_error_internal_error(ses, id);
+
+    // if (!info->auth)
+    //     return send_error_require_auth(ses, id);
+    if (json_array_size(params) != 6)
+        return send_error_invalid_argument(ses, id);
+
+    json_t *read_params = json_array();
+    json_array_append_new(read_params, json_integer(info->user_id));
+    json_array_extend(read_params, params);
+
+    nw_state_entry *entry = nw_state_add(state_context, settings.backend_timeout, 0);
+    struct state_data *state = entry->data;
+    state->ses = ses;
+    state->ses_id = ses->id;
+    state->request_id = id;
+
+    rpc_pkg pkg;
+    memset(&pkg, 0, sizeof(pkg));
+    pkg.pkg_type  = RPC_PKG_TYPE_REQUEST;
+    pkg.command   = CMD_POSITION_HISTORY;
+    pkg.sequence  = entry->id;
+    pkg.req_id    = id;
+    pkg.body      = json_dumps(read_params, 0);
+    pkg.body_size = strlen(pkg.body);
+
+    rpc_clt_send(readhistory, &pkg);
+    log_trace("send request to %s, cmd: %u, sequence: %u, params: %s",
+            nw_sock_human_addr(rpc_clt_peer_addr(readhistory)), pkg.command, pkg.sequence, (char *)pkg.body);
+    free(pkg.body);
+    json_decref(read_params);
+
+    return 0;
+}
+
 static int on_method_asset_subscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
     if (!info->auth)
@@ -867,10 +942,37 @@ static int on_method_asset_subscribe(nw_ses *ses, uint64_t id, struct clt_info *
     return send_success(ses, id);
 }
 
+static int on_method_position_subscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
+{
+    // if (!info->auth)
+    //     return send_error_require_auth(ses, id);
+
+    asset_unsubscribe(info->user_id, ses);
+    size_t params_size = json_array_size(params);
+    for (size_t i = 0; i < params_size; ++i) {
+        const char *asset = json_string_value(json_array_get(params, i));
+        if (asset == NULL || strlen(asset) >= ASSET_NAME_MAX_LEN)
+            return send_error_invalid_argument(ses, id);
+        if (asset_subscribe(info->user_id, ses, asset) < 0)
+            return send_error_internal_error(ses, id);
+    }
+
+    return send_success(ses, id);
+}
+
 static int on_method_asset_unsubscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
     if (!info->auth)
         return send_error_require_auth(ses, id);
+
+    asset_unsubscribe(info->user_id, ses);
+    return send_success(ses, id);
+}
+
+static int on_method_position_unsubscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
+{
+    // if (!info->auth)
+    //     return send_error_require_auth(ses, id);
 
     asset_unsubscribe(info->user_id, ses);
     return send_success(ses, id);
@@ -1090,6 +1192,11 @@ static int init_svr(void)
     ERR_RET_LN(add_handler("asset.history",     on_method_asset_history));
     ERR_RET_LN(add_handler("asset.subscribe",   on_method_asset_subscribe));
     ERR_RET_LN(add_handler("asset.unsubscribe", on_method_asset_unsubscribe));
+
+    ERR_RET_LN(add_handler("position.query",       on_method_position_query));
+    ERR_RET_LN(add_handler("position.history",     on_method_position_history));
+    ERR_RET_LN(add_handler("position.subscribe",   on_method_position_subscribe));
+    ERR_RET_LN(add_handler("position.unsubscribe", on_method_position_unsubscribe));
 
     return 0;
 }

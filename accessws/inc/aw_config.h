@@ -65,6 +65,7 @@ struct settings {
     rpc_clt_cfg         readhistory;
     kafka_consumer_cfg  orders;
     kafka_consumer_cfg  balances;
+    kafka_consumer_cfg  positions;
 
     int                 worker_num;
     char                *auth_url;
