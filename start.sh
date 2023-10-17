@@ -14,4 +14,8 @@ sleep 5
 sleep 5
 /viabtc-deal/bin/marketprice.exe /viabtc-deal/marketprice/config.json
 
+pushd /viabtc-deal/httpsServer
+nohup python3 server.py & 
+popd
+
 tail -f /var/log/trade/matchengine.log /var/log/trade/marketprice.log /var/log/trade/accesshttp.log /var/log/trade/accessws.log /var/log/trade/readhistory.log

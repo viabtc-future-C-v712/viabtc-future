@@ -2,6 +2,7 @@
 Documentation     An example resource file
 Library   WebSocketClient
 Library   JSONLibrary
+
 *** Variables ***
 
 

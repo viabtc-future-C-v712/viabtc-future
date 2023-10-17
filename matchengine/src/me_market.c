@@ -1655,10 +1655,10 @@ static int execute_order(args_t *args)
     if (args->taker->oper_type == 1){
         if(args->direction == 1){
             iter = skiplist_get_iterator(args->market->bids);
-            log_trace("%s %d 开多 %d", __FUNCTION__, args->user_id, args->volume);
+            log_trace("%s %d 开空 %d", __FUNCTION__, args->user_id, args->volume);
         }else{
             iter = skiplist_get_iterator(args->market->asks);
-            log_trace("%s %d 开空 %d", __FUNCTION__, args->user_id, args->volume);
+            log_trace("%s %d 开多 %d", __FUNCTION__, args->user_id, args->volume);
         }
     }
     else{

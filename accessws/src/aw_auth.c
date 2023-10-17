@@ -44,7 +44,8 @@ static void on_job(nw_job_entry *entry, void *privdata)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &reply);
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, (long)(settings.backend_timeout * 1000));
-
+    // curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+    // curl_easy_setopt(curl, CURLOPT_CAINFO, "/usr/src/myapp/httpsServer/cert.pem");
     CURLcode ret = curl_easy_perform(curl);
     if (ret != CURLE_OK) {
         log_fatal("curl_easy_perform fail: %s", curl_easy_strerror(ret));
@@ -94,6 +95,7 @@ static void on_result(struct state_data *state, sds token, json_t *result)
     if (info->auth && info->user_id != user_id) {
         asset_unsubscribe(info->user_id, state->ses);
         order_unsubscribe(info->user_id, state->ses);
+        position_unsubscribe(info->user_id, state->ses);
     }
 
     info->auth = true;

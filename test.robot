@@ -135,6 +135,11 @@ Test Teardown   重启
     check position    ${Alice}    ${多}    ${保证金}    62.4875
     check position all    ${Alice}    amount=5000
 仓位查询
+    ${my_websocket} =  wscall start
+    wscall send    ${my_websocket}    server.auth    "${Alice}",""
+    sleep   1s
+    wscall send    ${my_websocket}    position.subscribe    "BTCBCH",1,"BTCBCH",2
+    wscall recv    ${my_websocket}
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
     put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    8001  #新挂买单
@@ -144,8 +149,13 @@ Test Teardown   重启
     check balance    ${Alice}    BCH    ${可用余额}    799965.0
     check position    ${Alice}    ${多}    ${可用仓位}    0
     check position    ${Alice}    ${多}    ${冻结仓位}    2500
-    ${my_websocket} =  wscall start
-    wscall send    ${my_websocket}    position.query   ${Alice}, "BTCBCH", ${多}
+
+
+    # wscall send    ${my_websocket}    position.query   "BTCBCH", ${多}
+    wscall recv    ${my_websocket}
+    sleep   1s
+    wscall recv    ${my_websocket}
+    sleep   1s
     wscall recv    ${my_websocket}
 
 test1

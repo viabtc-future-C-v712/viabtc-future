@@ -814,14 +814,14 @@ static int on_method_asset_query(nw_ses *ses, uint64_t id, struct clt_info *info
 
 static int on_method_position_query(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
-    // if (!info->auth)
-    //     return send_error_require_auth(ses, id);
+    if (!info->auth)
+        return send_error_require_auth(ses, id);
 
     if (!rpc_clt_connected(matchengine))
         return send_error_internal_error(ses, id);
 
     json_t *trade_params = json_array();
-    // json_array_append_new(trade_params, json_integer(info->user_id));
+    json_array_append_new(trade_params, json_integer(info->user_id));
     json_array_extend(trade_params, params);
 
     nw_state_entry *entry = nw_state_add(state_context, settings.backend_timeout, 0);
@@ -891,8 +891,8 @@ static int on_method_position_history(nw_ses *ses, uint64_t id, struct clt_info 
     if (!rpc_clt_connected(readhistory))
         return send_error_internal_error(ses, id);
 
-    // if (!info->auth)
-    //     return send_error_require_auth(ses, id);
+    if (!info->auth)
+        return send_error_require_auth(ses, id);
     if (json_array_size(params) != 6)
         return send_error_invalid_argument(ses, id);
 
@@ -944,16 +944,18 @@ static int on_method_asset_subscribe(nw_ses *ses, uint64_t id, struct clt_info *
 
 static int on_method_position_subscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
-    // if (!info->auth)
-    //     return send_error_require_auth(ses, id);
+    if (!info->auth)
+        return send_error_require_auth(ses, id);
 
-    asset_unsubscribe(info->user_id, ses);
+    position_unsubscribe(info->user_id, ses);
     size_t params_size = json_array_size(params);
-    for (size_t i = 0; i < params_size; ++i) {
-        const char *asset = json_string_value(json_array_get(params, i));
-        if (asset == NULL || strlen(asset) >= ASSET_NAME_MAX_LEN)
+    //todo 确定参数形式
+    for (size_t i = 0; i < params_size/2; ++i) {
+        const char *market = json_string_value(json_array_get(params, 2*i));
+        int side = json_integer_value(json_array_get(params, 2*i+1));
+        if (market == NULL || strlen(market) >= ASSET_NAME_MAX_LEN)
             return send_error_invalid_argument(ses, id);
-        if (asset_subscribe(info->user_id, ses, asset) < 0)
+        if (position_subscribe(info->user_id, ses, market, side) < 0)
             return send_error_internal_error(ses, id);
     }
 
@@ -971,10 +973,10 @@ static int on_method_asset_unsubscribe(nw_ses *ses, uint64_t id, struct clt_info
 
 static int on_method_position_unsubscribe(nw_ses *ses, uint64_t id, struct clt_info *info, json_t *params)
 {
-    // if (!info->auth)
-    //     return send_error_require_auth(ses, id);
+    if (!info->auth)
+        return send_error_require_auth(ses, id);
 
-    asset_unsubscribe(info->user_id, ses);
+    position_unsubscribe(info->user_id, ses);
     return send_success(ses, id);
 }
 
