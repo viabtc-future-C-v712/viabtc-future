@@ -5,7 +5,11 @@
 # include "me_args.h"
 
 typedef struct deal_t{
-    args_t *args;
+    uint32_t real;
+    order_t *taker;
+    order_t *maker;
+    uint32_t pattern;
+    market_t *market;
     mpd_t *amount;
     mpd_t *price;
     mpd_t *taker_fee;

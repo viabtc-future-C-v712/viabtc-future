@@ -10,9 +10,9 @@
 # include "ut_mysql.h"
 
 int load_orders(MYSQL *conn, const char *table);
-int load_markets(MYSQL *conn, const char *table);
 int load_balance(MYSQL *conn, const char *table);
 int load_position(MYSQL *conn, const char *table);
+int load_market_db(MYSQL *conn, const char *table);
 int load_operlog(MYSQL *conn, const char *table, uint64_t *start_id);
 
 # endif

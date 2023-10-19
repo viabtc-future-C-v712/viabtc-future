@@ -8,6 +8,17 @@ CREATE TABLE `slice_balance_example` (
     `balance`       DECIMAL(35,16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `slice_market_example` (
+    `id`            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `name`          VARCHAR(30) NOT NULL,
+    `stock_name`    VARCHAR(30) NOT NULL,
+    `stock_prec`    TINYINT UNSIGNED NOT NULL,
+    `money_name`    VARCHAR(30) NOT NULL,
+    `money_prec`    TINYINT UNSIGNED NOT NULL,
+    `min_amount`    DECIMAL(35,16) NOT NULL,
+    `price`         DECIMAL(35,16) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `slice_position_example` (
     `id`            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `user_id`       INT UNSIGNED NOT NULL,
@@ -25,6 +36,7 @@ CREATE TABLE `slice_order_example` (
     `id`            BIGINT UNSIGNED NOT NULL PRIMARY KEY,
     `t`             TINYINT UNSIGNED NOT NULL, -- 1 limit, 2 market, 3 trigger(price=0表示为market)
     `side`          TINYINT UNSIGNED NOT NULL, -- 1 卖, 2 买
+    `pattern`       TINYINT UNSIGNED NOT NULL, -- 1 逐仓, 2 全仓
     `oper_type`     TINYINT UNSIGNED NOT NULL, -- 1 open, 2 close
     `create_time`   DOUBLE NOT NULL,
     `update_time`   DOUBLE NOT NULL,
@@ -50,7 +62,9 @@ CREATE TABLE `slice_history` (
     `time`          BIGINT NOT NULL,
     `end_oper_id`   BIGINT UNSIGNED NOT NULL,
     `end_order_id`  BIGINT UNSIGNED NOT NULL,
-    `end_deals_id`  BIGINT UNSIGNED NOT NULL
+    `end_deals_id`  BIGINT UNSIGNED NOT NULL,
+    `end_position_id`  BIGINT UNSIGNED NOT NULL,
+    `end_market_id`  BIGINT UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `operlog_example` (

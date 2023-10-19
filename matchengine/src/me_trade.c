@@ -6,7 +6,7 @@
 # include "me_config.h"
 # include "me_trade.h"
 
-static dict_t *dict_market;
+dict_t *dict_market;
 
 static uint32_t market_dict_hash_function(const void *key)
 {

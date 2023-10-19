@@ -29,6 +29,7 @@ typedef struct order_t {
     uint64_t        id;
     uint32_t        type;
     uint32_t        side;
+    uint32_t        pattern;
     uint32_t        oper_type;
     double          create_time;
     double          update_time;
@@ -65,6 +66,8 @@ typedef struct market_t {
 
     skiplist_t      *asks;
     skiplist_t      *bids;
+    skiplist_t      *plan_asks;
+    skiplist_t      *plan_bids;
 } market_t;
 
 market_t *market_create(struct market *conf);

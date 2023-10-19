@@ -26,10 +26,10 @@ static time_t get_today_start(void)
     return mktime(&t);
 }
 
-static int get_last_slice(MYSQL *conn, time_t *timestamp, uint64_t *last_oper_id, uint64_t *last_order_id, uint64_t *last_deals_id)
+static int get_last_slice(MYSQL *conn, time_t *timestamp, uint64_t *last_oper_id, uint64_t *last_order_id, uint64_t *last_deals_id, uint64_t *last_position_id, uint64_t *last_market_id)
 {
     sds sql = sdsempty();
-    sql = sdscatprintf(sql, "SELECT `time`, `end_oper_id`, `end_order_id`, `end_deals_id` from `slice_history` ORDER BY `id` DESC LIMIT 1");
+    sql = sdscatprintf(sql, "SELECT `time`, `end_oper_id`, `end_order_id`, `end_deals_id`, `end_position_id`, `end_market_id` from `slice_history` ORDER BY `id` DESC LIMIT 1");
     log_stderr("get last slice time");
     log_debug("exec sql: %s", sql);
     int ret = mysql_real_query(conn, sql, sdslen(sql));
@@ -95,6 +95,17 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
     }
     sdsfree(table);
 
+    table = sdscatprintf(table, "slice_market_%ld", timestamp);
+    log_stderr("load position from: %s", table);
+    ret = load_market_db(conn, table);
+    if (ret < 0) {
+        log_error("load_position from %s fail: %d", table, ret);
+        log_stderr("load_position from %s fail: %d", table, ret);
+        sdsfree(table);
+        return -__LINE__;
+    }
+    sdsfree(table);
+
     return 0;
 }
 
@@ -136,7 +147,9 @@ int init_from_db(void)
     uint64_t last_oper_id  = 0;
     uint64_t last_order_id = 0;
     uint64_t last_deals_id = 0;
-    int ret = get_last_slice(conn, &last_slice_time, &last_oper_id, &last_order_id, &last_deals_id);
+    uint64_t last_position_id = 0;
+    uint64_t last_market_id = 0;
+    int ret = get_last_slice(conn, &last_slice_time, &last_oper_id, &last_order_id, &last_deals_id, &last_position_id, &last_market_id);
     if (ret < 0) {
         return ret;
     }

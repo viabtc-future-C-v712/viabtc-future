@@ -204,6 +204,50 @@ int load_position(MYSQL *conn, const char *table)
     return 0;
 }
 
+int load_market_db(MYSQL *conn, const char *table)
+{
+    size_t query_limit = 1000;
+    uint64_t last_id = 0;
+    while (true) {
+        sds sql = sdsempty();
+        sql = sdscatprintf(sql, "SELECT \
+        `id`, \
+        `name`, \
+        `stock_name`, \
+        `stock_prec`, \
+        `money_name`, \
+        `money_prec`, \
+        `min_amount`, \
+        `price` FROM `%s` "
+                "WHERE `id` > %"PRIu64" ORDER BY id LIMIT %zu", table, last_id, query_limit);
+        log_debug("exec sql: %s", sql);
+        int ret = mysql_real_query(conn, sql, sdslen(sql));
+        if (ret != 0) {
+            log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+            sdsfree(sql);
+            return -__LINE__;
+        }
+        sdsfree(sql);
+
+        MYSQL_RES *result = mysql_store_result(conn);
+        size_t num_rows = mysql_num_rows(result);
+        log_trace("%s %d", __FUNCTION__, num_rows);
+        for (size_t i = 0; i < num_rows; ++i) {
+            MYSQL_ROW row = mysql_fetch_row(result);
+            market_t *market = get_market(row[1]);
+            if (market == NULL)
+                continue;
+            market->latestPrice = decimal(row[7], 0);
+        }
+        mysql_free_result(result);
+
+        if (num_rows < query_limit)
+            break;
+    }
+
+    return 0;
+}
+
 static int load_update_balance(json_t *params)
 {
     if (json_array_size(params) != 6)
