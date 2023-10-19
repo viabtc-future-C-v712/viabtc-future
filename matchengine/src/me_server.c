@@ -2336,6 +2336,7 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     {
         append_operlog("order_open", params);
         on_planner();//处理计划委托
+        force_liquidation();//处理爆仓
         return reply_success(ses, pkg);
     }
 }
@@ -2355,6 +2356,7 @@ static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     else{
         append_operlog("order_close", params);
         on_planner();//处理计划委托
+        force_liquidation();//处理爆仓
         return reply_success(ses, pkg);
     }
 }

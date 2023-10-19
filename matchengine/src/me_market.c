@@ -1362,14 +1362,13 @@ mpd_t *getSumPNL(uint32_t user_id)
     for (size_t i = 0; i < settings.market_num; ++i)
     {
         position_t *position = get_position(user_id, settings.markets[i].name, 1);
-        if (position->pattern == 2)
-        {
+        if ( position && position->pattern == 2){
             market_t *market = get_market(settings.markets[i].name);
             mpd_t *PNL = getPNL(position, market->latestPrice);
             mpd_add(totalPNL, totalPNL, PNL, &mpd_ctx);
         }
         position = get_position(user_id, settings.markets[i].name, 2);
-        if (position->pattern == 2)
+        if (position && position->pattern == 2)
         {
             market_t *market = get_market(settings.markets[i].name);
             mpd_t *PNL = getPNL(position, market->latestPrice);
@@ -1685,16 +1684,17 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
     bool save_db = true;
     skiplist_node *node;
     skiplist_iter *iter;
-    if (taker->oper_type == 1)
-    {
-        if (direction == 1)
-        {
+    int bSellOrBuy = SELL;
+    if (taker->oper_type == 1){
+        if(direction == 1){
             iter = skiplist_get_iterator(market->bids);
+            bSellOrBuy = SELL;
             log_trace("%s %d 开空 %d", __FUNCTION__, taker->user_id, taker->left);
         }
         else
         {
             iter = skiplist_get_iterator(market->asks);
+            bSellOrBuy = BUY;
             log_trace("%s %d 开多 %d", __FUNCTION__, taker->user_id, taker->left);
         }
     }
@@ -1703,10 +1703,10 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         if (direction == 2)
         {
             iter = skiplist_get_iterator(market->bids);
+            bSellOrBuy = SELL;
             log_trace("%s %d 平多 %d", __FUNCTION__, taker->user_id, taker->left);
-        }
-        else
-        {
+        }else{
+            bSellOrBuy = BUY;
             iter = skiplist_get_iterator(market->asks);
             log_trace("%s %d 平空 %d", __FUNCTION__, taker->user_id, taker->left);
         }
@@ -1739,7 +1739,7 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
             }
             else if (maker->type == 1)
             { // maker 限价
-                if (direction == 1)
+                if (bSellOrBuy == SELL)
                 { // taker 卖出
                     if (mpd_cmp(taker->price, maker->price, &mpd_ctx) <= 0)
                     {                                                  // 卖出价要不大于买入价
@@ -2139,7 +2139,7 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
             *result = get_order_info(order);
     }
 
-    if (mpd_cmp(order->freeze, mpd_zero, &mpd_ctx) > 0)
+    if (order->oper_type == 1 && mpd_cmp(order->freeze, mpd_zero, &mpd_ctx) > 0)
     {
         if (balance_unfreeze(order->user_id, m->money, order->freeze) == NULL)
         {
@@ -2147,8 +2147,11 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
         }
     }
 
-    // todo 解冻 仓位
-
+    if (order->oper_type == 2 && mpd_cmp(order->left, mpd_zero, &mpd_ctx) > 0){
+        position_t *position = get_position(order->user_id, order->market, order->side);
+        mpd_sub(position->frozen, position->frozen, order->left, &mpd_ctx);
+        mpd_add(position->position, position->position, order->left, &mpd_ctx);
+    }
     order_finish_future(real, m, order);
     return 0;
 }

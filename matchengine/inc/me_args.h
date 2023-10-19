@@ -6,6 +6,9 @@
 #define BEAR    1
 #define BULL    2
 
+#define SELL    1
+#define BUY     2
+
 #define MARKET 0
 #define LIMIT 1
 #define ENTRUST 2

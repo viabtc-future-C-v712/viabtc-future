@@ -18,7 +18,7 @@ Test Teardown   重启
     ${max_offset1}=    Evaluate    test.get_max_offset('orders')
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
     ${max_offset2}=    Evaluate    test.get_max_offset('orders')
-    Should Be Equal As Numbers    ${max_offset1}    ${max_offset2}    # 相等说明没有发Order信息
+    Should Be Equal As Numbers    ${max_offset1+1}    ${max_offset2}    # 发了ORDER_EVENT_FINISH
     check order    ${Alice}
 市价开空(未成交)
     put open     ${Alice}    ${空}    ${市价}    ${逐仓}    10000
