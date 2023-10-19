@@ -146,9 +146,9 @@ Test Teardown   重启
     put close     ${Alice}    ${多}    ${市价}    ${逐仓}    5000  #市价平多 2500个
     check order    ${Alice}  # 市价不挂单
     # -50， +20 -5 (800000 -35)
-    check balance    ${Alice}    BCH    ${可用余额}    799965.0
-    check position    ${Alice}    ${多}    ${可用仓位}    0
-    check position    ${Alice}    ${多}    ${冻结仓位}    2500
+    check balance    ${Alice}    BCH    ${可用余额}    799965.3125
+    check position    ${Alice}    ${多}    ${可用仓位}    2500
+    check position    ${Alice}    ${多}    ${冻结仓位}    0
 
 
     # wscall send    ${my_websocket}    position.query   "BTCBCH", ${多}

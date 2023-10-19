@@ -1348,11 +1348,36 @@ int getSumCrossCount(uint32_t user_id)
 
 mpd_t *getPNL(position_t *position, mpd_t *latestPrice)
 {
+    mpd_t *positionTotal = mpd_new(&mpd_ctx);
+    mpd_add(positionTotal, position->position, position->frozen, &mpd_ctx);
     mpd_t *PNL = mpd_new(&mpd_ctx);
-    mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
-    mpd_div(PNL, PNL, position->price, &mpd_ctx);
-    mpd_mul(PNL, PNL, position->position, &mpd_ctx); // todo: PNL 需要加冻结
-    mpd_add(PNL, PNL, position->principal, &mpd_ctx);
+    if(position->side == BULL)//开多
+    {
+        if(mpd_cmp(latestPrice, position->price, &mpd_ctx) >= 0){//盈利
+            mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
+            mpd_div(PNL, PNL, position->price, &mpd_ctx);
+            mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+            mpd_add(PNL, PNL, position->principal, &mpd_ctx);
+        }else{//亏损
+            mpd_sub(PNL, position->price, latestPrice, &mpd_ctx);
+            mpd_div(PNL, PNL, position->price, &mpd_ctx);
+            mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+            mpd_sub(PNL, position->principal, PNL, &mpd_ctx);
+        }
+    }else{//开空
+        if(mpd_cmp(latestPrice, position->price, &mpd_ctx) <= 0){//盈利
+            mpd_sub(PNL, position->price, latestPrice, &mpd_ctx);
+            mpd_div(PNL, PNL, position->price, &mpd_ctx);
+            mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+            mpd_add(PNL, PNL, position->principal, &mpd_ctx);
+        }else{//亏损
+            mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
+            mpd_div(PNL, PNL, position->price, &mpd_ctx);
+            mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+            mpd_sub(PNL, position->principal, PNL, &mpd_ctx);
+        }
+    }
+    mpd_del(positionTotal);
     return PNL;
 }
 
@@ -1456,6 +1481,7 @@ int adjustPosition(deal_t *deal)
             mpd_t *amount = mpd_new(&mpd_ctx);
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
+
             deal->taker_PNL = getPNL(position, deal->price);
             // 计算交易部份权益
             mpd_mul(deal->taker_PNL, deal->taker_PNL, deal->amount, &mpd_ctx);
@@ -1550,7 +1576,6 @@ int adjustBalance(deal_t *deal)
     // taker
     if (deal->taker->oper_type == 1)
     { // open
-
         log_debug("%s 余额减去 %s", __FUNCTION__, mpd_to_sci(deal->taker_priAmount, 0));
         balance_unfreeze(deal->taker->user_id, deal->market->money, deal->taker_priAmount);
         balance_sub(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_priAmount);
@@ -1778,7 +1803,7 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         deal->market = market;
         mpd_copy(market->latestPrice, deal->amount, &mpd_ctx);
         execute_order_open_imp(deal);
-        log_trace("%s deal amount:%s", __FUNCTION__, mpd_to_sci(deal->amount, 0));
+        log_trace("%s deal amount:%s deal price:%s", __FUNCTION__, mpd_to_sci(deal->amount, 0), mpd_to_sci(deal->price, 0));
         if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
         {
             if (real)
