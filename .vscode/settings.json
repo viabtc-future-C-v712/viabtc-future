@@ -6,6 +6,7 @@
         "mutex": "c",
         "optional": "c",
         "unordered_map": "c",
-        "vector": "c"
+        "vector": "c",
+        "__locale": "c"
     }
 }

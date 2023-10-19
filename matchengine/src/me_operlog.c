@@ -1,10 +1,10 @@
 /*
- * Description: 
+ * Description:
  *     History: yang@haipo.me, 2017/04/01, create
  */
 
-# include "me_config.h"
-# include "me_operlog.h"
+#include "me_config.h"
+#include "me_operlog.h"
 
 uint64_t operlog_id_start;
 
@@ -13,7 +13,8 @@ static nw_job *job;
 list_t *list;
 static nw_timer timer;
 
-struct operlog {
+struct operlog
+{
     uint64_t id;
     double create_time;
     char *detail;
@@ -29,9 +30,11 @@ static void on_job(nw_job_entry *entry, void *privdata)
     MYSQL *conn = privdata;
     sds sql = entry->request;
     log_trace("exec sql: %s", sql);
-    while (true) {
+    while (true)
+    {
         int ret = mysql_real_query(conn, sql, sdslen(sql));
-        if (ret != 0 && mysql_errno(conn) != 1062) {
+        if (ret != 0 && mysql_errno(conn) != 1062)
+        {
             log_fatal("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
             usleep(1000 * 1000);
             continue;
@@ -60,7 +63,8 @@ static void on_list_free(void *value)
 void flush_log(void)
 {
     static sds table_last;
-    if (table_last == NULL) {
+    if (table_last == NULL)
+    {
         table_last = sdsempty();
     }
 
@@ -69,7 +73,8 @@ void flush_log(void)
     sds table = sdsempty();
     table = sdscatprintf(table, "operlog_%04d%02d%02d", 1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday);
 
-    if (sdscmp(table_last, table) != 0) {
+    if (sdscmp(table_last, table) != 0)
+    {
         sds create_table_sql = sdsempty();
         create_table_sql = sdscatprintf(create_table_sql, "CREATE TABLE IF NOT EXISTS `%s` like `operlog_example`", table);
         nw_job_add(job, 0, create_table_sql);
@@ -84,12 +89,14 @@ void flush_log(void)
     char buf[10240];
     list_node *node;
     list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
-    while ((node = list_next(iter)) != NULL) {
+    while ((node = list_next(iter)) != NULL)
+    {
         struct operlog *log = node->value;
         size_t detail_len = strlen(log->detail);
         mysql_real_escape_string(mysql_conn, buf, log->detail, detail_len);
-        sql = sdscatprintf(sql, "(%"PRIu64", %f, '%s')", log->id, log->create_time, buf);
-        if (list_len(list) > 1) {
+        sql = sdscatprintf(sql, "(%" PRIu64 ", %f, '%s')", log->id, log->create_time, buf);
+        if (list_len(list) > 1)
+        {
             sql = sdscatprintf(sql, ", ");
         }
         list_del(list, node);
@@ -102,7 +109,8 @@ void flush_log(void)
 
 static void on_timer(nw_timer *t, void *privdata)
 {
-    if (list->len > 0) {
+    if (list->len > 0)
+    {
         flush_log();
     }
 }
@@ -117,8 +125,8 @@ int init_operlog(void)
 
     nw_job_type type;
     memset(&type, 0, sizeof(type));
-    type.on_init    = on_job_init;
-    type.on_job     = on_job;
+    type.on_init = on_job_init;
+    type.on_job = on_job;
     type.on_cleanup = on_job_cleanup;
     type.on_release = on_job_release;
 
@@ -149,7 +157,7 @@ int fini_operlog(void)
 
     return 0;
 }
-
+// todo: 用户操作流
 int append_operlog(const char *method, json_t *params)
 {
     json_t *detail = json_object();
@@ -175,8 +183,7 @@ bool is_operlog_block(void)
 
 sds operlog_status(sds reply)
 {
-    reply = sdscatprintf(reply, "operlog last ID: %"PRIu64"\n", operlog_id_start);
+    reply = sdscatprintf(reply, "operlog last ID: %" PRIu64 "\n", operlog_id_start);
     reply = sdscatprintf(reply, "operlog pending: %d\n", job->request_count);
     return reply;
 }
-
