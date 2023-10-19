@@ -103,7 +103,8 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
     table = sdscatprintf(table, "slice_market_%ld", timestamp);
     log_stderr("load position from: %s", table);
     ret = load_market_db(conn, table);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         log_error("load_position from %s fail: %d", table, ret);
         log_stderr("load_position from %s fail: %d", table, ret);
         sdsfree(table);
@@ -155,16 +156,12 @@ int init_from_db(void)
     uint64_t last_oper_id = 0;
     uint64_t last_order_id = 0;
     uint64_t last_deals_id = 0;
-<<<<<<< HEAD
     uint64_t last_position_id = 0;
     uint64_t last_market_id = 0;
     int ret = get_last_slice(conn, &last_slice_time, &last_oper_id, &last_order_id, &last_deals_id, &last_position_id, &last_market_id);
-    if (ret < 0) {
-=======
-    int ret = get_last_slice(conn, &last_slice_time, &last_oper_id, &last_order_id, &last_deals_id);
     if (ret < 0)
     {
->>>>>>> a0c90e3 (fix add todo)
+
         return ret;
     }
 
