@@ -1805,35 +1805,37 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         log_trace("deal price:%s", mpd_to_sci(deal->price, 0));
         log_trace("deal amount:%s", mpd_to_sci(deal->amount, 0));
         execute_order_open_imp(deal);
-        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
+        if (mpd_cmp(deal->taker->left, mpd_zero, &mpd_ctx) == 0)
         {
             if (real)
-                push_order_message(ORDER_EVENT_FINISH, taker, market);
+                push_order_message(ORDER_EVENT_FINISH, deal->taker, market);
         }
         else
         {
             if (real)
-                push_order_message(ORDER_EVENT_UPDATE, taker, market);
+                push_order_message(ORDER_EVENT_UPDATE, deal->taker, market);
         }
-        if (mpd_cmp(maker->left, mpd_zero, &mpd_ctx) == 0)
+        if (mpd_cmp(deal->maker->left, mpd_zero, &mpd_ctx) == 0)
         {
             if (real)
-                push_order_message(ORDER_EVENT_FINISH, maker, market);
+                push_order_message(ORDER_EVENT_FINISH, deal->maker, market);
         }
         else
         {
             if (real)
-                push_order_message(ORDER_EVENT_UPDATE, maker, market);
+                push_order_message(ORDER_EVENT_UPDATE, deal->maker, market);
         }
         log_trace("%s %d", __FUNCTION__, direction);
         // 清理处理完毕的order
-        if (mpd_cmp(maker->left, mpd_zero, &mpd_ctx) == 0)
+        if (mpd_cmp(deal->maker->left, mpd_zero, &mpd_ctx) == 0)
         {
-            order_finish_future(real, market, maker);
+            order_finish_future(real, market, deal->maker);
+            deal->maker = NULL;
         }
-        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
+        if (mpd_cmp(deal->taker->left, mpd_zero, &mpd_ctx) == 0)
         {
-            order_finish_future(real, market, taker);
+            order_finish_future(real, market, deal->taker);
+            taker = NULL;
             break;
         }
     }

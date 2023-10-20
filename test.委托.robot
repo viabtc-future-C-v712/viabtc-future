@@ -14,11 +14,11 @@ Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
-委托
+计划委托
     生成 order book
     put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=8000    触发价格=8000   #价格高于触发价后下单，
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
-    
+
     make slice
 *** Keywords ***
 生成 order book

@@ -21,7 +21,10 @@ void on_planner()
                 break;
             //判断是否要下单
             if(mpd_cmp(market->latestPrice, order->trigger, &mpd_ctx) >= 0){// 市场价大于等于卖价
-                order->type = 1;//变为限价单
+                if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
+                    order->type = 0;//变为限价单
+                else
+                    order->type = 1;//变为市价单
                 if(order->oper_type == 1)//开仓，卖 （开空）
                     execute_order(true, market, BEAR, order);
                 else//平仓，卖 （平多）
@@ -36,7 +39,10 @@ void on_planner()
                 break;
             //判断是否要下单
             if(mpd_cmp(market->latestPrice, order->trigger, &mpd_ctx) <= 0){// 市场价小于等于买价
-                order->type = 1;//变为限价单
+                if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
+                    order->type = 0;//变为限价单
+                else
+                    order->type = 1;//变为市价单
                 if(order->oper_type == 0)//开仓，买 （开多）
                     execute_order(1, market, BULL, order);
                 else//平仓，卖 （平空）
