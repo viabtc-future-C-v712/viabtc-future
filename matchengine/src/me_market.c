@@ -368,6 +368,7 @@ static int order_put_future(market_t *m, order_t *order)
         }
         else
         {
+            log_trace("order record %p", (void *)order);
             if (skiplist_insert(m->plan_asks, order) == NULL)
                 return -__LINE__;
         }
@@ -1643,18 +1644,34 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
 {
     if (order->side == MARKET_ORDER_SIDE_ASK)
     {
-        skiplist_node *node = skiplist_find(m->asks, order);
-        if (node)
-        {
-            skiplist_delete(m->asks, node);
+        if(order->type == 2){
+            skiplist_node *node = skiplist_find(m->plan_asks, order);
+            if (node)
+            {
+                skiplist_delete(m->plan_asks, node);
+            }
+        }else{
+            skiplist_node *node = skiplist_find(m->asks, order);
+            if (node)
+            {
+                skiplist_delete(m->asks, node);
+            }
         }
     }
     else
     {
-        skiplist_node *node = skiplist_find(m->bids, order);
-        if (node)
-        {
-            skiplist_delete(m->bids, node);
+        if(order->type == 2){
+            skiplist_node *node = skiplist_find(m->plan_bids, order);
+            if (node)
+            {
+                skiplist_delete(m->plan_bids, node);
+            }
+        }else{
+            skiplist_node *node = skiplist_find(m->bids, order);
+            if (node)
+            {
+                skiplist_delete(m->bids, node);
+            }
         }
     }
 
@@ -1698,7 +1715,7 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
             }
         }
     }
-
+    log_trace("order record %p", (void *)order);
     order_free(order);
     return 0;
 }
@@ -1829,11 +1846,13 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         // 清理处理完毕的order
         if (mpd_cmp(deal->maker->left, mpd_zero, &mpd_ctx) == 0)
         {
+            log_trace("order record %p left%s", (void *)deal->maker, mpd_to_sci(deal->maker->left, 0));
             order_finish_future(real, market, deal->maker);
             deal->maker = NULL;
         }
         if (mpd_cmp(deal->taker->left, mpd_zero, &mpd_ctx) == 0)
         {
+            log_trace("order record %p left%s", (void *)deal->taker, mpd_to_sci(deal->taker->left, 0));
             order_finish_future(real, market, deal->taker);
             taker = NULL;
             break;
@@ -1858,6 +1877,7 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         }
         else if (taker->type == MARKET_ORDER_TYPE_MARKET)
         {
+            log_trace("order record");
             int ret = market_cancel_order(real, NULL, market, taker);
         }
     }
@@ -1902,6 +1922,7 @@ order_t *initOrder(args_t *args)
     mpd_copy(order->deal_stock, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_money, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_fee, mpd_zero, &mpd_ctx);
+    log_trace("order record %p", (void *)order);
     return order;
 }
 // 开仓
@@ -2180,6 +2201,7 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
         mpd_sub(position->frozen, position->frozen, order->left, &mpd_ctx);
         mpd_add(position->position, position->position, order->left, &mpd_ctx);
     }
+    log_trace("order record");
     order_finish_future(real, m, order);
     return 0;
 }
