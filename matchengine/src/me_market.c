@@ -1801,9 +1801,10 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
         deal->taker = taker;
         deal->real = real;
         deal->market = market;
-        mpd_copy(market->latestPrice, deal->amount, &mpd_ctx);
+        mpd_copy(market->latestPrice, deal->price, &mpd_ctx);
+        log_trace("deal price:%s", mpd_to_sci(deal->price, 0));
+        log_trace("deal amount:%s", mpd_to_sci(deal->amount, 0));
         execute_order_open_imp(deal);
-        log_trace("%s deal amount:%s deal price:%s", __FUNCTION__, mpd_to_sci(deal->amount, 0), mpd_to_sci(deal->price, 0));
         if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
         {
             if (real)
