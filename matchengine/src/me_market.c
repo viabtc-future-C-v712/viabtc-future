@@ -1609,6 +1609,10 @@ int adjustBalance(deal_t *deal)
         append_balance_trade_sub(deal->taker, deal->market->money, deal->amount, deal->price, deal->amount, deal->maker);
         append_balance_trade_add(deal->taker, deal->market->money, deal->amount, deal->price, deal->amount, deal->maker);
         append_balance_trade_fee(deal->taker, deal->market->money, deal->amount, deal->price, deal->amount, deal->maker->maker_fee, deal->maker);
+
+        append_balance_trade_sub(deal->maker, deal->market->money, deal->amount, deal->price, deal->amount, deal->taker);
+        append_balance_trade_add(deal->maker, deal->market->money, deal->amount, deal->price, deal->amount, deal->taker);
+        append_balance_trade_fee(deal->maker, deal->market->money, deal->amount, deal->price, deal->amount, deal->taker->taker_fee, deal->taker);
     }
     return 0;
 }

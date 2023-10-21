@@ -2401,7 +2401,9 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         json_object_set_new_mpd(unit, "leverage", position->leverage);
         json_object_set_new_mpd(unit, "position", position->position);
         json_object_set_new_mpd(unit, "frozen", position->frozen);
-        json_object_set_new_mpd(unit, "price", position->price);
+        mpd_t *show = mpd_qncopy(position->price);
+        mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+        json_object_set_new_mpd(unit, "price", show);
         json_object_set_new_mpd(unit, "principal", position->principal);
         json_array_append_new(positions, unit);
         json_object_set_new(result, "count", json_integer(1));
@@ -2410,7 +2412,7 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     {
         json_object_set_new(result, "count", json_integer(0));
     }
-    json_object_set_new(result, "postions", positions);
+    json_object_set_new(result, "positions", positions);
     int ret = reply_result(ses, pkg, result);
     json_decref(result);
     return ret;
@@ -2454,7 +2456,9 @@ static int on_cmd_position_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
             json_object_set_new_mpd(unit, "leverage", position->leverage);
             json_object_set_new_mpd(unit, "position", position->position);
             json_object_set_new_mpd(unit, "frozen", position->frozen);
-            json_object_set_new_mpd(unit, "price", position->price);
+            mpd_t *show = mpd_qncopy(position->price);
+            mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+            json_object_set_new_mpd(unit, "price", show);
             json_object_set_new_mpd(unit, "principal", position->principal);
             json_array_append_new(positions, unit);
             count += 1;
@@ -2470,13 +2474,15 @@ static int on_cmd_position_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
             json_object_set_new_mpd(unit, "leverage", position->leverage);
             json_object_set_new_mpd(unit, "position", position->position);
             json_object_set_new_mpd(unit, "frozen", position->frozen);
-            json_object_set_new_mpd(unit, "price", position->price);
+            mpd_t *show = mpd_qncopy(position->price);
+            mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+            json_object_set_new_mpd(unit, "price", show);
             json_object_set_new_mpd(unit, "principal", position->principal);
             json_array_append_new(positions, unit);
             count += 1;
         }
     }
-    json_object_set_new(result, "postions", positions);
+    json_object_set_new(result, "positions", positions);
     json_object_set_new(result, "count", json_integer(count));
     int ret = reply_result(ses, pkg, result);
     json_decref(result);

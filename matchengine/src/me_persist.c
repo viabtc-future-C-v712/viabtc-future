@@ -265,6 +265,23 @@ static int dump_position_to_db(MYSQL *conn, time_t end)
     return 0;
 }
 
+static int dump_market_to_db(MYSQL *conn, time_t end)
+{
+    sds table = sdsempty();
+    table = sdscatprintf(table, "slice_market_%ld", end);
+    log_info("dump market to: %s", table);
+    int ret = dump_market(conn, table);
+    if (ret < 0)
+    {
+        log_error("dump_market to %s fail: %d", table, ret);
+        sdsfree(table);
+        return -__LINE__;
+    }
+    sdsfree(table);
+
+    return 0;
+}
+
 int update_slice_history(MYSQL *conn, time_t end)
 {
     sds sql = sdsempty();
@@ -310,6 +327,12 @@ int dump_to_db(time_t timestamp)
     }
 
     ret = dump_position_to_db(conn, timestamp);
+    if (ret < 0)
+    {
+        goto cleanup;
+    }
+
+    ret = dump_market_to_db(conn, timestamp);
     if (ret < 0)
     {
         goto cleanup;
