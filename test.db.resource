@@ -44,7 +44,7 @@ check db order
         Should Be Equal As Numbers    0    ${amount}
     END
 init oper Log
-    Connect To Database Using Custom Params    pymysql    database='trade_log', user='root', password='pass', host='192.168.1.3', port=3306
+    Connect To Database Using Custom Params    pymysql    database='trade_log', user='root', password='pass', host='127.0.0.1', port=3306
     ${rets} =  query    SHOW TABLES LIKE 'operlog_2%';
     FOR    ${ret}    IN    @{rets}
         Execute Sql String  drop table ${ret}[0]
@@ -65,7 +65,7 @@ init oper Log
     Disconnect From Database
 mysql
     [Arguments]  ${sql}
-    Connect To Database Using Custom Params    pymysql    database='trade_log', user='root', password='pass', host='192.168.1.3', port=3306
+    Connect To Database Using Custom Params    pymysql    database='trade_log', user='root', password='pass', host='127.0.0.1', port=3306
     ${ret}    query    ${sql}
     Disconnect From Database
     [Return]    ${ret}

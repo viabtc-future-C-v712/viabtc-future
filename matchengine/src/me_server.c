@@ -280,7 +280,7 @@ static int on_cmd_balance_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 
 static int on_cmd_balance_update(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
-    log_vip("on_cmd_balance_update");
+    log_debug("on_cmd_balance_update");
     if (json_array_size(params) != 6)
     {
         log_vip("reply_error_invalid_argument");

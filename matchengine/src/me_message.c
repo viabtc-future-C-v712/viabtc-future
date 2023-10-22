@@ -27,7 +27,7 @@ static void on_delivery(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, voi
     if (rkmessage->err) {
         log_fatal("Message delivery failed: %s", rd_kafka_err2str(rkmessage->err));
     } else {
-        log_trace("Message delivered (topic: %s, %zd bytes, partition %"PRId32")",
+        log_debug("Message delivered (topic: %s, %zd bytes, partition %"PRId32")",
                 rd_kafka_topic_name(rkmessage->rkt), rkmessage->len, rkmessage->partition);
     }
 }
@@ -267,6 +267,7 @@ int push_deal_message_extra(double t, const char *market, uint64_t aid, uint64_t
     return 0;
 }
 
+extern market_t *get_market(const char *name);
 int push_position_message(position_t *position)
 {
     json_t *message = json_array();
@@ -278,7 +279,10 @@ int push_position_message(position_t *position)
     json_array_append_mpd(message, position->leverage);
     json_array_append_mpd(message, position->position);
     json_array_append_mpd(message, position->frozen);
-    json_array_append_mpd(message, position->price);
+    mpd_t *show = mpd_qncopy(position->price);
+    market_t * market = get_market(position->market);
+    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+    json_array_append_mpd(message, show);
     json_array_append_mpd(message, position->principal);
 
     push_message(json_dumps(message, 0), rkt_positions, list_positions);

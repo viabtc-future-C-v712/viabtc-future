@@ -12,9 +12,9 @@ static order_t *initOrder(position_t *position){
    order_t *order = malloc(sizeof(order_t));
     order->id = ++order_id_start;
     order->type = 0;
-    order->side = abs(2 - position->side);
+    order->side = position->side;
     order->pattern = position->pattern;
-    order->oper_type = 0;
+    order->oper_type = 2;
     order->create_time = current_timestamp();
     order->update_time = order->create_time;
     order->user_id = position->user_id;
@@ -64,6 +64,8 @@ int force_liquidation(){
             mpd_t *pnl = getPNL(position, market->latestPrice);
             if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
                 order_t *order = initOrder(position);
+                mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
+                mpd_sub(position->position, position->position, position->position, &mpd_ctx);
                 execute_order(1, market, order->side, order);
             }
         }else{//全仓
@@ -71,6 +73,8 @@ int force_liquidation(){
             mpd_t *pnl = getSumPNL(position->user_id);
             if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
                 order_t *order = initOrder(position);
+                mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
+                mpd_sub(position->position, position->position, position->position, &mpd_ctx);
                 execute_order(1, market, order->side, order);
             }
         }

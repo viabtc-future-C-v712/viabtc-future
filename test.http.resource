@@ -141,10 +141,6 @@ position update
     ${ret} =  call    'position.adjust_principal'    ${id}, "BTCBCH", ${side}, "${amount}"
 market last
     call    'market.last'    "BTCBCH"
-重启
-    sleep    0.2s
-    init oper Log
-    call    'matchengine.suicide'    -1
 退出
     call    'matchengine.suicide'    0
 call

@@ -834,18 +834,19 @@ static int load_oper(json_t *detail)
     int ret = 0;
     if (strcmp(method, "update_balance") == 0) {
         ret = load_update_balance(params);
+        if(ret) log_stderr("update_balance %d", ret);
     } else if (strcmp(method, "order_open") == 0) {
         args_t *args = initOpenArgs(params); // 参数构造
         args->real = 0;
         args->bOpen = 1;
         ret = market_put_order_common(args);
-        // ret = load_limit_order(params);
+        if(ret) log_stderr("order_open %d", ret);
     } else if (strcmp(method, "order_close") == 0) {
         args_t *args = initCloseArgs(params); // 参数构造
         args->real = 0;
         args->bOpen = 0;
         ret = market_put_order_common(args);
-        // ret = load_market_order(params);
+        if(ret) log_stderr("order_close %d", ret);
     } else if (strcmp(method, "cancel_order") == 0) {
         ret = load_cancel_order(params);
     } else if (strcmp(method, "cancel_order_batch") == 0){
@@ -899,6 +900,7 @@ int load_operlog(MYSQL *conn, const char *table, uint64_t *start_id)
             if (ret < 0) {
                 json_decref(detail);
                 log_error("load_oper: %"PRIu64":%s fail: %d", id, row[1], ret);
+                log_stderr("load_oper: %"PRIu64":%s fail: %d", id, row[1], ret);
                 mysql_free_result(result);
                 return -__LINE__;
             }
