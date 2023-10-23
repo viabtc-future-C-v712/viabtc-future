@@ -98,7 +98,7 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
         sdsfree(table);
         return -__LINE__;
     }
-    sdsfree(table);
+    sdsclear(table);
 
     table = sdscatprintf(table, "slice_market_%ld", timestamp);
     log_stderr("load position from: %s", table);
@@ -285,8 +285,8 @@ static int dump_market_to_db(MYSQL *conn, time_t end)
 int update_slice_history(MYSQL *conn, time_t end)
 {
     sds sql = sdsempty();
-    sql = sdscatprintf(sql, "INSERT INTO `slice_history` (`id`, `time`, `end_oper_id`, `end_order_id`, `end_deals_id`) VALUES (NULL, %ld, %" PRIu64 ", %" PRIu64 ", %" PRIu64 ")",
-                       end, operlog_id_start, order_id_start, deals_id_start);
+    sql = sdscatprintf(sql, "INSERT INTO `slice_history` (`id`, `time`, `end_oper_id`, `end_order_id`, `end_deals_id`, `end_position_id`, `end_market_id`) VALUES (NULL, %ld, %" PRIu64 ", %" PRIu64 ", %" PRIu64", %" PRIu64", %" PRIu64 ")",
+                       end, operlog_id_start, order_id_start, deals_id_start, 0, 0);
     log_info("update slice history to: %ld", end);
     log_trace("exec sql: %s", sql);
     int ret = mysql_real_query(conn, sql, sdslen(sql));

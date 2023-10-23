@@ -20,6 +20,7 @@ int load_orders(MYSQL *conn, const char *table)
         sql = sdscatprintf(sql, "SELECT \
         `id`, \
         `t`, \
+        `isblast', \
         `side`, \
         `oper_type`, \
         `create_time`, \
@@ -62,25 +63,26 @@ int load_orders(MYSQL *conn, const char *table)
             memset(order, 0, sizeof(order_t));
             order->id = strtoull(row[0], NULL, 0);
             order->type = strtoul(row[1], NULL, 0);
-            order->side = strtoul(row[2], NULL, 0);
-            order->oper_type = strtoul(row[3], NULL, 0);
-            order->create_time = strtod(row[4], NULL);
-            order->update_time = strtod(row[5], NULL);
-            order->user_id = strtoul(row[6], NULL, 0);
-            order->market = strdup(row[7]);
-            order->relate_order = strtoull(row[8], NULL, 0);
-            order->price = decimal(row[9], market->money_prec);
-            order->amount = decimal(row[10], market->stock_prec);
-            order->leverage = decimal(row[11], market->stock_prec);
-            order->trigger = decimal(row[12], market->stock_prec);
-            order->taker_fee = decimal(row[13], market->fee_prec);
-            order->maker_fee = decimal(row[14], market->fee_prec);
-            order->left = decimal(row[15], market->stock_prec);
-            order->freeze = decimal(row[16], 0);
-            order->deal_stock = decimal(row[17], 0);
-            order->deal_money = decimal(row[18], 0);
-            order->deal_fee = decimal(row[19], 0);
-            order->source = strdup(row[20]);
+            order->isblast = strtoul(row[2], NULL, 0);
+            order->side = strtoul(row[3], NULL, 0);
+            order->oper_type = strtoul(row[4], NULL, 0);
+            order->create_time = strtod(row[5], NULL);
+            order->update_time = strtod(row[6], NULL);
+            order->user_id = strtoul(row[7], NULL, 0);
+            order->market = strdup(row[8]);
+            order->relate_order = strtoull(row[9], NULL, 0);
+            order->price = decimal(row[10], market->money_prec);
+            order->amount = decimal(row[11], market->stock_prec);
+            order->leverage = decimal(row[12], market->stock_prec);
+            order->trigger = decimal(row[13], market->stock_prec);
+            order->taker_fee = decimal(row[14], market->fee_prec);
+            order->maker_fee = decimal(row[15], market->fee_prec);
+            order->left = decimal(row[16], market->stock_prec);
+            order->freeze = decimal(row[17], 0);
+            order->deal_stock = decimal(row[18], 0);
+            order->deal_money = decimal(row[19], 0);
+            order->deal_fee = decimal(row[20], 0);
+            order->source = strdup(row[21]);
             // order->mm = (strncmp(order->source, MM_SOURCE_STR, MM_SOURCE_STR_LEN) == 0) ? true : false;
             order->mm = get_mm_order_type_by_source(order->source);
 

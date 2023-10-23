@@ -2785,7 +2785,7 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
         }
         break;
     case CMD_ORDER_BOOK_DEPTH:
-        log_trace("from: %s cmd order book depth, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        log_debug("from: %s cmd order book depth, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
         ret = on_cmd_order_book_depth(ses, pkg, params);
         if (ret < 0)
         {

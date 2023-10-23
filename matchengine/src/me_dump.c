@@ -33,14 +33,14 @@ static int dump_orders_list(MYSQL *conn, const char *table, skiplist_t *list)
     while ((node = skiplist_next(iter)) != NULL) {
         order_t *order = node->value;
         if (index == 0) {
-            sql = sdscatprintf(sql, "INSERT INTO `%s` (`id`, `t`, `side`, `oper_type`, `pattern`, `create_time`, `update_time`, `user_id`, `market`, `relate_order`, `source`,"
+            sql = sdscatprintf(sql, "INSERT INTO `%s` (`id`, `t`, `isblast`, `side`, `oper_type`, `pattern`, `create_time`, `update_time`, `user_id`, `market`, `relate_order`, `source`,"
                 "`price`, `amount`, `leverage`, `trigger`, `taker_fee`, `maker_fee`, `left`, `freeze`, `deal_stock`, `deal_money`, `deal_fee`) VALUES ", table);
         } else {
             sql = sdscatprintf(sql, ", ");
         }
 
-        sql = sdscatprintf(sql, "(%"PRIu64", %u, %u, %u, %u, %f, %f, %u, '%s', '%u', '%s', ",
-                order->id, order->type, order->side, order->oper_type, order->pattern, order->create_time, order->update_time, order->user_id, order->market, order->relate_order, order->source);
+        sql = sdscatprintf(sql, "(%"PRIu64", %u, %u, %u, %u, %u, %f, %f, %u, '%s', '%u', '%s', ",
+                order->id, order->type, order->isblast, order->side, order->oper_type, order->pattern, order->create_time, order->update_time, order->user_id, order->market, order->relate_order, order->source);
         sql = sql_append_mpd(sql, order->price, true);
         sql = sql_append_mpd(sql, order->amount, true);
         sql = sql_append_mpd(sql, order->leverage, true);
@@ -226,7 +226,7 @@ static int dump_position_dict(MYSQL *conn, const char *table, dict_t *dict)
         } else {
             sql = sdscatprintf(sql, ", ");
         }
-        log_stderr("%s", mpd_to_sci(position->price, 0));
+        // log_stderr("%s", mpd_to_sci(position->price, 0));
         sql = sdscatprintf(sql, "(NULL, %u, '%s', %u, %u, ", key->user_id, key->market, key->side, position->pattern);
         sql = sql_append_mpd(sql, position->leverage, true);
         sql = sql_append_mpd(sql, position->position, true);

@@ -10,5 +10,6 @@ deal_t* initDeal(){
     deal->taker_priAmount = mpd_new(&mpd_ctx);
     deal->maker_priAmount = mpd_new(&mpd_ctx);
     deal->deal = mpd_new(&mpd_ctx);
+    mpd_copy(deal->deal, mpd_zero, &mpd_ctx);
     return deal;
 }

@@ -28,6 +28,7 @@ extern dict_t *user_orders;
 typedef struct order_t {
     uint64_t        id;
     uint32_t        type;
+    uint32_t        isblast;
     uint32_t        side;
     uint32_t        pattern;
     uint32_t        oper_type;

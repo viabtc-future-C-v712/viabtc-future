@@ -101,8 +101,9 @@ static int on_order_deals_reply(struct state_data *state, json_t *result)
     uint64_t id = json_integer_value(json_object_get(first, "id"));
     if (id == 0)
         return -__LINE__;
+    // todo 
     obj->last_id = id;
-
+    log_trace("obj->last_id %d len %d", obj->last_id, obj->deals->len);
     for (size_t i = array_size; i > 0; --i) {
         json_t *deal = json_array_get(result, i - 1);
         json_incref(deal);
@@ -201,7 +202,7 @@ static void on_timer(nw_timer *timer, void *privdata)
         json_array_append_new(params, json_string(market));
         json_array_append_new(params, json_integer(DEALS_QUERY_LIMIT));
         json_array_append_new(params, json_integer(obj->last_id));
-
+        log_trace("obj->last_id %d", obj->last_id);
         nw_state_entry *state_entry = nw_state_add(state_context, settings.backend_timeout, 0);
         struct state_data *state = state_entry->data;
         strncpy(state->market, market, MARKET_NAME_MAX_LEN - 1);

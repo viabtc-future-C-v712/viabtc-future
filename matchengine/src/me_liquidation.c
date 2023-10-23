@@ -12,6 +12,7 @@ static order_t *initOrder(position_t *position){
    order_t *order = malloc(sizeof(order_t));
     order->id = ++order_id_start;
     order->type = 0;
+    order->isblast = 1;
     order->side = position->side;
     order->pattern = position->pattern;
     order->oper_type = 2;
@@ -35,9 +36,11 @@ static order_t *initOrder(position_t *position){
     // order->source       = strdup(source);
 
     // mpd_copy(order->price, args->entrustPrice, &mpd_ctx);
+    mpd_copy(order->price, mpd_zero, &mpd_ctx);
     mpd_copy(order->amount, position->position, &mpd_ctx);
     mpd_add(order->amount, order->amount, position->frozen, &mpd_ctx);
     mpd_copy(order->leverage, position->leverage, &mpd_ctx);
+    mpd_copy(order->trigger, mpd_zero, &mpd_ctx);
     // mpd_copy(order->trigger, args->triggerPrice, &mpd_ctx);
     mpd_copy(order->taker_fee, decimal("0.001", 0), &mpd_ctx);
     mpd_copy(order->maker_fee, decimal("0.002", 0), &mpd_ctx);
@@ -66,6 +69,7 @@ int force_liquidation(){
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);
+                log_trace("force_liquidation %d", order->id);
                 execute_order(1, market, order->side, order);
             }
         }else{//全仓
@@ -75,6 +79,7 @@ int force_liquidation(){
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);
+                log_trace("force_liquidation %d", order->id);
                 execute_order(1, market, order->side, order);
             }
         }

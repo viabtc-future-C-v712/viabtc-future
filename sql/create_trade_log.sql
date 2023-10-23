@@ -35,6 +35,7 @@ CREATE TABLE `slice_position_example` (
 CREATE TABLE `slice_order_example` (
     `id`            BIGINT UNSIGNED NOT NULL PRIMARY KEY,
     `t`             TINYINT UNSIGNED NOT NULL, -- 1 limit, 2 market, 3 trigger(price=0表示为market)
+    `isblast`      TINYINT UNSIGNED NOT NULL, -- 0 非爆仓单，1 爆仓单
     `side`          TINYINT UNSIGNED NOT NULL, -- 1 卖, 2 买
     `pattern`       TINYINT UNSIGNED NOT NULL, -- 1 逐仓, 2 全仓
     `oper_type`     TINYINT UNSIGNED NOT NULL, -- 1 open, 2 close
