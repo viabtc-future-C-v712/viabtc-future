@@ -7,17 +7,17 @@ Resource   test.db.resource
 Resource   test.http.resource
 Resource   test.ws.resource
 Resource   test.kafka.resource
+Resource   test.base.resource
 Variables  test_variable.py
 
-Test Setup   init balance all
+# Test Setup   init balance all
 # Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
 市价开多(未成交)
-    init balance all
     ${max_offset1}=    Evaluate    test.get_max_offset('orders')
-    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000
+    市价开多(未成交)
     ${max_offset2}=    Evaluate    test.get_max_offset('orders')
     Should Be Equal As Numbers    ${max_offset1+1}    ${max_offset2}    # 发了ORDER_EVENT_FINISH
     check order    ${Alice}

@@ -7,19 +7,22 @@ Resource   test.db.resource
 Resource   test.http.resource
 Resource   test.ws.resource
 Resource   test.kafka.resource
+Resource   test.base.resource
 Variables  test_variable.py
 
-Test Setup   init balance all
+# Test Setup   init balance all
 # Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
+uscase case 
+    check order     51317793
+uscase case 2
+    check order book    market=BTCBCH    side=1    offset=0    limit=100
+市价开多(未成交)
+    市价开多(未成交)
+    check order    ${Alice}
 仓位查询
-    ${my_websocket} =  wscall start
-    wscall send    ${my_websocket}    server.auth    "${Alice}",""
-    sleep   1s
-    wscall send    ${my_websocket}    position.subscribe    "BTCBCH",1,"BTCBCH",2
-    wscall recv    ${my_websocket}
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000  # 成交5000
     put open     ${Bob}    ${多}    ${限价}    ${逐仓}    2500    8001  #新挂买单
@@ -29,11 +32,3 @@ Test Setup   init balance all
     check balance    ${Alice}    BCH    ${可用余额}    799965.3125
     check position    ${Alice}    ${多}    ${可用仓位}    2500
     check position    ${Alice}    ${多}    ${冻结仓位}    0
-
-
-    # wscall send    ${my_websocket}    position.query   "BTCBCH", ${多}
-    wscall recv    ${my_websocket}
-    sleep   1s
-    wscall recv    ${my_websocket}
-    sleep   1s
-    wscall recv    ${my_websocket}

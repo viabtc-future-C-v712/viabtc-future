@@ -20,7 +20,7 @@ int load_orders(MYSQL *conn, const char *table)
         sql = sdscatprintf(sql, "SELECT \
         `id`, \
         `t`, \
-        `isblast', \
+        `isblast`, \
         `side`, \
         `oper_type`, \
         `create_time`, \
@@ -32,6 +32,7 @@ int load_orders(MYSQL *conn, const char *table)
         `amount`,\
         `leverage`, \
         `trigger`, \
+        `current_price`, \
         `taker_fee`, \
         `maker_fee`, \
         `left`, \
@@ -74,15 +75,16 @@ int load_orders(MYSQL *conn, const char *table)
             order->price = decimal(row[10], market->money_prec);
             order->amount = decimal(row[11], market->stock_prec);
             order->leverage = decimal(row[12], market->stock_prec);
-            order->trigger = decimal(row[13], market->stock_prec);
-            order->taker_fee = decimal(row[14], market->fee_prec);
-            order->maker_fee = decimal(row[15], market->fee_prec);
-            order->left = decimal(row[16], market->stock_prec);
-            order->freeze = decimal(row[17], 0);
-            order->deal_stock = decimal(row[18], 0);
-            order->deal_money = decimal(row[19], 0);
-            order->deal_fee = decimal(row[20], 0);
-            order->source = strdup(row[21]);
+            order->trigger = decimal(row[13], market->money_prec);
+            order->current_price = decimal(row[14], market->money_prec);
+            order->taker_fee = decimal(row[15], market->fee_prec);
+            order->maker_fee = decimal(row[16], market->fee_prec);
+            order->left = decimal(row[17], market->money_prec);
+            order->freeze = decimal(row[18], 0);
+            order->deal_stock = decimal(row[19], 0);
+            order->deal_money = decimal(row[20], 0);
+            order->deal_fee = decimal(row[21], 0);
+            order->source = strdup(row[22]);
             // order->mm = (strncmp(order->source, MM_SOURCE_STR, MM_SOURCE_STR_LEN) == 0) ? true : false;
             order->mm = get_mm_order_type_by_source(order->source);
 

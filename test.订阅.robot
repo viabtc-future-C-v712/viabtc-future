@@ -7,13 +7,17 @@ Resource   test.db.resource
 Resource   test.http.resource
 Resource   test.ws.resource
 Resource   test.kafka.resource
+Resource   test.base.resource
 Variables  test_variable.py
 
-Test Setup   init balance all
-# Test Teardown   重启
+Test Setup   登陆
+Test Teardown   退出
 *** Variables ***
 
 *** Test Cases ***
+市价开多(未成交)
+    市价开多(未成交)
+    check order    ${Alice}
 仓位定阅
     ${my_websocket} =  wscall start
     wscall send    ${my_websocket}    server.auth    "${Alice}",""
@@ -37,3 +41,9 @@ Test Setup   init balance all
     wscall recv    ${my_websocket}
     sleep   1s
     wscall recv    ${my_websocket}
+*** Keywords ***
+登陆
+    ${my_websocket} =  wscall start
+    wscall send    ${my_websocket}    server.auth    "${Alice}",""
+退出
+    wscall end    ${my_websocket}

@@ -200,6 +200,7 @@ json_t *get_order_info(order_t *order)
 
     json_object_set_new_mpd(info, "price", order->price);
     json_object_set_new_mpd(info, "trigger", order->trigger);
+    json_object_set_new_mpd(info, "current_price", order->current_price);
     json_object_set_new_mpd(info, "amount", order->amount);
     json_object_set_new_mpd(info, "taker_fee", order->taker_fee);
     json_object_set_new_mpd(info, "maker_fee", order->maker_fee);
@@ -312,7 +313,6 @@ static int order_put_future(market_t *m, order_t *order)
     struct dict_order_key order_key = {.order_id = order->id};
     if (dict_add(m->orders, &order_key, order) == NULL)
         return -__LINE__;
-
     struct dict_user_key user_key = {.user_id = order->user_id};
     dict_entry *entry = dict_find(m->users, &user_key);
     if (entry)
@@ -334,7 +334,6 @@ static int order_put_future(market_t *m, order_t *order)
         if (dict_add(m->users, &user_key, order_list) == NULL)
             return -__LINE__;
     }
-
     if (!order->mm)
     {
         entry = dict_find(user_orders, &user_key);
@@ -358,7 +357,6 @@ static int order_put_future(market_t *m, order_t *order)
                 return -__LINE__;
         }
     }
-
     if (order->side == 1)
     {
         if (order->type == 0 || order->type == 1)
@@ -368,7 +366,6 @@ static int order_put_future(market_t *m, order_t *order)
         }
         else
         {
-            log_trace("order record %p", (void *)order);
             if (skiplist_insert(m->plan_asks, order) == NULL)
                 return -__LINE__;
         }
@@ -1493,7 +1490,8 @@ int adjustPosition(deal_t *deal)
             mpd_sub(position->principal, position->principal, deal->taker_priAmount, &mpd_ctx);
 
             if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
-                del_position(position->user_id, position->market, position->side);
+                mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
+                mpd_copy(position->position, mpd_zero, &mpd_ctx);
             }else{
                 mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // 下单时已冻结仓位，这里只需减少冻结仓位
@@ -1507,6 +1505,9 @@ int adjustPosition(deal_t *deal)
     if (deal->real)
     {
         push_position_message(position);
+        if(mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+            del_position(position->user_id, position->market, position->side);
+        }
     }
     // maker position
     position = get_position(deal->maker->user_id, deal->maker->market, deal->maker->side);
@@ -1564,7 +1565,8 @@ int adjustPosition(deal_t *deal)
             mpd_sub(position->principal, position->principal, deal->maker_priAmount, &mpd_ctx);
 
             if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
-                del_position(position->user_id, position->market, position->side);
+                mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
+                mpd_copy(position->position, mpd_zero, &mpd_ctx);
             }else{
                 mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // maker 只可能是限价单，下单时已冻结仓位，这里只需减少冻结仓位
@@ -1578,6 +1580,9 @@ int adjustPosition(deal_t *deal)
     if (deal->real)
     {
         push_position_message(position);
+        if(mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+            del_position(position->user_id, position->market, position->side);
+        }
     }
     mpd_del(sum);
     mpd_del(money);
@@ -1663,7 +1668,7 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
 {
     if (order->side == MARKET_ORDER_SIDE_ASK)
     {
-        if(order->type == 2){
+        if(order->type == MARKET_ORDER_TYPE_PLAN){
             skiplist_node *node = skiplist_find(m->plan_asks, order);
             if (node)
             {
@@ -1679,7 +1684,7 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
     }
     else
     {
-        if(order->type == 2){
+        if(order->type == MARKET_ORDER_TYPE_PLAN){
             skiplist_node *node = skiplist_find(m->plan_bids, order);
             if (node)
             {
@@ -1923,6 +1928,7 @@ order_t *initOrder(args_t *args)
     order->amount = mpd_new(&mpd_ctx);
     order->leverage = mpd_new(&mpd_ctx);
     order->trigger = mpd_new(&mpd_ctx);
+    order->current_price = mpd_new(&mpd_ctx);
     order->taker_fee = mpd_new(&mpd_ctx);
     order->maker_fee = mpd_new(&mpd_ctx);
     order->left = mpd_new(&mpd_ctx);
@@ -1931,12 +1937,14 @@ order_t *initOrder(args_t *args)
     order->deal_money = mpd_new(&mpd_ctx);
     order->deal_fee = mpd_new(&mpd_ctx);
     order->source = "";
+    order->mm = 0;
     // order->source       = strdup(source);
 
     mpd_copy(order->price, args->entrustPrice, &mpd_ctx);
     mpd_copy(order->amount, args->volume, &mpd_ctx);
     mpd_copy(order->leverage, args->leverage, &mpd_ctx);
     mpd_copy(order->trigger, args->triggerPrice, &mpd_ctx);
+    mpd_copy(order->current_price, args->market->latestPrice, &mpd_ctx);
     mpd_copy(order->taker_fee, args->taker_fee_rate, &mpd_ctx);
     mpd_copy(order->maker_fee, args->maker_fee_rate, &mpd_ctx);
     mpd_copy(order->left, args->volume, &mpd_ctx);
@@ -1947,6 +1955,37 @@ order_t *initOrder(args_t *args)
     log_debug("order record %p", (void *)order);
     return order;
 }
+
+int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee){
+    if (pattern == 1){ // 逐仓
+        if (mpd_cmp(balance, priAndFee, &mpd_ctx) < 0)
+            return -1;
+    }
+    if (pattern == 2){ // 全仓
+        if (getSumCrossCount(user_id))
+        {
+            mpd_t *totalPNL = getSumPNL(user_id);
+            if (mpd_cmp(totalPNL, mpd_zero, &mpd_ctx) < 0)
+            {
+                mpd_add(totalPNL, totalPNL, balance, &mpd_ctx);
+                if (mpd_cmp(totalPNL, priAndFee, &mpd_ctx) < 0)
+                    return -1;
+            }
+            else
+            {
+                if (mpd_cmp(balance, priAndFee, &mpd_ctx) < 0)
+                    return -1;
+            }
+        }
+        else
+        {
+            if (mpd_cmp(balance, priAndFee, &mpd_ctx) < 0)
+                return -1;
+        }
+    }
+    return 0;
+}
+
 // 开仓
 int market_put_order_open(void *args_)
 {
@@ -1979,34 +2018,8 @@ int market_put_order_open(void *args_)
 
     // 计算余额 是否大于保证金
     mpd_copy(args->priAndFee, args->priAmount, &mpd_ctx);
-    if (args->pattern == 1)
-    { // 逐仓
-        if (mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0)
-            return -1;
-    }
-    if (args->pattern == 2)
-    { // 全仓
-        if (getSumCrossCount(args->user_id))
-        {
-            mpd_t *totalPNL = getSumPNL(args->user_id);
-            if (mpd_cmp(totalPNL, mpd_zero, &mpd_ctx) < 0)
-            {
-                mpd_add(totalPNL, totalPNL, balance, &mpd_ctx);
-                if (mpd_cmp(totalPNL, args->priAndFee, &mpd_ctx) < 0)
-                    return -1;
-            }
-            else
-            {
-                if (mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0)
-                    return -1;
-            }
-        }
-        else
-        {
-            if (mpd_cmp(balance, args->priAndFee, &mpd_ctx) < 0)
-                return -1;
-        }
-    }
+    if(checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee)) return -1;
+
     args->taker = initOrder(args);
     args->taker->oper_type = 1;
     if (args->taker == NULL)
@@ -2027,7 +2040,8 @@ int market_put_order_open(void *args_)
     }
     else
     { // 计划委托
-        push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
+        if(args->real)
+            push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
         order_put_future(args->market, args->taker);
     }
     return 0;
@@ -2075,7 +2089,8 @@ int market_put_order_close(void *args_)
     }
     else
     { // 计划委托
-        push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
+        if(args->real)
+            push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
         order_put_future(args->market, args->taker);
     }
     return 0;

@@ -41,6 +41,7 @@ typedef struct order_t {
     mpd_t           *amount;
     mpd_t           *leverage;
     mpd_t           *trigger;
+    mpd_t           *current_price;
     mpd_t           *taker_fee;
     mpd_t           *maker_fee;
     mpd_t           *left;
@@ -85,6 +86,7 @@ int market_put_order(market_t *m, order_t *order);
 int market_put_order_common(void*);
 int market_put_order_open(void*);
 int market_put_order_close(void*);
+int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee);
 
 json_t *get_order_info(order_t *order);
 json_t *get_order_info_brief(order_t *order);

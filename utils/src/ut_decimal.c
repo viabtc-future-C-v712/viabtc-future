@@ -73,6 +73,8 @@ char *rstripzero(char *str)
 int json_object_set_new_mpd(json_t *obj, const char *key, mpd_t *value)
 {
     char *str = mpd_to_sci(value, 0);
+    if(!str)
+        return json_object_set_new(obj, key, json_string(rstripzero("0")));
     int ret = json_object_set_new(obj, key, json_string(rstripzero(str)));
     free(str);
     return ret;

@@ -48,6 +48,7 @@ CREATE TABLE `slice_order_example` (
     `amount`        DECIMAL(35,16) NOT NULL, -- 交易的单位 U 既 volume
     `leverage`      DECIMAL(8,2) NOT NULL,
     `trigger`       DECIMAL(35,16) NOT NULL, -- trigger price
+    `current_price`       DECIMAL(35,16) NOT NULL, -- current price
     `taker_fee`     DECIMAL(8,6) NOT NULL,
     `maker_fee`     DECIMAL(8,6) NOT NULL,
     `left`          DECIMAL(35,16) NOT NULL, -- 买卖的单位 U 既 volume

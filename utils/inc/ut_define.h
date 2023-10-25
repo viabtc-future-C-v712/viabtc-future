@@ -7,6 +7,7 @@
 # ifndef _UT_DEFINE_H_
 # define _UT_DEFINE_H_
 
+# define MARKET_ORDER_TYPE_PLAN     2
 # define MARKET_ORDER_TYPE_LIMIT    1
 # define MARKET_ORDER_TYPE_MARKET   0
 

@@ -2410,6 +2410,8 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     }
     else
     {
+        json_object_set_new(result, "market", json_string(market_name));
+        json_object_set_new(result, "side", json_integer(side));
         json_object_set_new(result, "count", json_integer(0));
     }
     json_object_set_new(result, "positions", positions);

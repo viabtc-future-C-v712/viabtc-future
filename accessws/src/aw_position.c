@@ -16,6 +16,11 @@ struct position_key {
     uint32_t    side;
 };
 
+struct dict_user_key
+{
+    uint32_t user_id;
+};
+
 struct sub_unit {
     void *ses;
     struct position_key position;
@@ -43,7 +48,9 @@ static void dict_sub_val_free(void *val)
 
 static int list_node_compare(const void *value1, const void *value2)
 {
-    return memcmp(value1, value2, sizeof(struct sub_unit));
+    const struct sub_unit *a = (const struct sub_unit *)value1;
+    const struct sub_unit *b = (const struct sub_unit *)value2;
+    return memcmp(&a->position, &b->position, sizeof(struct position_key));
 }
 
 static void *list_node_dup(void *value)
@@ -75,8 +82,9 @@ static void on_backend_connect(nw_ses *ses, bool result)
 
 static int on_position_query_reply(struct state_data *state, json_t *result)
 {
-    void *key = (void *)(uintptr_t)state->user_id;
-    dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_id: %d ses id: tobe", state->user_id);
+    struct dict_user_key key = {.user_id = state->user_id};
+    dict_entry *entry = dict_find(dict_sub, &key);
     if (entry == NULL)
         return 0 ;
 
@@ -88,7 +96,8 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
     list_node *node;
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
-        if (strcmp(unit->position.market, state->position.market) == 0 && unit->position.side, state->position.side) {
+        if (strcmp(unit->position.market, state->position.market) == 0 && unit->position.side == state->position.side) {
+            log_trace("user_id: %d ses id: %d ", state->user_id, ((nw_ses *)unit->ses)->id);
             send_notify(unit->ses, "position.update", params);
         }
     }
@@ -100,6 +109,7 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
 
 static void on_backend_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
 {
+    log_trace("user_id:  ses id: %d", ses->id);
     sds reply_str = sdsnewlen(pkg->body, pkg->body_size);
     log_trace("recv pkg from: %s, cmd: %u, sequence: %u, reply: %s",
             nw_sock_human_addr(&ses->peer_addr), pkg->command, pkg->sequence, reply_str);
@@ -148,12 +158,29 @@ static void on_backend_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
     nw_state_del(state_context, pkg->sequence);
 }
 
+static uint32_t dict_user_hash_function(const void *key)
+{
+    const struct dict_user_key *obj = key;
+    return obj->user_id;
+}
+
+static int dict_user_key_compare(const void *key1, const void *key2)
+{
+    const struct dict_user_key *obj1 = key1;
+    const struct dict_user_key *obj2 = key2;
+    if (obj1->user_id == obj2->user_id)
+    {
+        return 0;
+    }
+    return 1;
+}
+
 int init_position(void)
 {
     dict_types dt;
     memset(&dt, 0, sizeof(dt));
-    dt.hash_function = dict_sub_hash_func;
-    dt.key_compare = dict_sub_key_compare;
+    dt.hash_function = dict_user_hash_function;
+    dt.key_compare = dict_user_key_compare;
     dt.val_destructor = dict_sub_val_free;
 
     dict_sub = dict_create(&dt, 1024);
@@ -184,7 +211,9 @@ int init_position(void)
 
 int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32_t side)
 {
-    void *key = (void *)(uintptr_t)user_id;
+    log_trace("user_id: %d ses id: %d", user_id, ses->id);
+    struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
+    key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
     if (entry == NULL) {
         list_type lt;
@@ -201,15 +230,15 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     }
 
     list_t *list = entry->val;
-    struct sub_unit unit;
-    memset(&unit, 0, sizeof(unit));
-    unit.ses = ses;
-    strncpy(unit.position.market, market, ASSET_NAME_MAX_LEN - 1);
-    unit.position.side = side;
+    struct sub_unit *unit = (struct sub_unit*)malloc(sizeof(struct sub_unit));
+    memset(unit, 0, sizeof(struct sub_unit));
+    unit->ses = ses;
+    strncpy(unit->position.market, market, ASSET_NAME_MAX_LEN - 1);
+    unit->position.side = side;
 
-    if (list_find(list, &unit) != NULL)
+    if (list_find(list, unit) != NULL)
         return 0;
-    if (list_add_node_tail(list, &unit) == NULL)
+    if (list_add_node_tail(list, unit) == NULL)
         return -__LINE__;
 
     return 0;
@@ -217,7 +246,9 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
 
 int position_unsubscribe(uint32_t user_id, nw_ses *ses)
 {
-    void *key = (void *)(uintptr_t)user_id;
+    log_trace("user_id: %d ses id: %d", user_id, ses->id);
+    struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
+    key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
     if (entry == NULL)
         return 0;
@@ -242,11 +273,13 @@ int position_unsubscribe(uint32_t user_id, nw_ses *ses)
 
 int position_on_update(uint32_t user_id, const char *market, uint32_t side)
 {
-    void *key = (void *)(uintptr_t)user_id;
+    log_trace("user_id: %d ses tobe", user_id);
+    struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
+    key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
     if (entry == NULL)
         return 0;
-
+    log_trace("user_id: %d ses tobe", user_id);
     bool notify = false;
     list_t *list = entry->val;
     list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
@@ -254,6 +287,7 @@ int position_on_update(uint32_t user_id, const char *market, uint32_t side)
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
         if (strcmp(unit->position.market, market) == 0 && unit->position.side == side) {
+            log_trace("user_id: %d ses %d %s, %s, %d, %d", user_id, ((nw_ses *)unit->ses)->id, unit->position.market, market, unit->position.side, side );
             notify = true;
             break;
         }
@@ -280,7 +314,7 @@ int position_on_update(uint32_t user_id, const char *market, uint32_t side)
     pkg.sequence  = state_entry->id;
     pkg.body      = json_dumps(trade_params, 0);
     pkg.body_size = strlen(pkg.body);
-
+    log_trace("user_id: %d ses tobe", user_id);
     rpc_clt_send(matchengine, &pkg);
     log_trace("send request to %s, cmd: %u, sequence: %u, params: %s",
             nw_sock_human_addr(rpc_clt_peer_addr(matchengine)), pkg.command, pkg.sequence, (char *)pkg.body);

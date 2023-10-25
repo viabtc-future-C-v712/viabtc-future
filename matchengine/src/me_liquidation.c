@@ -33,6 +33,7 @@ static order_t *initOrder(position_t *position){
     order->deal_money = mpd_new(&mpd_ctx);
     order->deal_fee = mpd_new(&mpd_ctx);
     order->source = "";
+    order->mm = 0;
     // order->source       = strdup(source);
 
     // mpd_copy(order->price, args->entrustPrice, &mpd_ctx);

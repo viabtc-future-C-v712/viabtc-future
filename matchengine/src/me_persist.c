@@ -101,7 +101,7 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
     sdsclear(table);
 
     table = sdscatprintf(table, "slice_market_%ld", timestamp);
-    log_stderr("load position from: %s", table);
+    log_stderr("load market from: %s", table);
     ret = load_market_db(conn, table);
     if (ret < 0)
     {

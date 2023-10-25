@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     daemon(1, 1);
     process_keepalive();
-
+    
     ret = init_from_db();
     if (ret < 0)
     {
@@ -139,6 +139,7 @@ int main(int argc, char *argv[])
     {
         error(EXIT_FAILURE, errno, "init history fail: %d", ret);
     }
+
     ret = init_message();
     if (ret < 0)
     {
