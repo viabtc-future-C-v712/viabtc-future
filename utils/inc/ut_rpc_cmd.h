@@ -15,6 +15,8 @@
 # define CMD_BALANCE_UNFREEZE       106
 # define CMD_MATCHENGINE_MAKE_SLICE 107
 
+# define CMD_BALANCE_QUERY_ALL      108
+
 // trade
 # define CMD_ORDER_PUT_LIMIT        201
 # define CMD_ORDER_PUT_MARKET       202

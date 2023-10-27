@@ -102,7 +102,7 @@ static int order_match_compare(const void *value1, const void *value2)
     }
 
     int cmp;
-    if (order1->side == MARKET_ORDER_SIDE_ASK)
+    if (order1->side == 1 && order1->oper_type == 1 || order1->side == 2 && order1->oper_type == 2)
     {
         cmp = mpd_cmp(order1->price, order2->price, &mpd_ctx);
     }
@@ -357,9 +357,9 @@ static int order_put_future(market_t *m, order_t *order)
                 return -__LINE__;
         }
     }
-    if (order->side == 1)
+    if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2  )
     {
-        if (order->type == 0 || order->type == 1)
+        if (order->type == 1)
         {
             if (skiplist_insert(m->asks, order) == NULL)
                 return -__LINE__;
@@ -372,7 +372,7 @@ static int order_put_future(market_t *m, order_t *order)
     }
     else
     {
-        if (order->type == 0 || order->type == 1)
+        if (order->type == 1)
         {
             if (skiplist_insert(m->bids, order) == NULL)
                 return -__LINE__;
@@ -1298,10 +1298,16 @@ int market_put_order_common(void *args_)
             }
         }
     }
-    if (args->bOpen)
-        return market_put_order_open((void *)args);
-    else
-        return market_put_order_close((void *)args);
+    int ret = 0;
+    if (args->bOpen){
+        ret = market_put_order_open((void *)args);
+    }
+    else{
+        ret = market_put_order_close((void *)args);
+    }
+    on_planner(args->real);//处理计划委托
+    force_liquidation(args->real);//处理爆仓
+    return ret;
 }
 
 mpd_t *calcPriAmout(mpd_t *volume, mpd_t *Price, mpd_t *leverage)
@@ -1333,10 +1339,10 @@ int getSumCrossCount(uint32_t user_id)
     for (size_t i = 0; i < settings.market_num; ++i)
     {
         position_t *position = get_position(user_id, settings.markets[i].name, 1);
-        if (position->pattern == 2)
+        if (position && position->pattern == 2)
             count++;
         position = get_position(user_id, settings.markets[i].name, 2);
-        if (position->pattern == 2)
+        if (position && position->pattern == 2)
             count++;
     }
     return count;
@@ -1649,16 +1655,18 @@ int execute_order_open_imp(deal_t *deal)
 
     uint64_t deal_id = ++deals_id_start;
 
+    deal->taker->update_time = deal->maker->update_time = current_timestamp();
     if (deal->real)
     {
-
-        // 添加记录
-        append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee);
-        // 发送消息
-        if (deal->taker->side == MARKET_ORDER_SIDE_ASK)
+        if (deal->taker->side == 1 && deal->taker->oper_type == 1 || deal->taker->side == 2 && deal->taker->oper_type == 2){
+            // 添加记录
+            append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee);
+            // 发送消息
             push_deal_message(deal->taker->update_time, deal->taker->market, deal->taker, deal->maker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
-        else
+        }else{
+            append_order_deal_history_future(deal->maker->update_time, deal_id, deal->maker, MARKET_ROLE_MAKER, deal->taker, MARKET_ROLE_TAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee);
             push_deal_message(deal->maker->update_time, deal->maker->market, deal->maker, deal->taker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
+        }
     }
     log_debug("%s", __FUNCTION__);
     return 0;
@@ -1666,7 +1674,7 @@ int execute_order_open_imp(deal_t *deal)
 
 static int order_finish_future(bool real, market_t *m, order_t *order)
 {
-    if (order->side == MARKET_ORDER_SIDE_ASK)
+    if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2)
     {
         if(order->type == MARKET_ORDER_TYPE_PLAN){
             skiplist_node *node = skiplist_find(m->plan_asks, order);

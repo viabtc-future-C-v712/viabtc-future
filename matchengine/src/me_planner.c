@@ -41,7 +41,7 @@ order_t * copyOrder(order_t *order_old){
     return order;
 }
 
-void on_planner()
+void on_planner(uint32_t real)
 {
     dict_iterator *iter_market = dict_get_iterator(dict_market);
     dict_entry *entry_market;
@@ -74,13 +74,13 @@ void on_planner()
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
-                    execute_order(true, market, BEAR, order);
+                    execute_order(real, market, BEAR, order);
                 }
                 else{//平仓，卖 （平多）
                     position_t *position = get_position(order->user_id, order->market, order->side);
                     mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                     mpd_sub(position->position, position->position, order->left, &mpd_ctx);
-                    execute_order(true, market, BULL, order);
+                    execute_order(real, market, BULL, order);
                 }
             }
         }
@@ -109,13 +109,13 @@ void on_planner()
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
-                    execute_order(1, market, BULL, order);
+                    execute_order(real, market, BULL, order);
                 }
                 else{//平仓，卖 （平空）
                     position_t *position = get_position(order->user_id, order->market, order->side);
                     mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                     mpd_sub(position->position, position->position, order->left, &mpd_ctx);
-                    execute_order(1, market, BEAR, order);
+                    execute_order(real, market, BEAR, order);
                 }
             }
         }

@@ -25,6 +25,7 @@ static order_t *initOrder(position_t *position){
     order->amount = mpd_new(&mpd_ctx);
     order->leverage = mpd_new(&mpd_ctx);
     order->trigger = mpd_new(&mpd_ctx);
+    order->current_price = mpd_new(&mpd_ctx);
     order->taker_fee = mpd_new(&mpd_ctx);
     order->maker_fee = mpd_new(&mpd_ctx);
     order->left = mpd_new(&mpd_ctx);
@@ -42,6 +43,7 @@ static order_t *initOrder(position_t *position){
     mpd_add(order->amount, order->amount, position->frozen, &mpd_ctx);
     mpd_copy(order->leverage, position->leverage, &mpd_ctx);
     mpd_copy(order->trigger, mpd_zero, &mpd_ctx);
+    mpd_copy(order->current_price, mpd_zero, &mpd_ctx);
     // mpd_copy(order->trigger, args->triggerPrice, &mpd_ctx);
     mpd_copy(order->taker_fee, decimal("0.001", 0), &mpd_ctx);
     mpd_copy(order->maker_fee, decimal("0.002", 0), &mpd_ctx);
@@ -53,7 +55,7 @@ static order_t *initOrder(position_t *position){
     return order;
 }
 
-int force_liquidation(){
+int force_liquidation(uint32_t real){
     // 通过遍历仓位，检查逐仓
     dict_iterator *iter = dict_get_iterator(dict_position);
     if (iter == NULL)
@@ -65,23 +67,25 @@ int force_liquidation(){
         position_t *position = entry->val;
         if(position->pattern == 1){//逐仓
             market_t *market = get_market(position->market);
+            if(mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0) continue;
             mpd_t *pnl = getPNL(position, market->latestPrice);
             if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);
                 log_trace("force_liquidation %d", order->id);
-                execute_order(1, market, order->side, order);
+                execute_order(real, market, order->side, order);
             }
         }else{//全仓
             market_t *market = get_market(position->market);
+            if(mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0) continue;
             mpd_t *pnl = getSumPNL(position->user_id);
             if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);
                 log_trace("force_liquidation %d", order->id);
-                execute_order(1, market, order->side, order);
+                execute_order(real, market, order->side, order);
             }
         }
     }

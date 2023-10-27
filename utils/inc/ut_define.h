@@ -14,6 +14,9 @@
 # define MARKET_ORDER_SIDE_ASK      1
 # define MARKET_ORDER_SIDE_BID      2
 
+# define MARKET_ORDER_OPEN          1
+# define MARKET_ORDER_CLOSE         2
+
 # define MARKET_ROLE_MAKER          1
 # define MARKET_ROLE_TAKER          2
 

@@ -299,6 +299,7 @@ static int init_methods_handler(void)
     ERR_RET_LN(add_handler("asset.summary", matchengine, CMD_ASSET_SUMMARY));
 
     ERR_RET_LN(add_handler("balance.query", matchengine, CMD_BALANCE_QUERY));
+    ERR_RET_LN(add_handler("balance.query_all", matchengine, CMD_BALANCE_QUERY_ALL));
     ERR_RET_LN(add_handler("balance.update", matchengine, CMD_BALANCE_UPDATE));
     ERR_RET_LN(add_handler("balance.history", readhistory, CMD_BALANCE_HISTORY));
     ERR_RET_LN(add_handler("balance.unfreeze", matchengine, CMD_BALANCE_UNFREEZE));

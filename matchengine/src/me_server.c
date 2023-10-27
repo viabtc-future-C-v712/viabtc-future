@@ -278,6 +278,143 @@ static int on_cmd_balance_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     return ret;
 }
 
+static int on_cmd_balance_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    size_t request_size = json_array_size(params);
+    json_t *array_result = json_array();
+
+    dict_iterator *iter = dict_get_iterator(dict_balance);
+    if (iter == NULL)
+        return -1;
+
+    //获得用户列表
+    uint32_t user_id = -1;
+    dict_entry *entry;
+    struct balance_key* key = NULL;
+    while ((entry = dict_next(iter)) != NULL) {
+        key = entry->key;
+        if (key->user_id == user_id) continue;
+        user_id = key->user_id;
+
+        json_t *result = json_object();
+        if (request_size == 0)
+        {
+            for (size_t i = 0; i < settings.asset_num; ++i)
+            {
+                const char *asset = settings.assets[i].name;
+                json_t *unit = json_object();
+                int prec_save = asset_prec(asset);
+                int prec_show = asset_prec_show(asset);
+
+                mpd_t *available = balance_get(user_id, BALANCE_TYPE_AVAILABLE, asset);
+                if (available)
+                {
+                    if (prec_save != prec_show)
+                    {
+                        mpd_t *show = mpd_qncopy(available);
+                        mpd_rescale(show, show, -prec_show, &mpd_ctx);
+                        json_object_set_new_mpd(unit, "available", show);
+                        mpd_del(show);
+                    }
+                    else
+                    {
+                        json_object_set_new_mpd(unit, "available", available);
+                    }
+                }
+                else
+                {
+                    json_object_set_new(unit, "available", json_string("0"));
+                }
+
+                mpd_t *freeze = balance_get(user_id, BALANCE_TYPE_FREEZE, asset);
+                if (freeze)
+                {
+                    if (prec_save != prec_show)
+                    {
+                        mpd_t *show = mpd_qncopy(freeze);
+                        mpd_rescale(show, show, -prec_show, &mpd_ctx);
+                        json_object_set_new_mpd(unit, "freeze", show);
+                        mpd_del(show);
+                    }
+                    else
+                    {
+                        json_object_set_new_mpd(unit, "freeze", freeze);
+                    }
+                }
+                else
+                {
+                    json_object_set_new(unit, "freeze", json_string("0"));
+                }
+
+                json_object_set_new(result, asset, unit);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < request_size; ++i)
+            {
+                const char *asset = json_string_value(json_array_get(params, i));
+                if (!asset || !asset_exist(asset))
+                {
+                    json_decref(result);
+                    return reply_error_invalid_argument(ses, pkg);
+                }
+                json_t *unit = json_object();
+                int prec_save = asset_prec(asset);
+                int prec_show = asset_prec_show(asset);
+
+                mpd_t *available = balance_get(user_id, BALANCE_TYPE_AVAILABLE, asset);
+                if (available)
+                {
+                    if (prec_save != prec_show)
+                    {
+                        mpd_t *show = mpd_qncopy(available);
+                        mpd_rescale(show, show, -prec_show, &mpd_ctx);
+                        json_object_set_new_mpd(unit, "available", show);
+                        mpd_del(show);
+                    }
+                    else
+                    {
+                        json_object_set_new_mpd(unit, "available", available);
+                    }
+                }
+                else
+                {
+                    json_object_set_new(unit, "available", json_string("0"));
+                }
+
+                mpd_t *freeze = balance_get(user_id, BALANCE_TYPE_FREEZE, asset);
+                if (freeze)
+                {
+                    if (prec_save != prec_show)
+                    {
+                        mpd_t *show = mpd_qncopy(freeze);
+                        mpd_rescale(show, show, -prec_show, &mpd_ctx);
+                        json_object_set_new_mpd(unit, "freeze", show);
+                        mpd_del(show);
+                    }
+                    else
+                    {
+                        json_object_set_new_mpd(unit, "freeze", freeze);
+                    }
+                }
+                else
+                {
+                    json_object_set_new(unit, "freeze", json_string("0"));
+                }
+
+                json_object_set_new(result, asset, unit);
+            }
+        }
+        json_object_set_new(result, "user_id", json_integer(user_id));
+        json_array_append_new(array_result, result);
+    }
+    
+    int ret = reply_result(ses, pkg, array_result);
+    json_decref(array_result);
+    return ret;
+}
+
 static int on_cmd_balance_update(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     log_debug("on_cmd_balance_update");
@@ -2335,8 +2472,6 @@ static int on_cmd_order_open(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     else
     {
         append_operlog("order_open", params);
-        on_planner();//处理计划委托
-        force_liquidation();//处理爆仓
         return reply_success(ses, pkg);
     }
 }
@@ -2355,8 +2490,6 @@ static int on_cmd_order_close(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     }
     else{
         append_operlog("order_close", params);
-        on_planner();//处理计划委托
-        force_liquidation();//处理爆仓
         return reply_success(ses, pkg);
     }
 }
@@ -2423,71 +2556,191 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 static int on_cmd_position_query_all(nw_ses *ses, rpc_pkg *pkg, json_t *params)
 {
     size_t request_size = json_array_size(params);
-    if (request_size != 2)
-        return reply_error_invalid_argument(ses, pkg);
 
-    if (!json_is_integer(json_array_get(params, 0)))
-        return reply_error_invalid_argument(ses, pkg);
-    uint32_t user_id = json_integer_value(json_array_get(params, 0));
-    if (user_id == 0)
-        return reply_error_invalid_argument(ses, pkg);
+    json_t *array_result = json_array();
 
-    // market
-    if (!json_is_string(json_array_get(params, 1)))
-        return reply_error_invalid_argument(ses, pkg);
-    const char *market_name = json_string_value(json_array_get(params, 1));
+    if(request_size){
+        const char *market_name = json_string_value(json_array_get(params, 0));
+        if(!market_name){
+            if (!json_is_integer(json_array_get(params, 0)))
+                return reply_error_invalid_argument(ses, pkg);
+            uint32_t user_id = json_integer_value(json_array_get(params, 0));
+            if (user_id == 0)
+                return reply_error_invalid_argument(ses, pkg);
+
+            // market
+            if (!json_is_string(json_array_get(params, 1)))
+                return reply_error_invalid_argument(ses, pkg);
+            const char *market_name = json_string_value(json_array_get(params, 1));
+            market_t *market = NULL;
+            if(strlen(market_name) != 0){
+                market = get_market(market_name);
+                if (market == NULL)
+                    return reply_error_other(ses, pkg, "market不存在");
+            }
+
+            json_t *result = json_object();
+            json_t *positions = json_array();
+            int count = 0;
+            for (size_t i = 0; i < settings.market_num; ++i) {
+                position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
+                if (position)
+                {
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+                position = get_position(user_id, settings.markets[i].name, BULL);
+                if (position)
+                {
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+            }
+            json_object_set_new(result, "positions", positions);
+            json_object_set_new(result, "count", json_integer(count));
+            int ret = reply_result(ses, pkg, result);
+            json_decref(result);
+            return ret;
+        }
+    }
+    dict_iterator *iter = dict_get_iterator(dict_balance);
+    if (iter == NULL)
+        return -1;
+    //获得用户列表
+    uint32_t user_id = -1;
+    dict_entry *entry;
+    struct balance_key* key = NULL;
     market_t *market = NULL;
-    if(strlen(market_name) != 0){
-        market = get_market(market_name);
-        if (market == NULL)
-            return reply_error_other(ses, pkg, "market不存在");
+    while ((entry = dict_next(iter)) != NULL) {
+        key = entry->key;
+        if (key->user_id == user_id) continue;
+        user_id = key->user_id;
+
+        json_t *result = json_object();
+        json_t *positions = json_array();
+        int count = 0;
+        if(request_size == 0){
+            for (size_t i = 0; i < settings.market_num; ++i) {
+                position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
+                if (position)
+                {
+                    market = get_market(settings.markets[i].name);
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+                position = get_position(user_id, settings.markets[i].name, BULL);
+                if (position)
+                {
+                    market = get_market(settings.markets[i].name);
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+            }
+            json_object_set_new(result, "positions", positions);
+            json_object_set_new(result, "count", json_integer(count));
+
+            json_object_set_new(result, "user_id", json_integer(user_id));
+            json_array_append_new(array_result, result);
+        }else{
+            for (size_t i = 0; i < request_size; ++i){
+                const char *market_name = json_string_value(json_array_get(params, i));
+                position_t *position = get_position(user_id, market_name, BEAR);
+                if (position)
+                {
+                    market = get_market(market_name);
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+                position = get_position(user_id, market_name, BULL);
+                if (position)
+                {
+                    market = get_market(market_name);
+                    json_t *unit = json_object();
+                    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+                    json_object_set_new(unit, "market", json_string(position->market));
+                    json_object_set_new(unit, "side", json_integer(position->side));
+                    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+                    json_object_set_new_mpd(unit, "leverage", position->leverage);
+                    json_object_set_new_mpd(unit, "position", position->position);
+                    json_object_set_new_mpd(unit, "frozen", position->frozen);
+                    mpd_t *show = mpd_qncopy(position->price);
+                    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+                    json_object_set_new_mpd(unit, "price", show);
+                    json_object_set_new_mpd(unit, "principal", position->principal);
+                    json_array_append_new(positions, unit);
+                    count += 1;
+                }
+            }
+            json_object_set_new(result, "positions", positions);
+            json_object_set_new(result, "count", json_integer(count));
+
+            json_object_set_new(result, "user_id", json_integer(user_id));
+            json_array_append_new(array_result, result);
+        }
     }
 
-    json_t *result = json_object();
-    json_t *positions = json_array();
-    int count = 0;
-    for (size_t i = 0; i < settings.market_num; ++i) {
-        position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
-        if (position)
-        {
-            json_t *unit = json_object();
-            json_object_set_new(unit, "user_id", json_integer(position->user_id));
-            json_object_set_new(unit, "market", json_string(position->market));
-            json_object_set_new(unit, "side", json_integer(position->side));
-            json_object_set_new(unit, "pattern", json_integer(position->pattern));
-            json_object_set_new_mpd(unit, "leverage", position->leverage);
-            json_object_set_new_mpd(unit, "position", position->position);
-            json_object_set_new_mpd(unit, "frozen", position->frozen);
-            mpd_t *show = mpd_qncopy(position->price);
-            mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
-            json_object_set_new_mpd(unit, "price", show);
-            json_object_set_new_mpd(unit, "principal", position->principal);
-            json_array_append_new(positions, unit);
-            count += 1;
-        }
-        position = get_position(user_id, settings.markets[i].name, BULL);
-        if (position)
-        {
-            json_t *unit = json_object();
-            json_object_set_new(unit, "user_id", json_integer(position->user_id));
-            json_object_set_new(unit, "market", json_string(position->market));
-            json_object_set_new(unit, "side", json_integer(position->side));
-            json_object_set_new(unit, "pattern", json_integer(position->pattern));
-            json_object_set_new_mpd(unit, "leverage", position->leverage);
-            json_object_set_new_mpd(unit, "position", position->position);
-            json_object_set_new_mpd(unit, "frozen", position->frozen);
-            mpd_t *show = mpd_qncopy(position->price);
-            mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
-            json_object_set_new_mpd(unit, "price", show);
-            json_object_set_new_mpd(unit, "principal", position->principal);
-            json_array_append_new(positions, unit);
-            count += 1;
-        }
-    }
-    json_object_set_new(result, "positions", positions);
-    json_object_set_new(result, "count", json_integer(count));
-    int ret = reply_result(ses, pkg, result);
-    json_decref(result);
+    int ret = reply_result(ses, pkg, array_result);
+    json_decref(array_result);
     return ret;
 }
 
@@ -2585,6 +2838,14 @@ static void svr_on_recv_pkg(nw_ses *ses, rpc_pkg *pkg)
         if (ret < 0)
         {
             log_error("on_cmd_balance_query %s fail: %d", params_str, ret);
+        }
+        break;
+    case CMD_BALANCE_QUERY_ALL:
+        log_trace("from: %s cmd balance query all, sequence: %u params: %s", nw_sock_human_addr(&ses->peer_addr), pkg->sequence, params_str);
+        ret = on_cmd_balance_query_all(ses, pkg, params);
+        if (ret < 0)
+        {
+            log_error("on_cmd_balance_query_all %s fail: %d", params_str, ret);
         }
         break;
     case CMD_BALANCE_UPDATE:

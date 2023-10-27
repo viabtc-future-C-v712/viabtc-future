@@ -14,6 +14,8 @@ Variables  test_variable.py
 *** Variables ***
 
 *** Test Cases ***
+充值
+    call    'balance.update'    1, "USDT", "deposit", 16983029630, "1282031", {"detail": "detail"}
 保存数据库
     make slice
 重启服务 并清理数据库

@@ -10,7 +10,7 @@ Resource   test.kafka.resource
 Resource   test.base.resource
 Variables  test_variable.py
 
-# Test Setup   init balance all
+Test Setup   init balance all
 # Test Teardown   重启
 *** Variables ***
 

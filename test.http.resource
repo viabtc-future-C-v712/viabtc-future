@@ -119,9 +119,9 @@ check position
         Should Be Equal As Numbers    0    ${amount}
     ELSE
         IF    '${amount}' == '0'
-            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    0
+            Should Be Equal As Numbers    ${ret.json()["result"]["positions"][0]["${type}"]}    0
         ELSE
-            Should Be Equal As Numbers    ${ret.json()["result"]["postions"][0]["${type}"]}    ${amount}
+            Should Be Equal As Numbers    ${ret.json()["result"]["positions"][0]["${type}"]}    ${amount}
         END
     END
 check position all
