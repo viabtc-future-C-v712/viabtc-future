@@ -366,13 +366,23 @@ json_t *get_finished_order_detail(MYSQL *conn, uint64_t order_id)
 json_t *get_market_user_deals(MYSQL *conn, uint32_t user_id, const char *market, size_t offset, size_t limit)
 {
     size_t market_len = strlen(market);
-    log_trace2() char _market[2 * market_len + 1];
+    char _market[2 * market_len + 1];
     mysql_real_escape_string(conn, _market, market, market_len);
 
     sds sql = sdsempty();
-    sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` "
-                            "FROM `user_deal_history_%u` where `user_id` = %u AND `market` = '%s' ORDER BY `id` DESC",
-                       user_id % HISTORY_HASH_NUM, user_id, _market);
+    log_trace2("传入的market值为: %s", _market) if (strlen(_market) == 0)
+    {
+        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` "
+                                "FROM `user_deal_history_%u` where `user_id` = %u ORDER BY `id` DESC",
+                           user_id % HISTORY_HASH_NUM, user_id);
+    }
+    else
+    {
+        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` "
+                                "FROM `user_deal_history_%u` where `user_id` = %u AND `market` = '%s' ORDER BY `id` DESC",
+                           user_id % HISTORY_HASH_NUM, user_id, _market);
+    }
+
     if (offset)
     {
         sql = sdscatprintf(sql, " LIMIT %zu, %zu", offset, limit);
