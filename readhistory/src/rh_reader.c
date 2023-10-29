@@ -370,7 +370,8 @@ json_t *get_market_user_deals(MYSQL *conn, uint32_t user_id, const char *market,
     mysql_real_escape_string(conn, _market, market, market_len);
 
     sds sql = sdsempty();
-    log_trace2("传入的market值为: %s", _market) if (strlen(_market) == 0)
+    log_trace2("传入的market值为: %s", _market);
+    if (strlen(_market) == 0)
     {
         sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` "
                                 "FROM `user_deal_history_%u` where `user_id` = %u ORDER BY `id` DESC",
