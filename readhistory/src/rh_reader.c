@@ -366,7 +366,7 @@ json_t *get_finished_order_detail(MYSQL *conn, uint64_t order_id)
 json_t *get_market_user_deals(MYSQL *conn, uint32_t user_id, const char *market, size_t offset, size_t limit)
 {
     size_t market_len = strlen(market);
-    char _market[2 * market_len + 1];
+    log_trace2() char _market[2 * market_len + 1];
     mysql_real_escape_string(conn, _market, market, market_len);
 
     sds sql = sdsempty();
