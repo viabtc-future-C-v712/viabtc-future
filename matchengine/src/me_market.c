@@ -1480,21 +1480,23 @@ int adjustPosition(deal_t *deal)
         {
             mpd_sub(total, sum, deal->deal, &mpd_ctx);
             // log_stderr("%s %s %s", mpd_to_sci(total, 0), mpd_to_sci(deal->deal, 0), mpd_to_sci(sum, 0));
-            mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
             // log_stderr("%s %s %s", mpd_to_sci(totalPosition, 0), mpd_to_sci(deal->amount, 0), mpd_to_sci(totalPosition, 0));
             mpd_t *amount = mpd_new(&mpd_ctx);
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
             deal->taker_PNL = getPNL(position, deal->price);
+            // 
             // 计算交易部份权益
             mpd_mul(deal->taker_PNL, deal->taker_PNL, deal->amount, &mpd_ctx);
             mpd_div(deal->taker_PNL, deal->taker_PNL, amount, &mpd_ctx);
             // 平仓释放的保证金计算
-            mpd_mul(amount, amount, position->principal, &mpd_ctx);
-            mpd_div(deal->taker_priAmount, deal->amount, amount, &mpd_ctx);
+            mpd_mul(amount, deal->amount, position->principal, &mpd_ctx);
+            mpd_div(deal->taker_priAmount, amount, totalPosition, &mpd_ctx);
+
             mpd_del(amount);
             mpd_sub(position->principal, position->principal, deal->taker_priAmount, &mpd_ctx);
-
+            
+            mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
             if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
@@ -1555,8 +1557,6 @@ int adjustPosition(deal_t *deal)
         else
         {
             mpd_sub(total, sum, deal->deal, &mpd_ctx);
-
-            mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
             mpd_t *amount = mpd_new(&mpd_ctx);
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
@@ -1565,11 +1565,12 @@ int adjustPosition(deal_t *deal)
             mpd_mul(deal->maker_PNL, deal->maker_PNL, deal->amount, &mpd_ctx);
             mpd_div(deal->maker_PNL, deal->maker_PNL, amount, &mpd_ctx);
             // 平仓释放的保证金计算
-            mpd_mul(amount, amount, position->principal, &mpd_ctx);
-            mpd_div(deal->maker_priAmount, deal->amount, amount, &mpd_ctx);
+            mpd_mul(amount, deal->amount, position->principal, &mpd_ctx);
+            mpd_div(deal->maker_priAmount, amount, totalPosition, &mpd_ctx);
             mpd_del(amount);
             mpd_sub(position->principal, position->principal, deal->maker_priAmount, &mpd_ctx);
 
+            mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
             if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);

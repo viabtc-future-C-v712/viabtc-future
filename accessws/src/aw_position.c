@@ -85,6 +85,7 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
     log_trace("user_id: %d ses id: tobe", state->user_id);
     struct dict_user_key key = {.user_id = state->user_id};
     dict_entry *entry = dict_find(dict_sub, &key);
+    log_trace("user_entry: %p user_id: %d", (void*)entry, state->user_id);
     if (entry == NULL)
         return 0 ;
 
@@ -97,7 +98,7 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
         if (strcmp(unit->position.market, state->position.market) == 0 && unit->position.side == state->position.side) {
-            log_trace("user_id: %d ses id: %d ", state->user_id, ((nw_ses *)unit->ses)->id);
+            log_trace("user entry: %p user_id: %d ses id: %d ", (void*)entry, state->user_id, ((nw_ses *)(unit->ses))->id);
             send_notify(unit->ses, "position.update", params);
         }
     }
@@ -211,10 +212,10 @@ int init_position(void)
 
 int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32_t side)
 {
-    log_trace("user_id: %d ses id: %d", user_id, ses->id);
     struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d", (void*)entry, user_id, ses->id);
     if (entry == NULL) {
         list_type lt;
         memset(&lt, 0, sizeof(lt));
@@ -230,15 +231,15 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     }
 
     list_t *list = entry->val;
-    struct sub_unit *unit = (struct sub_unit*)malloc(sizeof(struct sub_unit));
-    memset(unit, 0, sizeof(struct sub_unit));
-    unit->ses = ses;
-    strncpy(unit->position.market, market, ASSET_NAME_MAX_LEN - 1);
-    unit->position.side = side;
+    struct sub_unit unit;
+    memset(&unit, 0, sizeof(struct sub_unit));
+    unit.ses = ses;
+    strncpy(unit.position.market, market, ASSET_NAME_MAX_LEN - 1);
+    unit.position.side = side;
 
-    if (list_find(list, unit) != NULL)
+    if (list_find(list, &unit) != NULL)
         return 0;
-    if (list_add_node_tail(list, unit) == NULL)
+    if (list_add_node_tail(list, &unit) == NULL)
         return -__LINE__;
 
     return 0;
@@ -246,10 +247,10 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
 
 int position_unsubscribe(uint32_t user_id, nw_ses *ses)
 {
-    log_trace("user_id: %d ses id: %d", user_id, ses->id);
     struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d", (void*)entry, user_id, ses->id);
     if (entry == NULL)
         return 0;
 
@@ -273,10 +274,10 @@ int position_unsubscribe(uint32_t user_id, nw_ses *ses)
 
 int position_on_update(uint32_t user_id, const char *market, uint32_t side)
 {
-    log_trace("user_id: %d ses tobe", user_id);
     struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d", (void*)entry, user_id);
     if (entry == NULL)
         return 0;
     log_trace("user_id: %d ses tobe", user_id);
@@ -287,7 +288,7 @@ int position_on_update(uint32_t user_id, const char *market, uint32_t side)
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
         if (strcmp(unit->position.market, market) == 0 && unit->position.side == side) {
-            log_trace("user_id: %d ses %d %s, %s, %d, %d", user_id, ((nw_ses *)unit->ses)->id, unit->position.market, market, unit->position.side, side );
+            log_trace("user_id: %d ses %d %s, %s, %d, %d", user_id, ((nw_ses *)(unit->ses))->id, unit->position.market, market, unit->position.side, side );
             notify = true;
             break;
         }

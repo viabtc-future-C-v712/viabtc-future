@@ -48,8 +48,8 @@ static int send_json(nw_ses *ses, const json_t *json)
     char *message_data = json_dumps(json, 0);
     if (message_data == NULL)
         return -__LINE__;
-    log_trace("send to: %"PRIu64", size: %zu, message: %s", ses->id, strlen(message_data), message_data);
     int ret = ws_send_text(ses, message_data);
+    log_trace("send to: %"PRIu64", size: %zu, message: %s ret:%d", ses->id, strlen(message_data), message_data, ret);
     free(message_data);
     return ret;
 }
