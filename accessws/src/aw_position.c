@@ -11,24 +11,24 @@ static dict_t *dict_sub;
 static rpc_clt *matchengine;
 static nw_state *state_context;
 
-struct position_key {
+struct position_key_ws {
     char        market[MARKET_NAME_MAX_LEN + 1];
     uint32_t    side;
 };
 
-struct dict_user_key
+static struct dict_user_key
 {
     uint32_t user_id;
 };
 
-struct sub_unit {
+static struct sub_unit_ws {
     void *ses;
-    struct position_key position;
+    struct position_key_ws position;
 };
 
-struct state_data {
+static struct state_data {
     uint32_t user_id;
-    struct position_key position;
+    struct position_key_ws position;
 };
 
 static uint32_t dict_sub_hash_func(const void *key)
@@ -48,15 +48,15 @@ static void dict_sub_val_free(void *val)
 
 static int list_node_compare(const void *value1, const void *value2)
 {
-    const struct sub_unit *a = (const struct sub_unit *)value1;
-    const struct sub_unit *b = (const struct sub_unit *)value2;
-    return memcmp(&a->position, &b->position, sizeof(struct position_key));
+    const struct sub_unit_ws *a = (const struct sub_unit_ws *)value1;
+    const struct sub_unit_ws *b = (const struct sub_unit_ws *)value2;
+    return memcmp(a, b, sizeof(struct sub_unit_ws));
 }
 
 static void *list_node_dup(void *value)
 {
-    struct sub_unit *obj = malloc(sizeof(struct sub_unit));
-    memcpy(obj, value, sizeof(struct sub_unit));
+    struct sub_unit_ws *obj = malloc(sizeof(struct sub_unit_ws));
+    memcpy(obj, value, sizeof(struct sub_unit_ws));
     return obj;
 }
 
@@ -96,7 +96,7 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
     list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
     list_node *node;
     while ((node = list_next(iter)) != NULL) {
-        struct sub_unit *unit = node->value;
+        struct sub_unit_ws *unit = node->value;
         if (strcmp(unit->position.market, state->position.market) == 0 && unit->position.side == state->position.side) {
             log_trace("user entry: %p user_id: %d ses id: %d ", (void*)entry, state->user_id, ((nw_ses *)(unit->ses))->id);
             send_notify(unit->ses, "position.update", params);
@@ -215,7 +215,7 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
-    log_trace("user_entry: %p user_id: %d ses id: %d", (void*)entry, user_id, ses->id);
+    log_trace("user_entry: %p user_id: %d ses id: %d %p", (void*)entry, user_id, ses->id, (void*)ses);
     if (entry == NULL) {
         list_type lt;
         memset(&lt, 0, sizeof(lt));
@@ -231,14 +231,16 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     }
 
     list_t *list = entry->val;
-    struct sub_unit unit;
-    memset(&unit, 0, sizeof(struct sub_unit));
+    struct sub_unit_ws unit;
+    memset(&unit, 0, sizeof(struct sub_unit_ws));
     unit.ses = ses;
     strncpy(unit.position.market, market, ASSET_NAME_MAX_LEN - 1);
     unit.position.side = side;
 
-    if (list_find(list, &unit) != NULL)
+    if (list_find(list, &unit) != NULL){
+        // list_node * node = list_find(list, &unit);
         return 0;
+    }
     if (list_add_node_tail(list, &unit) == NULL)
         return -__LINE__;
 
@@ -255,16 +257,22 @@ int position_unsubscribe(uint32_t user_id, nw_ses *ses)
         return 0;
 
     list_t *list = entry->val;
-    list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
-    list_node *node;
-    while ((node = list_next(iter)) != NULL) {
-        struct sub_unit *unit = node->value;
-        if (unit->ses == ses) {
-            list_del(list, node);
-        }
-    }
-    list_release_iterator(iter);
 
+    list_iter *iter;
+    list_node *node;
+    int flag = 0;
+    while(!flag){
+        iter = list_get_iterator(list, LIST_START_HEAD);
+        while ((node = list_next(iter)) != NULL) {
+            struct sub_unit_ws *unit = node->value;
+            if (unit->ses == (void*)ses) {
+                list_del(list, node);
+                break;
+            }
+        }
+        flag = 1;
+        list_release_iterator(iter);
+    }
     if (list->len == 0) {
         dict_delete(dict_sub, key);
     }
@@ -286,9 +294,9 @@ int position_on_update(uint32_t user_id, const char *market, uint32_t side)
     list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
     list_node *node;
     while ((node = list_next(iter)) != NULL) {
-        struct sub_unit *unit = node->value;
+        struct sub_unit_ws *unit = node->value;
         if (strcmp(unit->position.market, market) == 0 && unit->position.side == side) {
-            log_trace("user_id: %d ses %d %s, %s, %d, %d", user_id, ((nw_ses *)(unit->ses))->id, unit->position.market, market, unit->position.side, side );
+            log_trace("user_id: %d ses %d %p %s, %s, %d, %d", user_id, ((nw_ses *)(unit->ses))->id, (void*)unit->ses, unit->position.market, market, unit->position.side, side );
             notify = true;
             break;
         }

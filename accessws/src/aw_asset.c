@@ -181,6 +181,7 @@ int asset_subscribe(uint32_t user_id, nw_ses *ses, const char *asset)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d %p", (void*)entry, user_id, ses->id, (void*)ses);
     if (entry == NULL) {
         list_type lt;
         memset(&lt, 0, sizeof(lt));
@@ -213,6 +214,7 @@ int asset_unsubscribe(uint32_t user_id, nw_ses *ses)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d", (void*)entry, user_id, ses->id);
     if (entry == NULL)
         return 0;
 

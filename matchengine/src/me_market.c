@@ -10,6 +10,7 @@
 #include "me_deal.h"
 #include "me_history.h"
 #include "me_message.h"
+#include "me_trade.h"
 
 uint64_t order_id_start;
 uint64_t deals_id_start;
