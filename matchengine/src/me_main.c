@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     daemon(1, 1);
     process_keepalive();
-    
+    // todo:回放数据
     ret = init_from_db();
     if (ret < 0)
     {
