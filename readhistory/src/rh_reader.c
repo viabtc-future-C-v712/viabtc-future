@@ -373,13 +373,13 @@ json_t *get_market_user_deals(MYSQL *conn, uint32_t user_id, const char *market,
     log_trace2("传入的market值为: %s", _market);
     if (strlen(_market) == 0)
     {
-        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` , `market`"
+        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` , `market`,`oper_type`"
                                 "FROM `user_deal_history_%u` where `user_id` = %u ORDER BY `id` DESC",
                            user_id % HISTORY_HASH_NUM, user_id);
     }
     else
     {
-        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` , `market`"
+        sql = sdscatprintf(sql, "SELECT `time`, `user_id`, `deal_id`, `side`, `role`, `price`, `amount`, `deal`, `fee`, `deal_order_id` , `market`,`oper_type`"
                                 "FROM `user_deal_history_%u` where `user_id` = %u AND `market` = '%s' ORDER BY `id` DESC",
                            user_id % HISTORY_HASH_NUM, user_id, _market);
     }
@@ -430,6 +430,9 @@ json_t *get_market_user_deals(MYSQL *conn, uint32_t user_id, const char *market,
         json_object_set_new(record, "deal_order_id", json_integer(deal_order_id));
 
         json_object_set_new(record, "market", json_string(rstripzero(row[10])));
+
+        int oper_type = atoi(row[11]);
+        json_object_set_new(record, "oper_type", json_integer(oper_type));
 
         json_array_append_new(records, record);
     }
