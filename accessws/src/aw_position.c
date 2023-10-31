@@ -262,15 +262,16 @@ int position_unsubscribe(uint32_t user_id, nw_ses *ses)
     list_node *node;
     int flag = 0;
     while(!flag){
+        flag = 1;
         iter = list_get_iterator(list, LIST_START_HEAD);
         while ((node = list_next(iter)) != NULL) {
             struct sub_unit_ws *unit = node->value;
             if (unit->ses == (void*)ses) {
                 list_del(list, node);
+                flag = 0;
                 break;
             }
         }
-        flag = 1;
         list_release_iterator(iter);
     }
     if (list->len == 0) {

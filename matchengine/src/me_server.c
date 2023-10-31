@@ -1620,7 +1620,7 @@ static int on_cmd_order_cancel(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         return reply_error_internal_error(ses, pkg);
     }
 
-    append_operlog("cancel_order", params);
+    // append_operlog("cancel_order", params);
     ret = reply_result(ses, pkg, result);
     json_decref(result);
     return ret;

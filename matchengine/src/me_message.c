@@ -268,7 +268,7 @@ int push_deal_message_extra(double t, const char *market, uint64_t aid, uint64_t
 }
 
 extern market_t *get_market(const char *name);
-int push_position_message(position_t *position)
+int push_position_message_(position_t *position)
 {
     json_t *message = json_array();
     json_array_append_new(message, json_integer(position->id));

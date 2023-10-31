@@ -1434,6 +1434,22 @@ int adjustOrder(deal_t *deal)
     return 0;
 }
 
+// 当一个仓位有变动，全部推送，
+int push_position_message(position_t *position){
+    push_position_message_(position);
+    if(position->side == BULL){
+        position = get_position(position->user_id, position->market, BEAR);
+        if (position){
+            push_position_message_(position);
+        }
+    }else{
+        position = get_position(position->user_id, position->market, BULL);
+        if (position){
+            push_position_message_(position);
+        }
+    }
+}
+
 int adjustPosition(deal_t *deal)
 {
     mpd_t *sum = mpd_new(&mpd_ctx);
@@ -2241,6 +2257,7 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
     {
         if (balance_unfreeze(order->user_id, m->money, order->freeze) == NULL)
         {
+            log_trace("order->freeze %s", mpd_to_sci(order->freeze, 0));
             return -__LINE__;
         }
     }

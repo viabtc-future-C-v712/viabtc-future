@@ -852,7 +852,7 @@ static int load_oper(json_t *detail)
         ret = market_put_order_common(args);
         if(ret) log_stderr("order_close %d", ret);
     } else if (strcmp(method, "cancel_order") == 0) {
-        ret = load_cancel_order(params);
+        // ret = load_cancel_order(params);
     } else if (strcmp(method, "cancel_order_batch") == 0){
         ret = load_cancel_order_batch(params);
     } else if (strcmp(method, "limit_order_batch") == 0){

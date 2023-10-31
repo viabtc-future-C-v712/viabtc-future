@@ -25,7 +25,7 @@ int push_deal_message(double t, const char *market, order_t *ask, order_t *bid, 
         mpd_t *ask_fee, mpd_t *bid_fee, int side, uint64_t id, const char *stock, const char *money);
 int push_deal_message_extra(double t, const char *market, uint64_t aid, uint64_t bid, uint32_t a_u_id, uint32_t b_u_id, mpd_t *price, mpd_t *amount,
         mpd_t *ask_fee, mpd_t *bid_fee, int side, uint64_t id, const char *stock, const char *money);
-int push_position_message(position_t *position);
+int push_position_message_(position_t *position);
 bool is_message_block(void);
 sds message_status(sds reply);
 

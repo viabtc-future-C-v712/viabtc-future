@@ -14,6 +14,13 @@ Variables  test_variable.py
 *** Variables ***
 
 *** Test Cases ***
+限价平多(开发测试1)
+    put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000     30000
+    put open     ${Alice}    ${多}    ${限价}    ${逐仓}    5000    30000
+
+    put open     ${Bob}    ${多}    ${限价}    ${逐仓}    50000     35000
+    put open     ${Carol}    ${空}    ${限价}    ${逐仓}    5000     35000
+    put close     ${Alice}    ${多}    ${限价}    ${逐仓}    5000    35000
 市价平多(未成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    5000

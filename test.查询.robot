@@ -16,7 +16,10 @@ Variables  test_variable.py
 
 *** Test Cases ***
 uscase case 
-    check order     51317793
+    check order book    market=BTCUSDT   side=${空}    limit=10
+    check order book    market=BTCUSDT   side=${多}    limit=10
+    check balance    1145509    USDT    ${冻结余额}    799965.3125
+    check balance    1145509    USDT    ${可用余额}    799965.3125
 uscase case 2
     check order book    market=BTCBCH    side=1    offset=0    limit=100
 市价开多(未成交)
