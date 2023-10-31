@@ -101,6 +101,7 @@ CREATE TABLE `user_deal_history_example` (
     `order_id`      BIGINT UNSIGNED NOT NULL,
     `deal_order_id` BIGINT UNSIGNED NOT NULL,
     `side`          TINYINT UNSIGNED NOT NULL,
+    `oper_type`     TINYINT UNSIGNED NOT NULL, -- 1 open, 2 close
     `role`          TINYINT UNSIGNED NOT NULL,
     `price`         DECIMAL(35,16) NOT NULL,
     `amount`        DECIMAL(35,16) NOT NULL,
