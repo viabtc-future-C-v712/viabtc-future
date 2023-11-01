@@ -270,6 +270,8 @@ int push_deal_message_extra(double t, const char *market, uint64_t aid, uint64_t
 extern market_t *get_market(const char *name);
 int push_position_message_(position_t *position)
 {
+    mpd_t *show;
+    market_t * market = get_market(position->market);;
     json_t *message = json_array();
     json_array_append_new(message, json_integer(position->id));
     json_array_append_new(message, json_integer(position->user_id));
@@ -278,9 +280,10 @@ int push_position_message_(position_t *position)
     json_array_append_new(message, json_integer(position->pattern));
     json_array_append_mpd(message, position->leverage);
     json_array_append_mpd(message, position->position);
-    json_array_append_mpd(message, position->frozen);
-    mpd_t *show = mpd_qncopy(position->price);
-    market_t * market = get_market(position->market);
+    show = mpd_qncopy(position->frozen);
+    mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
+    json_array_append_mpd(message, show);
+    show = mpd_qncopy(position->price);
     mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
     json_array_append_mpd(message, show);
     json_array_append_mpd(message, position->principal);

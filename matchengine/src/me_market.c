@@ -200,6 +200,7 @@ json_t *get_order_info(order_t *order)
     json_object_set_new(info, "oper_type", json_integer(order->oper_type));
 
     json_object_set_new_mpd(info, "price", order->price);
+    json_object_set_new_mpd(info, "leverage", order->leverage);
     json_object_set_new_mpd(info, "trigger", order->trigger);
     json_object_set_new_mpd(info, "current_price", order->current_price);
     json_object_set_new_mpd(info, "amount", order->amount);
@@ -1646,7 +1647,7 @@ int adjustBalance(deal_t *deal)
     { // close
         log_debug("%s 余额加上权益 %s 减去费用 %s", __FUNCTION__, mpd_to_sci(deal->maker_PNL, 0), mpd_to_sci(deal->maker_fee, 0));
         balance_add(deal->maker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->maker_PNL);
-        balance_sub(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->maker_fee);
+        balance_sub(deal->maker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->maker_fee);
     }
     if (deal->real)
     {
@@ -2030,6 +2031,9 @@ int market_put_order_open(void *args_)
     position_t *position = get_position(args->user_id, args->market->name, args->direction);
     if (position)
     {
+        // 检查仓位模式
+        if (position->pattern != args->pattern)
+            return -1;
         mpd_copy(args->leverage, position->leverage, &mpd_ctx);
         mpd_div(args->priAmount, args->volume, args->leverage, &mpd_ctx);
     }

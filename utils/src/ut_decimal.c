@@ -72,9 +72,13 @@ char *rstripzero(char *str)
 
 int json_object_set_new_mpd(json_t *obj, const char *key, mpd_t *value)
 {
+    if (mpd_cmp(value, mpd_zero, &mpd_ctx) == 0)  // 如果 a 接近于零
+        return json_object_set_new(obj, key, json_string(rstripzero("0")));  // 返回 "0"
+
     char *str = mpd_to_sci(value, 0);
     if(!str)
         return json_object_set_new(obj, key, json_string(rstripzero("0")));
+
     int ret = json_object_set_new(obj, key, json_string(rstripzero(str)));
     free(str);
     return ret;
