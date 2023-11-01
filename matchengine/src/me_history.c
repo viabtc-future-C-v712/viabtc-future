@@ -324,7 +324,7 @@ static int append_order_deal(double t, uint32_t user_id, uint64_t deal_id, uint6
     return 0;
 }
 
-static int append_user_deal_future(double t, uint32_t user_id, const char *market, uint64_t deal_id, uint64_t order_id, uint64_t deal_order_id, int side, int oper_type, int role, mpd_t *price, mpd_t *amount, mpd_t *deal, mpd_t *fee, mpd_t *deal_fee)
+static int append_user_deal_future(double t, uint32_t user_id, const char *market, uint64_t deal_id, uint64_t order_id, uint64_t deal_order_id, int side, int oper_type, int role, mpd_t *price, mpd_t *amount, mpd_t *deal, mpd_t *fee, mpd_t *deal_fee, mpd_t *pnl)
 {
     struct dict_sql_key key;
     key.hash = user_id % HISTORY_HASH_NUM;
@@ -335,7 +335,7 @@ static int append_user_deal_future(double t, uint32_t user_id, const char *marke
 
     if (sdslen(sql) == 0)
     {
-        sql = sdscatprintf(sql, "INSERT INTO `user_deal_history_%u` (`id`, `time`, `user_id`, `market`, `deal_id`, `order_id`, `deal_order_id`, `side`, `oper_type`, `role`, `price`, `amount`, `deal`, `fee`, `deal_fee`) VALUES ", key.hash);
+        sql = sdscatprintf(sql, "INSERT INTO `user_deal_history_%u` (`id`, `time`, `user_id`, `market`, `deal_id`, `order_id`, `deal_order_id`, `side`, `oper_type`, `role`, `price`, `amount`, `deal`, `fee`, `deal_fee`, `pnl`) VALUES ", key.hash);
     }
     else
     {
@@ -348,6 +348,7 @@ static int append_user_deal_future(double t, uint32_t user_id, const char *marke
     sql = sql_append_mpd(sql, deal, true);
     sql = sql_append_mpd(sql, fee, true);
     sql = sql_append_mpd(sql, deal_fee, false);
+    sql = sql_append_mpd(sql, pnl, false);
     sql = sdscatprintf(sql, ")");
 
     set_sql(&key, sql);
@@ -424,14 +425,51 @@ int append_order_history(order_t *order)
     return 0;
 }
 
-int append_order_deal_history_future(double t, uint64_t deal_id, order_t *ask, int ask_role, order_t *bid, int bid_role, mpd_t *price, mpd_t *amount, mpd_t *deal, mpd_t *ask_fee, mpd_t *bid_fee)
+mpd_t *getDealPnl(int side, int role, int oper_type, mpd_t *taker_pnl, mpd_t *maker_pnl)
+{
+    mpd_t *pnl = mpd_new(&mpd_ctx);
+    mpd_set_string(pnl, "0", 10);
+    if (side == MARKET_ORDER_SIDE_ASK)
+    {
+        if (oper_type == 2) // 平多
+        {
+            if (role == MARKET_ROLE_TAKER)
+            {
+                mpd_copy(pnl, taker_pnl, &mpd_ctx);
+            }
+            if (role == MARKET_ROLE_MAKER)
+            {
+                mpd_copy(pnl, maker_pnl, &mpd_ctx);
+            }
+        }
+    }
+    if (side == MARKET_ORDER_SIDE_BID)
+    {
+        if (oper_type == 2) // 平空
+        {
+            if (role == MARKET_ROLE_TAKER)
+            {
+                mpd_copy(pnl, taker_pnl, &mpd_ctx);
+            }
+            if (role == MARKET_ROLE_MAKER)
+            {
+                mpd_copy(pnl, maker_pnl, &mpd_ctx)
+            }
+        }
+    }
+    return pnl;
+}
+int append_order_deal_history_future(double t, uint64_t deal_id, order_t *ask, int ask_role, order_t *bid, int bid_role, mpd_t *price, mpd_t *amount, mpd_t *deal, mpd_t *ask_fee, mpd_t *bid_fee, mpd_t *taker_pnl, mpd_t *maker_pnl)
 {
     append_order_deal_future(t, ask->user_id, deal_id, ask->id, bid->id, ask_role, price, amount, deal, ask_fee, bid_fee);
     append_order_deal_future(t, bid->user_id, deal_id, bid->id, ask->id, bid_role, price, amount, deal, bid_fee, ask_fee);
 
-    append_user_deal_future(t, ask->user_id, ask->market, deal_id, ask->id, bid->id, ask->side, ask->oper_type, ask_role, price, amount, deal, ask_fee, bid_fee);
-    append_user_deal_future(t, bid->user_id, ask->market, deal_id, bid->id, ask->id, bid->side, bid->oper_type, bid_role, price, amount, deal, bid_fee, ask_fee);
-
+    mpd_t *ask_pnl = getDealPnl(MARKET_ORDER_SIDE_ASK, ask_role, ask->oper_type, taker_pnl, maker_pnl);
+    mpd_t *bid_pnl = getDealPnl(MARKET_ORDER_SIDE_BID, ask_role, ask->oper_type, taker_pnl, maker_pnl);
+    append_user_deal_future(t, ask->user_id, ask->market, deal_id, ask->id, bid->id, ask->side, ask->oper_type, ask_role, price, amount, deal, ask_fee, bid_fee, ask_pnl);
+    append_user_deal_future(t, bid->user_id, ask->market, deal_id, bid->id, ask->id, bid->side, bid->oper_type, bid_role, price, amount, deal, bid_fee, ask_fee, bid_pnl);
+    mpd_del(ask_pnl);
+    mpd_del(bid_pnl);
     return 0;
 }
 

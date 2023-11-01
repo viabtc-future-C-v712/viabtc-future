@@ -358,7 +358,7 @@ static int order_put_future(market_t *m, order_t *order)
                 return -__LINE__;
         }
     }
-    if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2  )
+    if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2)
     {
         if (order->type == 1)
         {
@@ -1300,14 +1300,16 @@ int market_put_order_common(void *args_)
         }
     }
     int ret = 0;
-    if (args->bOpen){
+    if (args->bOpen)
+    {
         ret = market_put_order_open((void *)args);
     }
-    else{
+    else
+    {
         ret = market_put_order_close((void *)args);
     }
-    on_planner(args->real);//处理计划委托
-    force_liquidation(args->real);//处理爆仓
+    on_planner(args->real);        // 处理计划委托
+    force_liquidation(args->real); // 处理爆仓
     return ret;
 }
 
@@ -1354,26 +1356,34 @@ mpd_t *getPNL(position_t *position, mpd_t *latestPrice)
     mpd_t *positionTotal = mpd_new(&mpd_ctx);
     mpd_add(positionTotal, position->position, position->frozen, &mpd_ctx);
     mpd_t *PNL = mpd_new(&mpd_ctx);
-    if(position->side == BULL)//开多
+    if (position->side == BULL) // 开多
     {
-        if(mpd_cmp(latestPrice, position->price, &mpd_ctx) >= 0){//盈利
+        if (mpd_cmp(latestPrice, position->price, &mpd_ctx) >= 0)
+        { // 盈利
             mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
             mpd_div(PNL, PNL, position->price, &mpd_ctx);
             mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
             mpd_add(PNL, PNL, position->principal, &mpd_ctx);
-        }else{//亏损
+        }
+        else
+        { // 亏损
             mpd_sub(PNL, position->price, latestPrice, &mpd_ctx);
             mpd_div(PNL, PNL, position->price, &mpd_ctx);
             mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
             mpd_sub(PNL, position->principal, PNL, &mpd_ctx);
         }
-    }else{//开空
-        if(mpd_cmp(latestPrice, position->price, &mpd_ctx) <= 0){//盈利
+    }
+    else
+    { // 开空
+        if (mpd_cmp(latestPrice, position->price, &mpd_ctx) <= 0)
+        { // 盈利
             mpd_sub(PNL, position->price, latestPrice, &mpd_ctx);
             mpd_div(PNL, PNL, position->price, &mpd_ctx);
             mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
             mpd_add(PNL, PNL, position->principal, &mpd_ctx);
-        }else{//亏损
+        }
+        else
+        { // 亏损
             mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
             mpd_div(PNL, PNL, position->price, &mpd_ctx);
             mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
@@ -1390,7 +1400,8 @@ mpd_t *getSumPNL(uint32_t user_id)
     for (size_t i = 0; i < settings.market_num; ++i)
     {
         position_t *position = get_position(user_id, settings.markets[i].name, 1);
-        if ( position && position->pattern == 2){
+        if (position && position->pattern == 2)
+        {
             market_t *market = get_market(settings.markets[i].name);
             mpd_t *PNL = getPNL(position, market->latestPrice);
             mpd_add(totalPNL, totalPNL, PNL, &mpd_ctx);
@@ -1435,16 +1446,22 @@ int adjustOrder(deal_t *deal)
 }
 
 // 当一个仓位有变动，全部推送，
-int push_position_message(position_t *position){
+int push_position_message(position_t *position)
+{
     push_position_message_(position);
-    if(position->side == BULL){
+    if (position->side == BULL)
+    {
         position = get_position(position->user_id, position->market, BEAR);
-        if (position){
+        if (position)
+        {
             push_position_message_(position);
         }
-    }else{
+    }
+    else
+    {
         position = get_position(position->user_id, position->market, BULL);
-        if (position){
+        if (position)
+        {
             push_position_message_(position);
         }
     }
@@ -1502,7 +1519,7 @@ int adjustPosition(deal_t *deal)
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
             deal->taker_PNL = getPNL(position, deal->price);
-            // 
+            //
             // 计算交易部份权益
             mpd_mul(deal->taker_PNL, deal->taker_PNL, deal->amount, &mpd_ctx);
             mpd_div(deal->taker_PNL, deal->taker_PNL, amount, &mpd_ctx);
@@ -1512,12 +1529,15 @@ int adjustPosition(deal_t *deal)
 
             mpd_del(amount);
             mpd_sub(position->principal, position->principal, deal->taker_priAmount, &mpd_ctx);
-            
+
             mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
-            if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
+            if (mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0)
+            {
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
-            }else{
+            }
+            else
+            {
                 // mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // 下单时已冻结仓位，这里只需减少冻结仓位
                 mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
@@ -1530,7 +1550,8 @@ int adjustPosition(deal_t *deal)
     if (deal->real)
     {
         push_position_message(position);
-        if(mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+        if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
+        {
             del_position(position->user_id, position->market, position->side);
         }
     }
@@ -1588,10 +1609,13 @@ int adjustPosition(deal_t *deal)
             mpd_sub(position->principal, position->principal, deal->maker_priAmount, &mpd_ctx);
 
             mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
-            if(mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0){
+            if (mpd_cmp(totalPosition, mpd_zero, &mpd_ctx) == 0)
+            {
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
-            }else{
+            }
+            else
+            {
                 // mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // maker 只可能是限价单，下单时已冻结仓位，这里只需减少冻结仓位
                 mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
@@ -1604,7 +1628,8 @@ int adjustPosition(deal_t *deal)
     if (deal->real)
     {
         push_position_message(position);
-        if(mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+        if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
+        {
             del_position(position->user_id, position->market, position->side);
         }
     }
@@ -1676,13 +1701,16 @@ int execute_order_open_imp(deal_t *deal)
     deal->taker->update_time = deal->maker->update_time = current_timestamp();
     if (deal->real)
     {
-        if (deal->taker->side == 1 && deal->taker->oper_type == 1 || deal->taker->side == 2 && deal->taker->oper_type == 2){
+        if (deal->taker->side == 1 && deal->taker->oper_type == 1 || deal->taker->side == 2 && deal->taker->oper_type == 2)
+        {
             // 添加记录
-            append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee);
+            append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->taker_PNL, deal->maker_PNL);
             // 发送消息
             push_deal_message(deal->taker->update_time, deal->taker->market, deal->taker, deal->maker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
-        }else{
-            append_order_deal_history_future(deal->maker->update_time, deal_id, deal->maker, MARKET_ROLE_MAKER, deal->taker, MARKET_ROLE_TAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee);
+        }
+        else
+        {
+            append_order_deal_history_future(deal->maker->update_time, deal_id, deal->maker, MARKET_ROLE_MAKER, deal->taker, MARKET_ROLE_TAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->taker_PNL, deal->maker_PNL);
             push_deal_message(deal->maker->update_time, deal->maker->market, deal->maker, deal->taker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
         }
     }
@@ -1694,13 +1722,16 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
 {
     if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2)
     {
-        if(order->type == MARKET_ORDER_TYPE_PLAN){
+        if (order->type == MARKET_ORDER_TYPE_PLAN)
+        {
             skiplist_node *node = skiplist_find(m->plan_asks, order);
             if (node)
             {
                 skiplist_delete(m->plan_asks, node);
             }
-        }else{
+        }
+        else
+        {
             skiplist_node *node = skiplist_find(m->asks, order);
             if (node)
             {
@@ -1710,13 +1741,16 @@ static int order_finish_future(bool real, market_t *m, order_t *order)
     }
     else
     {
-        if(order->type == MARKET_ORDER_TYPE_PLAN){
+        if (order->type == MARKET_ORDER_TYPE_PLAN)
+        {
             skiplist_node *node = skiplist_find(m->plan_bids, order);
             if (node)
             {
                 skiplist_delete(m->plan_bids, node);
             }
-        }else{
+        }
+        else
+        {
             skiplist_node *node = skiplist_find(m->bids, order);
             if (node)
             {
@@ -1778,8 +1812,10 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
     skiplist_node *node;
     skiplist_iter *iter;
     int bSellOrBuy = SELL;
-    if (taker->oper_type == 1){
-        if(direction == 1){
+    if (taker->oper_type == 1)
+    {
+        if (direction == 1)
+        {
             iter = skiplist_get_iterator(market->bids);
             bSellOrBuy = SELL;
             log_debug("%s %d 开空 %d", __FUNCTION__, taker->user_id, taker->left);
@@ -1798,7 +1834,9 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
             iter = skiplist_get_iterator(market->bids);
             bSellOrBuy = SELL;
             log_debug("%s %d 平多 %d", __FUNCTION__, taker->user_id, taker->left);
-        }else{
+        }
+        else
+        {
             bSellOrBuy = BUY;
             iter = skiplist_get_iterator(market->asks);
             log_debug("%s %d 平空 %d", __FUNCTION__, taker->user_id, taker->left);
@@ -1982,12 +2020,15 @@ order_t *initOrder(args_t *args)
     return order;
 }
 
-int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee){
-    if (pattern == 1){ // 逐仓
+int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee)
+{
+    if (pattern == 1)
+    { // 逐仓
         if (mpd_cmp(balance, priAndFee, &mpd_ctx) < 0)
             return -1;
     }
-    if (pattern == 2){ // 全仓
+    if (pattern == 2)
+    { // 全仓
         if (getSumCrossCount(user_id))
         {
             mpd_t *totalPNL = getSumPNL(user_id);
@@ -2044,7 +2085,8 @@ int market_put_order_open(void *args_)
 
     // 计算余额 是否大于保证金
     mpd_copy(args->priAndFee, args->priAmount, &mpd_ctx);
-    if(checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee)) return -1;
+    if (checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee))
+        return -1;
 
     args->taker = initOrder(args);
     args->taker->oper_type = 1;
@@ -2066,7 +2108,7 @@ int market_put_order_open(void *args_)
     }
     else
     { // 计划委托
-        if(args->real)
+        if (args->real)
             push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
         order_put_future(args->market, args->taker);
     }
@@ -2115,7 +2157,7 @@ int market_put_order_close(void *args_)
     }
     else
     { // 计划委托
-        if(args->real)
+        if (args->real)
             push_order_message(ORDER_EVENT_PUT, args->taker, args->market);
         order_put_future(args->market, args->taker);
     }
@@ -2262,7 +2304,8 @@ int market_cancel_order(bool real, json_t **result, market_t *m, order_t *order)
         }
     }
 
-    if (order->oper_type == 2 && mpd_cmp(order->left, mpd_zero, &mpd_ctx) > 0){
+    if (order->oper_type == 2 && mpd_cmp(order->left, mpd_zero, &mpd_ctx) > 0)
+    {
         position_t *position = get_position(order->user_id, order->market, order->side);
         mpd_sub(position->frozen, position->frozen, order->left, &mpd_ctx);
         mpd_add(position->position, position->position, order->left, &mpd_ctx);
