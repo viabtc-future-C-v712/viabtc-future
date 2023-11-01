@@ -1518,11 +1518,11 @@ int adjustPosition(deal_t *deal)
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
             }else{
-                mpd_div(newPrice, total, totalPosition, &mpd_ctx);
+                // mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // 下单时已冻结仓位，这里只需减少冻结仓位
                 mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
                 // log_stderr("%s %s", mpd_to_sci(position->frozen, 0), mpd_to_sci(deal->amount, 0));
-                mpd_copy(position->price, newPrice, &mpd_ctx);
+                // mpd_copy(position->price, newPrice, &mpd_ctx);
                 // log_stderr("%s", mpd_to_sci(position->price, 0));
             }
         }
@@ -1592,11 +1592,11 @@ int adjustPosition(deal_t *deal)
                 mpd_copy(position->frozen, mpd_zero, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
             }else{
-                mpd_div(newPrice, total, totalPosition, &mpd_ctx);
+                // mpd_div(newPrice, total, totalPosition, &mpd_ctx);
                 // maker 只可能是限价单，下单时已冻结仓位，这里只需减少冻结仓位
                 mpd_sub(position->frozen, position->frozen, deal->amount, &mpd_ctx);
                 // log_stderr("%s %s", mpd_to_sci(position->frozen, 0), mpd_to_sci(deal->amount, 0));
-                mpd_copy(position->price, newPrice, &mpd_ctx);
+                // mpd_copy(position->price, newPrice, &mpd_ctx);
                 // log_stderr("%s", mpd_to_sci(position->price, 0));
             }
         }
