@@ -453,7 +453,7 @@ mpd_t *getDealPnl(int side, int role, int oper_type, mpd_t *taker_pnl, mpd_t *ma
             }
             if (role == MARKET_ROLE_MAKER)
             {
-                mpd_copy(pnl, maker_pnl, &mpd_ctx)
+                mpd_copy(pnl, maker_pnl, &mpd_ctx);
             }
         }
     }
