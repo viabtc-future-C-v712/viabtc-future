@@ -469,7 +469,7 @@ int append_order_deal_history_future(double t, uint64_t deal_id, order_t *ask, i
     append_order_deal_future(t, bid->user_id, deal_id, bid->id, ask->id, bid_role, price, amount, deal, bid_fee, ask_fee);
 
     mpd_t *ask_pnl = getDealPnl(MARKET_ORDER_SIDE_ASK, ask_role, ask->oper_type, taker_pnl, maker_pnl);
-    mpd_t *bid_pnl = getDealPnl(MARKET_ORDER_SIDE_BID, ask_role, ask->oper_type, taker_pnl, maker_pnl);
+    mpd_t *bid_pnl = getDealPnl(MARKET_ORDER_SIDE_BID, bid_role, bid->oper_type, taker_pnl, maker_pnl);
     append_user_deal_future(t, ask->user_id, ask->market, deal_id, ask->id, bid->id, ask->side, ask->oper_type, ask_role, price, amount, deal, ask_fee, bid_fee, ask_pnl);
     append_user_deal_future(t, bid->user_id, ask->market, deal_id, bid->id, ask->id, bid->side, bid->oper_type, bid_role, price, amount, deal, bid_fee, ask_fee, bid_pnl);
     mpd_del(ask_pnl);

@@ -1352,6 +1352,29 @@ int getSumCrossCount(uint32_t user_id)
     return count;
 }
 
+mpd_t *getPartPNL(position_t *position, mpd_t *latestPrice)
+{
+    mpd_t *positionTotal = mpd_new(&mpd_ctx);
+    mpd_add(positionTotal, position->position, position->frozen, &mpd_ctx);
+    mpd_t *PNL = mpd_new(&mpd_ctx);
+
+    if (position->side == BULL) // 平多
+    {
+        mpd_sub(PNL, latestPrice, position->price, &mpd_ctx);
+        mpd_div(PNL, PNL, position->price, &mpd_ctx);
+        mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+    }
+    else // 平空
+    {
+        mpd_sub(PNL, position->price, latestPrice, &mpd_ctx);
+        mpd_div(PNL, PNL, position->price, &mpd_ctx);
+        mpd_mul(PNL, PNL, positionTotal, &mpd_ctx);
+    }
+
+    mpd_del(positionTotal);
+    return PNL;
+}
+
 mpd_t *getPNL(position_t *position, mpd_t *latestPrice)
 {
     mpd_t *positionTotal = mpd_new(&mpd_ctx);
@@ -1520,6 +1543,8 @@ int adjustPosition(deal_t *deal)
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
             deal->taker_PNL = getPNL(position, deal->price);
+            // 计算部分权益
+            deal->t_PNL = getPartPNL(position, deal->price);
             //
             // 计算交易部份权益
             mpd_mul(deal->taker_PNL, deal->taker_PNL, deal->amount, &mpd_ctx);
@@ -1600,6 +1625,7 @@ int adjustPosition(deal_t *deal)
             mpd_add(amount, position->position, position->frozen, &mpd_ctx);
             // 计算总权益
             deal->maker_PNL = getPNL(position, deal->price);
+            deal->m_PNL = getPartPNL(position, deal->price);
             // 计算交易部份权益
             mpd_mul(deal->maker_PNL, deal->maker_PNL, deal->amount, &mpd_ctx);
             mpd_div(deal->maker_PNL, deal->maker_PNL, amount, &mpd_ctx);
@@ -1705,13 +1731,13 @@ int execute_order_open_imp(deal_t *deal)
         if (deal->taker->side == 1 && deal->taker->oper_type == 1 || deal->taker->side == 2 && deal->taker->oper_type == 2)
         {
             // 添加记录
-            append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->taker_PNL, deal->maker_PNL);
+            append_order_deal_history_future(deal->taker->update_time, deal_id, deal->taker, MARKET_ROLE_TAKER, deal->maker, MARKET_ROLE_MAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->t_PNL, deal->m_PNL);
             // 发送消息
             push_deal_message(deal->taker->update_time, deal->taker->market, deal->taker, deal->maker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
         }
         else
         {
-            append_order_deal_history_future(deal->maker->update_time, deal_id, deal->maker, MARKET_ROLE_MAKER, deal->taker, MARKET_ROLE_TAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->taker_PNL, deal->maker_PNL);
+            append_order_deal_history_future(deal->maker->update_time, deal_id, deal->maker, MARKET_ROLE_MAKER, deal->taker, MARKET_ROLE_TAKER, deal->price, deal->amount, deal->deal, deal->taker_fee, deal->maker_fee, deal->t_PNL, deal->m_PNL);
             push_deal_message(deal->maker->update_time, deal->maker->market, deal->maker, deal->taker, deal->price, deal->amount, deal->taker_fee, deal->maker_fee, MARKET_ORDER_SIDE_ASK, deal_id, deal->market->stock, deal->market->money);
         }
     }
