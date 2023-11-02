@@ -3,6 +3,7 @@
 
 deal_t* initDeal(){
     deal_t *deal = malloc(sizeof(deal_t));
+    memset(deal, 0, sizeof(deal_t));
     deal->amount = mpd_new(&mpd_ctx);
     deal->price = mpd_new(&mpd_ctx);
     deal->taker_fee = mpd_new(&mpd_ctx);

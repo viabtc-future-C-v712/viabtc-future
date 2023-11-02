@@ -428,18 +428,19 @@ int append_order_history(order_t *order)
 mpd_t *getDealPnl(int side, int role, int oper_type, mpd_t *taker_pnl, mpd_t *maker_pnl)
 {
     mpd_t *pnl = mpd_new(&mpd_ctx);
-    mpd_set_string(pnl, "0", 10);
+    mpd_copy(pnl, mpd_zero, &mpd_ctx);
+    // mpd_set_string(pnl, "0", 10);
     if (side == MARKET_ORDER_SIDE_ASK)
     {
         if (oper_type == 2) // 平多
         {
             if (role == MARKET_ROLE_TAKER)
             {
-                mpd_copy(pnl, taker_pnl, &mpd_ctx);
+                if(taker_pnl) mpd_copy(pnl, taker_pnl, &mpd_ctx);
             }
             if (role == MARKET_ROLE_MAKER)
             {
-                mpd_copy(pnl, maker_pnl, &mpd_ctx);
+                if(maker_pnl) mpd_copy(pnl, maker_pnl, &mpd_ctx);
             }
         }
     }
@@ -449,11 +450,11 @@ mpd_t *getDealPnl(int side, int role, int oper_type, mpd_t *taker_pnl, mpd_t *ma
         {
             if (role == MARKET_ROLE_TAKER)
             {
-                mpd_copy(pnl, taker_pnl, &mpd_ctx);
+                if(taker_pnl) mpd_copy(pnl, taker_pnl, &mpd_ctx);
             }
             if (role == MARKET_ROLE_MAKER)
             {
-                mpd_copy(pnl, maker_pnl, &mpd_ctx);
+                if(maker_pnl) mpd_copy(pnl, maker_pnl, &mpd_ctx);
             }
         }
     }
