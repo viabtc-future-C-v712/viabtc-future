@@ -108,6 +108,6 @@ CREATE TABLE `user_deal_history_example` (
     `deal`          DECIMAL(35,16) NOT NULL,
     `fee`           DECIMAL(35,16) NOT NULL,
     `deal_fee`      DECIMAL(35,16) NOT NULL,
-    `pnl`      DECIMAL(35,16) NOT NULL,
+    `pnl`           DECIMAL(35,16) NOT NULL,
     INDEX `idx_user_market` (`user_id`, `market`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

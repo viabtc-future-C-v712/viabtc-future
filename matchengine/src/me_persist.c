@@ -263,7 +263,7 @@ static int dump_balance_to_db(MYSQL *conn, time_t end)
 static int dump_position_mode_to_db(MYSQL *conn, time_t end)
 {
     sds table = sdsempty();
-    table = sdscatprintf(table, "slice_position_%ld", end);
+    table = sdscatprintf(table, "slice_position_mode_%ld", end);
     log_info("dump position to: %s", table);
     int ret = dump_position_mode(conn, table);
     if (ret < 0)

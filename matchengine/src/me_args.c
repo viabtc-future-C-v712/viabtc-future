@@ -84,7 +84,7 @@ args_t* initCloseArgs(json_t *params){
     args->markPrice = markPrice;
     args->triggerPrice = triggerPrice;
     args->entrustPrice = entrustPrice;
-    args->leverage = mpd_new(&mpd_ctx);;
+    args->leverage = mpd_new(&mpd_ctx);
     args->volume = volume;
     args->taker_fee_rate = taker_fee;
     args->maker_fee_rate = maker_fee;

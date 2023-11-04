@@ -1574,13 +1574,11 @@ int adjustPosition(deal_t *deal)
             }
         }
     }
-    if (deal->real)
-    {
+    if (deal->real){
         push_position_message(position);
-        if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
-        {
-            del_position(position->user_id, position->market, position->side);
-        }
+    }
+    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+        del_position(position->user_id, position->market, position->side);
     }
     // maker position
     position = get_position(deal->maker->user_id, deal->maker->market, deal->maker->side);
@@ -1653,13 +1651,11 @@ int adjustPosition(deal_t *deal)
             }
         }
     }
-    if (deal->real)
-    {
+    if (deal->real){
         push_position_message(position);
-        if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
-        {
-            del_position(position->user_id, position->market, position->side);
-        }
+    }
+    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+        del_position(position->user_id, position->market, position->side);
     }
     mpd_del(sum);
     mpd_del(money);
@@ -2111,7 +2107,13 @@ int market_put_order_open(void *args_)
     }
     else
     {
-        mpd_div(args->priAmount, args->volume, args->leverage, &mpd_ctx);
+        position_mode_t *position_mode;
+        position_mode = get_position_mode(args->user_id, args->market->name);
+        if(!position_mode){
+            add_position_mode(args->user_id, args->market->name, ISOLATED_MARGIN, args->leverage);
+            position_mode = get_position_mode(args->user_id, args->market->name);
+        }
+        mpd_div(args->priAmount, args->volume, position_mode->leverage, &mpd_ctx);
     }
 
     log_debug("%s 需要保证金 %s", __FUNCTION__, mpd_to_sci(args->priAmount, 0));

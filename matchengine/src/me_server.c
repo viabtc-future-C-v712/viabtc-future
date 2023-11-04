@@ -2518,16 +2518,18 @@ static int on_cmd_position_mode_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
     json_t *positions = json_array();
 
     position_mode_t *position = get_position_mode(user_id, market_name);
-    if (position)
-    {
-        json_t *unit = json_object();
-        json_object_set_new(unit, "user_id", json_integer(position->user_id));
-        json_object_set_new(unit, "market", json_string(position->market));
-        json_object_set_new(unit, "pattern", json_integer(position->pattern));
-        json_object_set_new_mpd(unit, "leverage", position->leverage);
-        json_array_append_new(positions, unit);
-        json_object_set_new(result, "count", json_integer(1));
+    if (!position){
+        add_position_mode(user_id, market_name, ISOLATED_MARGIN, mpd_one);
+        position = get_position_mode(user_id, market_name);
     }
+
+    json_t *unit = json_object();
+    json_object_set_new(unit, "user_id", json_integer(position->user_id));
+    json_object_set_new(unit, "market", json_string(position->market));
+    json_object_set_new(unit, "pattern", json_integer(position->pattern));
+    json_object_set_new_mpd(unit, "leverage", position->leverage);
+    json_array_append_new(positions, unit);
+    json_object_set_new(result, "count", json_integer(1));
     json_object_set_new(result, "position_modes", positions);
     int ret = reply_result(ses, pkg, result);
     json_decref(result);
@@ -2574,33 +2576,32 @@ static int on_cmd_position_mode_adjust(nw_ses *ses, rpc_pkg *pkg, json_t *params
     }
 
     position_mode_t *position_mode = get_position_mode(user_id, market_name);
-    if (position_mode){
-        //检查order
-        skiplist_t *order_list = market_get_order_list(market, user_id);
-        if(order_list){
-            skiplist_iter *iter = skiplist_get_iterator(order_list);
-            skiplist_node *node;
-            if (iter && (node = skiplist_next(iter)) != NULL){// 如果有order存在，就不能设置
-                return reply_error_other(ses, pkg, "set position mode fail order exists");
-            }
+    if (!position_mode){
+        add_position_mode(user_id, market_name, ISOLATED_MARGIN, leverage);
+        position_mode = get_position_mode(user_id, market_name);
+    }
+    //检查order
+    skiplist_t *order_list = market_get_order_list(market, user_id);
+    if(order_list){
+        skiplist_iter *iter = skiplist_get_iterator(order_list);
+        skiplist_node *node;
+        if (iter && (node = skiplist_next(iter)) != NULL){// 如果有order存在，就不能设置
+            return reply_error_other(ses, pkg, "set position mode fail order exists");
         }
-        //检查position
-        if(get_position(user_id, market_name, BULL) || get_position(user_id, market_name, BEAR))// 如果有position存在，就不能设置
-            return reply_error_other(ses, pkg, "set position mode fail position exists");
+    }
+    //检查position
+    if(get_position(user_id, market_name, BULL) || get_position(user_id, market_name, BEAR))// 如果有position存在，就不能设置
+        return reply_error_other(ses, pkg, "set position mode fail position exists");
 
-        //检查杠杆
-        int ret = mpd_cmp(leverage, mpd_zero, &mpd_ctx);
-        if( mpd_cmp(leverage, mpd_zero, &mpd_ctx) < 0 ){
-            return reply_error_other(ses, pkg, "set position fail leverage not right");
-        }
-        //检查模式
-        mpd_copy(position_mode->leverage, leverage, &mpd_ctx);
-        position_mode->pattern = mode;
-        reply_success(ses, pkg);
+    //检查杠杆
+    int ret = mpd_cmp(leverage, mpd_zero, &mpd_ctx);
+    if( mpd_cmp(leverage, mpd_zero, &mpd_ctx) < 0 ){
+        return reply_error_other(ses, pkg, "set position fail leverage not right");
     }
-    else{
-        return reply_error_other(ses, pkg, "set position mode fail");
-    }
+    //检查模式
+    mpd_copy(position_mode->leverage, leverage, &mpd_ctx);
+    position_mode->pattern = mode;
+    reply_success(ses, pkg);
 }
 
 static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)

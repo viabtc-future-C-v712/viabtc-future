@@ -98,15 +98,6 @@ int init_position(){
     return 0;
 }
 
-int add_position_mode(uint32_t user_id, char* market, position_mode_t *p){
-    if (!p) return -1;
-    struct position_mode_key key;
-    key.user_id = user_id;
-    strncpy(key.market, market, sizeof(key.market));
-    dict_entry *entry = dict_add(dict_position_mode, &key, p);
-    return 0;
-}
-
 int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p){
     if (!p) return -1;
     struct position_key key;
@@ -132,6 +123,21 @@ int del_position(uint32_t user_id, char* market, uint32_t side){
     return 0;
 }
 
+int add_position_mode(uint32_t user_id, char* market, uint32_t pattern, mpd_t *leverage){
+    struct position_mode_key key;
+    key.user_id = user_id;
+    strncpy(key.market, market, sizeof(key.market));
+
+    position_mode_t *position_mode = malloc(sizeof(position_mode_t));
+    position_mode->user_id = user_id;
+    position_mode->pattern = pattern;
+    position_mode->leverage = mpd_new(&mpd_ctx);
+    mpd_copy(position_mode->leverage, leverage, &mpd_ctx);
+
+    dict_add(dict_position_mode, &key, position_mode);
+    return 0;
+}
+
 position_mode_t* get_position_mode(uint32_t user_id, char* market){
     struct position_mode_key key;
     key.user_id = user_id;
@@ -141,15 +147,7 @@ position_mode_t* get_position_mode(uint32_t user_id, char* market){
     if (entry) {
         return entry->val;
     }
-
-    // 如果之前不存在，则创建
-    position_mode_t *position_mode = malloc(sizeof(position_mode_t));
-    position_mode->user_id = user_id;
-    position_mode->pattern = 1;
-    position_mode->leverage = mpd_new(&mpd_ctx);
-
-    mpd_copy(position_mode->leverage, mpd_one, &mpd_ctx);
-    return dict_add(dict_position, &key, position_mode);
+    return NULL;
 }
 
 position_t* get_position(uint32_t user_id, char* market, uint32_t side){
