@@ -224,6 +224,44 @@ static int append_user_order(order_t *order)
     return 0;
 }
 
+static int append_market_order(order_t *order)
+{
+    struct dict_sql_key key;
+    key.hash = order->user_id % HISTORY_HASH_NUM;
+    key.type = HISTORY_USER_ORDER;
+    sds sql = get_sql(&key);
+    if (sql == NULL)
+        return -__LINE__;
+
+    if (sdslen(sql) == 0)
+    {
+        sql = sdscatprintf(sql, "INSERT INTO `order_history_%s` (`id`, `create_time`, `finish_time`, `user_id`, "
+                                "`market`, `source`, `t`, `side`, `oper_type`, `price`, `amount`, `leverage`, `trigger`, `taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`) VALUES ",
+                           order->market);
+    }
+    else
+    {
+        sql = sdscatprintf(sql, ", ");
+    }
+
+    sql = sdscatprintf(sql, "(%" PRIu64 ", %f, %f, %u, '%s', '%s', %u, %u, %u, ", order->id,
+                       order->create_time, order->update_time, order->user_id, order->market, order->source, order->type, order->side, order->oper_type);
+    sql = sql_append_mpd(sql, order->price, true);
+    sql = sql_append_mpd(sql, order->amount, true);
+    sql = sql_append_mpd(sql, order->leverage, true);
+    sql = sql_append_mpd(sql, order->trigger, true);
+    sql = sql_append_mpd(sql, order->taker_fee, true);
+    sql = sql_append_mpd(sql, order->maker_fee, true);
+    sql = sql_append_mpd(sql, order->deal_stock, true);
+    sql = sql_append_mpd(sql, order->deal_money, true);
+    sql = sql_append_mpd(sql, order->deal_fee, false);
+    sql = sdscatprintf(sql, ")");
+
+    set_sql(&key, sql);
+
+    return 0;
+}
+
 static int append_order_detail(order_t *order)
 {
     struct dict_sql_key key;
@@ -421,7 +459,8 @@ int append_order_history(order_t *order)
 {
     append_user_order(order);
     append_order_detail(order);
-
+    //需要提前建order_history_BTCUSDT表
+    append_market_order(order);
     return 0;
 }
 
