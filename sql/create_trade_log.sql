@@ -19,6 +19,14 @@ CREATE TABLE `slice_market_example` (
     `price`         DECIMAL(35,16) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `slice_position_mode_example` (
+    `id`            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `user_id`       INT UNSIGNED NOT NULL,
+    `market`        VARCHAR(30) NOT NULL,
+    `pattern`       TINYINT UNSIGNED NOT NULL, -- 1 逐仓, 2 全仓
+    `leverage`      DECIMAL(8,2) NOT NULL, -- 杠杆倍数
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `slice_position_example` (
     `id`            INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `user_id`       INT UNSIGNED NOT NULL,

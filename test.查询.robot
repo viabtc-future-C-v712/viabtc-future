@@ -10,16 +10,24 @@ Resource   test.kafka.resource
 Resource   test.base.resource
 Variables  test_variable.py
 
-Test Setup   init balance all
+# Test Setup   init balance all
 # Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
+uscase case 0
+    check position    51324534    market=BTCUSDT    side=${多}    type=${冻结仓位}    amount=0
+    check position    51324534    market=BTCUSDT    side=${空}    type=${冻结仓位}    amount=0
 uscase case 
     check order book    market=BTCUSDT   side=${空}    limit=10
     check order book    market=BTCUSDT   side=${多}    limit=10
     check balance    1145509    USDT    ${冻结余额}    799965.3125
     check balance    1145509    USDT    ${可用余额}    799965.3125
+position mode query
+    check position mode    ${Alice}    BTCBCH
+
+position mode adjust
+    position mode adjust    ${Alice}    BTCBCH
 uscase case 2
     check order book    market=BTCBCH    side=1    offset=0    limit=100
 市价开多(未成交)

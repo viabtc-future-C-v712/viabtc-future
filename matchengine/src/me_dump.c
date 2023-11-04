@@ -211,6 +211,89 @@ int dump_balance(MYSQL *conn, const char *table)
     return 0;
 }
 
+static int dump_position_mode_dict(MYSQL *conn, const char *table, dict_t *dict)
+{
+    sds sql = sdsempty();
+
+    size_t insert_limit = 1000;
+    size_t index = 0;
+    dict_iterator *iter = dict_get_iterator(dict);
+    dict_entry *entry;
+    while ((entry = dict_next(iter)) != NULL) {
+        struct position_mode_key *key = entry->key;
+        position_mode_t *position = entry->val;
+        if (index == 0) {
+            sql = sdscatprintf(sql, "INSERT INTO `%s` (`id`, `user_id`, `market`, `pattern`, `leverage`) VALUES ", table);
+        } else {
+            sql = sdscatprintf(sql, ", ");
+        }
+        // log_stderr("%s", mpd_to_sci(position->price, 0));
+        sql = sdscatprintf(sql, "(NULL, %u, '%s', %u, ", key->user_id, key->market, position->pattern);
+        sql = sql_append_mpd(sql, position->leverage, false);
+        sql = sdscatprintf(sql, ")");
+
+        index += 1;
+        if (index == insert_limit) {
+            log_trace("exec sql: %s", sql);
+            int ret = mysql_real_query(conn, sql, sdslen(sql));
+            if (ret < 0) {
+                log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+                dict_release_iterator(iter);
+                sdsfree(sql);
+                return -__LINE__;
+            }
+            sdsclear(sql);
+            index = 0;
+        }
+    }
+    dict_release_iterator(iter);
+
+    if (index > 0) {
+        log_trace("exec sql: %s", sql);
+        int ret = mysql_real_query(conn, sql, sdslen(sql));
+        if (ret < 0) {
+            log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+            sdsfree(sql);
+            return -__LINE__;
+        }
+    }
+
+    sdsfree(sql);
+    return 0;
+}
+
+int dump_position_mode(MYSQL *conn, const char *table)
+{
+    sds sql = sdsempty();
+    sql = sdscatprintf(sql, "DROP TABLE IF EXISTS `%s`", table);
+    log_trace("exec sql: %s", sql);
+    int ret = mysql_real_query(conn, sql, sdslen(sql));
+    if (ret != 0) {
+        log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+        sdsfree(sql);
+        return -__LINE__;
+    }
+    sdsclear(sql);
+
+    sql = sdscatprintf(sql, "CREATE TABLE IF NOT EXISTS `%s` LIKE `slice_position_mode_example`", table);
+    log_trace("exec sql: %s", sql);
+    ret = mysql_real_query(conn, sql, sdslen(sql));
+    if (ret != 0) {
+        log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+        sdsfree(sql);
+        return -__LINE__;
+    }
+    sdsfree(sql);
+
+    ret = dump_position_mode_dict(conn, table, dict_position_mode);
+    if (ret < 0) {
+        log_error("dump_position_dict fail: %d", ret);
+        return -__LINE__;
+    }
+
+    return 0;
+}
+
 static int dump_position_dict(MYSQL *conn, const char *table, dict_t *dict)
 {
     sds sql = sdsempty();

@@ -15,7 +15,7 @@ put limit
     call    'order.put_limit'    ${data}
 put open
     [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH
-    call    'order.open'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "${触发价格}", "${价格}", "100", "${张}", "0.002", "0.001"
+    call    'order.open'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "0", "${触发价格}", "${价格}", "100", "${张}", "0.002", "0.001"
 put close
     [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH
     call    'order.close'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "${触发价格}", "${价格}", "${张}", "0.002", "0.001"
@@ -113,8 +113,8 @@ balance unfreeze
     [Arguments]  ${user}    ${asset}    ${amount}
     call    'balance.unfreeze'    ${user}, "${asset}", "${amount}"
 check position
-    [Arguments]  ${id}    ${side}    ${type}    ${amount}    
-    ${ret} =  call    'position.query'    ${id}, "BTCBCH", ${side}
+    [Arguments]  ${id}    ${market}=BTCBCH    ${side}=${多}    ${type}=${可用仓位}    ${amount}=0
+    ${ret} =  call    'position.query'    ${id}, "${market}", ${side}
     IF    '${ret.json()["result"]["count"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE
@@ -124,6 +124,12 @@ check position
             Should Be Equal As Numbers    ${ret.json()["result"]["positions"][0]["${type}"]}    ${amount}
         END
     END
+check position mode
+    [Arguments]  ${id}    ${market}=BTCBCH
+    ${ret} =  call    'position_mode.query'    ${id}, "${market}"
+position mode adjust
+    [Arguments]  ${id}    ${market}=BTCBCH    ${mode}=1    ${leverage}=10
+    ${ret} =  call    'position_mode.adjust'    ${id}, "${market}", ${mode}, "${leverage}"
 check position all
     [Arguments]  ${id}    ${market}=BTCBCH    ${type}=${可用仓位}    ${amount}=0
     ${ret} =  call    'position.query_all'    ${id}, "${market}"

@@ -9,6 +9,15 @@
 # include "me_config.h"
 
 extern dict_t *dict_position;
+extern dict_t *dict_position_mode;
+
+typedef struct position_mode_t{
+    uint32_t        id;
+    uint32_t        user_id;
+    char            *market;
+    uint32_t        pattern;
+    mpd_t           *leverage;
+} position_mode_t;
 
 typedef struct position_t{
     uint32_t        id;
@@ -23,6 +32,11 @@ typedef struct position_t{
     mpd_t           *principal;
 } position_t;
 
+struct position_mode_key {
+    uint32_t    user_id;
+    char        market[MARKET_NAME_MAX_LEN + 1];
+};
+
 struct position_key {
     uint32_t    user_id;
     char        market[MARKET_NAME_MAX_LEN + 1];
@@ -32,6 +46,7 @@ struct position_key {
 int init_position(void);
 int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p);
 position_t* get_position(uint32_t user_id, char* market, uint32_t side);
+position_mode_t* get_position_mode(uint32_t user_id, char* market);
 int del_position(uint32_t user_id, char* market, uint32_t side);
 position_t *initPosition(uint32_t user_id, const char* market, uint32_t pattern);
 # endif

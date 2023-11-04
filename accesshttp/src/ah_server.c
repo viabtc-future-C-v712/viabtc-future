@@ -295,6 +295,9 @@ static int init_methods_handler(void)
     ERR_RET_LN(add_handler("position.query_all", matchengine, CMD_POSITION_QUERY_ALL));
     ERR_RET_LN(add_handler("position.adjust_principal", matchengine, CMD_POSITION_ADJUST_PRINCIPAL));
 
+    ERR_RET_LN(add_handler("position_mode.query", matchengine, CMD_POSITION_MODE_QUERY));
+    ERR_RET_LN(add_handler("position_mode.adjust", matchengine, CMD_POSITION_MODE_ADJUST));
+
     ERR_RET_LN(add_handler("asset.list", matchengine, CMD_ASSET_LIST));
     ERR_RET_LN(add_handler("asset.summary", matchengine, CMD_ASSET_SUMMARY));
 

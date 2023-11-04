@@ -9,11 +9,13 @@ Resource   test.ws.resource
 Resource   test.kafka.resource
 Variables  test_variable.py
 
-Test Setup   init balance all
-Test Teardown   重启
+# Test Setup   init balance all
+# Test Teardown   重启
 *** Variables ***
 
 *** Test Cases ***
+全仓价
+    put open     51324534    ${多}    ${限价}    ${全仓}    5000    触发价格=0    market=BTCUSDT
 市价平多(未成交)
     put open     ${Bob}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    5000

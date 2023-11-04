@@ -146,6 +146,58 @@ int load_balance(MYSQL *conn, const char *table)
     return 0;
 }
 
+int load_position_mode(MYSQL *conn, const char *table)
+{
+    size_t query_limit = 1000;
+    uint64_t last_id = 0;
+    while (true) {
+        sds sql = sdsempty();
+        sql = sdscatprintf(sql, "SELECT \
+        `id`, \
+        `user_id`, \
+        `market`, \
+        `pattern`, \
+        `leverage` FROM `%s` "
+                "WHERE `id` > %"PRIu64" ORDER BY id LIMIT %zu", table, last_id, query_limit);
+        log_debug("exec sql: %s", sql);
+        int ret = mysql_real_query(conn, sql, sdslen(sql));
+        if (ret != 0) {
+            log_error("exec sql: %s fail: %d %s", sql, mysql_errno(conn), mysql_error(conn));
+            sdsfree(sql);
+            return -__LINE__;
+        }
+        sdsfree(sql);
+
+        MYSQL_RES *result = mysql_store_result(conn);
+        size_t num_rows = mysql_num_rows(result);
+        log_trace("%s %d", __FUNCTION__, num_rows);
+        for (size_t i = 0; i < num_rows; ++i) {
+            MYSQL_ROW row = mysql_fetch_row(result);
+            last_id = strtoull(row[0], NULL, 0);
+            uint32_t user_id = strtoul(row[1], NULL, 0);
+            market_t *market = get_market(row[2]);
+            if (market == NULL)
+                continue;
+
+            position_mode_t *position = malloc(sizeof(position_mode_t));
+            memset(position, 0, sizeof(position_mode_t));
+            position->id = strtoull(row[0], NULL, 0);
+            position->user_id = strtoull(row[1], NULL, 0);
+            position->market = strdup(row[2]);
+            position->pattern = strtoul(row[3], NULL, 0);
+            position->leverage = decimal(row[4], 0);
+            log_trace("%s %d %s %d", __FUNCTION__, user_id, position->market);
+            add_position_mode(user_id, position->market, position);
+        }
+        mysql_free_result(result);
+
+        if (num_rows < query_limit)
+            break;
+    }
+
+    return 0;
+}
+
 int load_position(MYSQL *conn, const char *table)
 {
     size_t query_limit = 1000;

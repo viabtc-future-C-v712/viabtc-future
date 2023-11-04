@@ -1421,6 +1421,7 @@ mpd_t *getPNL(position_t *position, mpd_t *latestPrice)
 mpd_t *getSumPNL(uint32_t user_id)
 {
     mpd_t *totalPNL = mpd_new(&mpd_ctx);
+    mpd_copy(totalPNL, mpd_zero, &mpd_ctx);
     for (size_t i = 0; i < settings.market_num; ++i)
     {
         position_t *position = get_position(user_id, settings.markets[i].name, 1);
@@ -2092,15 +2093,19 @@ int market_put_order_open(void *args_)
         return -1;
     }
     // 检查买入数量
-    if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume))
+    if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume)){
+        args->msg = "volume error";
         return -1;
+    }
+
+    // 判断仓位模式
+    {
+        
+    }
     // 计算保证金 如果以前有仓位，参照以前的仓位？
     position_t *position = get_position(args->user_id, args->market->name, args->direction);
     if (position)
     {
-        // 检查仓位模式
-        if (position->pattern != args->pattern)
-            return -1;
         mpd_copy(args->leverage, position->leverage, &mpd_ctx);
         mpd_div(args->priAmount, args->volume, args->leverage, &mpd_ctx);
     }
@@ -2108,6 +2113,7 @@ int market_put_order_open(void *args_)
     {
         mpd_div(args->priAmount, args->volume, args->leverage, &mpd_ctx);
     }
+
     log_debug("%s 需要保证金 %s", __FUNCTION__, mpd_to_sci(args->priAmount, 0));
 
     // 计算开仓手续费
@@ -2115,8 +2121,10 @@ int market_put_order_open(void *args_)
 
     // 计算余额 是否大于保证金
     mpd_copy(args->priAndFee, args->priAmount, &mpd_ctx);
-    if (checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee))
+    if (checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee)){
+        args->msg = "checkPriAndFee fail";
         return -1;
+    }
 
     args->taker = initOrder(args);
     args->taker->oper_type = 1;

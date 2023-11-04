@@ -100,6 +100,18 @@ static int load_slice_from_db(MYSQL *conn, time_t timestamp)
     }
     sdsclear(table);
 
+    table = sdscatprintf(table, "slice_position_mode_%ld", timestamp);
+    log_stderr("load position_mode from: %s", table);
+    ret = load_position_mode(conn, table);
+    if (ret < 0)
+    {
+        log_error("load_position_mode from %s fail: %d", table, ret);
+        log_stderr("load_position_mode from %s fail: %d", table, ret);
+        sdsfree(table);
+        return -__LINE__;
+    }
+    sdsclear(table);
+
     table = sdscatprintf(table, "slice_market_%ld", timestamp);
     log_stderr("load market from: %s", table);
     ret = load_market_db(conn, table);
@@ -248,6 +260,23 @@ static int dump_balance_to_db(MYSQL *conn, time_t end)
     return 0;
 }
 
+static int dump_position_mode_to_db(MYSQL *conn, time_t end)
+{
+    sds table = sdsempty();
+    table = sdscatprintf(table, "slice_position_%ld", end);
+    log_info("dump position to: %s", table);
+    int ret = dump_position_mode(conn, table);
+    if (ret < 0)
+    {
+        log_error("dump_position_mode to %s fail: %d", table, ret);
+        sdsfree(table);
+        return -__LINE__;
+    }
+    sdsfree(table);
+
+    return 0;
+}
+
 static int dump_position_to_db(MYSQL *conn, time_t end)
 {
     sds table = sdsempty();
@@ -321,6 +350,12 @@ int dump_to_db(time_t timestamp)
     }
 
     ret = dump_order_to_db(conn, timestamp);
+    if (ret < 0)
+    {
+        goto cleanup;
+    }
+
+    ret = dump_position_mode_to_db(conn, timestamp);
     if (ret < 0)
     {
         goto cleanup;
