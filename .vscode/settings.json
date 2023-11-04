@@ -9,5 +9,6 @@
         "vector": "c",
         "__locale": "c",
         "__node_handle": "c"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
