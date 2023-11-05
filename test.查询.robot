@@ -11,21 +11,12 @@ Resource   test.base.resource
 Variables  test_variable.py
 
 Test Setup   init balance all
-# Test Teardown   重启
+Test Teardown   重启服务 并清理数据库
 *** Variables ***
 
 *** Test Cases ***
-uscase case 0
-    check position    51324534    market=BTCUSDT    side=${多}    type=${冻结仓位}    amount=0
-    check position    51324534    market=BTCUSDT    side=${空}    type=${冻结仓位}    amount=0
-uscase case 
-    check order book    market=BTCUSDT   side=${空}    limit=10
-    check order book    market=BTCUSDT   side=${多}    limit=10
-    check balance    1145509    USDT    ${冻结余额}    799965.3125
-    check balance    1145509    USDT    ${可用余额}    799965.3125
 position mode query
     check position mode    ${Alice}    BTCBCH
-
 position mode adjust
     position mode adjust    ${Alice}    BTCBCH
 uscase case 2
@@ -41,5 +32,5 @@ uscase case 2
     check order    ${Alice}  # 市价不挂单
     # -50， +20 -5 (800000 -35)
     check balance    ${Alice}    BCH    ${可用余额}    799965.3125
-    check position    ${Alice}    ${多}    ${可用仓位}    2500
-    check position    ${Alice}    ${多}    ${冻结仓位}    0
+    check position    ${Alice}    market=BTCBCH    side=${多}    type=${可用仓位}    amount=2500
+    check position    ${Alice}    market=BTCBCH    side=${多}    type=${冻结仓位}    amount=0

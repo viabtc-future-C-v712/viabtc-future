@@ -125,8 +125,10 @@ check position
         END
     END
 check position mode
-    [Arguments]  ${id}    ${market}=BTCBCH
+    [Arguments]  ${id}    ${market}=BTCBCH    ${mode}=1    ${leverage}=1
     ${ret} =  call    'position_mode.query'    ${id}, "${market}"
+    Should Be Equal As Numbers    ${ret.json()["result"]["position_modes"][0]["pattern"]}    ${mode}
+    Should Be Equal As Numbers    ${ret.json()["result"]["position_modes"][0]["leverage"]}    ${leverage}
 position mode adjust
     [Arguments]  ${id}    ${market}=BTCBCH    ${mode}=1    ${leverage}=10
     ${ret} =  call    'position_mode.adjust'    ${id}, "${market}", ${mode}, "${leverage}"
@@ -147,12 +149,20 @@ position update
     ${ret} =  call    'position.adjust_principal'    ${id}, "BTCBCH", ${side}, "${amount}"
 market last
     call    'market.last'    "BTCBCH"
+重启服务 并清理数据库
+    sleep    0.2s
+    init oper Log
+    call    'matchengine.suicide'    -1
+重启服务
+    sleep    0.2s
+    call    'matchengine.suicide'    -1
 退出
     call    'matchengine.suicide'    0
 call
     [Arguments]  ${method}    ${data}
     Create Session    user    ${BASE_URL}
     ${data2} =  Evaluate  {'method': ${method}, 'params': [${data}], 'id': 3}
+
     ${resp} =    POST On Session    user    /    json=${data2}
     Should Be Equal As Strings    ${resp.status_code}    200
     Should Be Equal As Strings    ${resp.json()["error"]}    None

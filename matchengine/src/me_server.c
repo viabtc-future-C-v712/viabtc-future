@@ -2580,26 +2580,17 @@ static int on_cmd_position_mode_adjust(nw_ses *ses, rpc_pkg *pkg, json_t *params
         add_position_mode(user_id, market_name, ISOLATED_MARGIN, leverage);
         position_mode = get_position_mode(user_id, market_name);
     }
-    //检查order
-    skiplist_t *order_list = market_get_order_list(market, user_id);
-    if(order_list){
-        skiplist_iter *iter = skiplist_get_iterator(order_list);
-        skiplist_node *node;
-        if (iter && (node = skiplist_next(iter)) != NULL){// 如果有order存在，就不能设置
-            return reply_error_other(ses, pkg, "set position mode fail order exists");
-        }
-    }
-    //检查position
-    if(get_position(user_id, market_name, BULL) || get_position(user_id, market_name, BEAR))// 如果有position存在，就不能设置
-        return reply_error_other(ses, pkg, "set position mode fail position exists");
-
+    // 检查order //检查position
+    int ret = check_position_order_mode(user_id, market_name);
+    if(ret)
+        return reply_error_other(ses, pkg, "set position fail position or order exists");
     //检查杠杆
-    int ret = mpd_cmp(leverage, mpd_zero, &mpd_ctx);
+    ret = mpd_cmp(leverage, mpd_zero, &mpd_ctx);
     if( mpd_cmp(leverage, mpd_zero, &mpd_ctx) < 0 ){
         return reply_error_other(ses, pkg, "set position fail leverage not right");
     }
-    //检查模式
     mpd_copy(position_mode->leverage, leverage, &mpd_ctx);
+    //检查模式
     position_mode->pattern = mode;
     reply_success(ses, pkg);
 }

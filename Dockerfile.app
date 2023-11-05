@@ -2,6 +2,7 @@
 FROM viabtcdealbase
 
 COPY . /usr/src/myapp
+COPY ./gdbinit /root
 WORKDIR /usr/src/myapp
 
 RUN apt-get update

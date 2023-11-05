@@ -83,6 +83,7 @@ int market_put_limit_order_extra(bool real, json_t *result, market_t *m, uint32_
 int market_cancel_all_order(market_t *m);
 int market_put_order(market_t *m, order_t *order);
 
+int check_position_order_mode(uint32_t user_id, market_t *market);
 int market_put_order_common(void*);
 int market_put_order_open(void*);
 int market_put_order_close(void*);

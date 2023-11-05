@@ -1280,6 +1280,24 @@ static int execute_market_bid_order(bool real, market_t *m, order_t *taker)
     return 0;
 }
 
+
+int check_position_order_mode(uint32_t user_id, market_t *market){
+    //检查order
+
+    skiplist_t *order_list = market_get_order_list(market, user_id);
+    if(order_list){
+        skiplist_iter *iter = skiplist_get_iterator(order_list);
+        skiplist_node *node;
+        if (iter && (node = skiplist_next(iter)) != NULL){// 如果有order存在，就不能设置
+            return -1;
+        }
+    }
+    //检查position
+    if(get_position(user_id, market->name, BULL) || get_position(user_id, market->name, BEAR))// 如果有position存在，就不能设置
+        return -1;
+    return 0;
+}
+
 int market_put_order_common(void *args_)
 {
     args_t *args = (args_t *)args_;
@@ -2094,12 +2112,13 @@ int market_put_order_open(void *args_)
         return -1;
     }
 
-    // 判断仓位模式
-    {
-        
-    }
+    position_mode_t *position_mode;
+    position_mode = get_position_mode(args->user_id, args->market->name);
     // 计算保证金 如果以前有仓位，参照以前的仓位？
-    position_t *position = get_position(args->user_id, args->market->name, args->direction);
+    position_t *position = NULL;
+    position = get_position(args->user_id, args->market->name, BULL);
+    if(!position) position = get_position(args->user_id, args->market->name, BEAR);
+
     if (position)
     {
         mpd_copy(args->leverage, position->leverage, &mpd_ctx);
@@ -2107,15 +2126,24 @@ int market_put_order_open(void *args_)
     }
     else
     {
-        position_mode_t *position_mode;
-        position_mode = get_position_mode(args->user_id, args->market->name);
         if(!position_mode){
-            add_position_mode(args->user_id, args->market->name, ISOLATED_MARGIN, args->leverage);
+            add_position_mode(args->user_id, args->market->name, args->pattern, args->leverage);
             position_mode = get_position_mode(args->user_id, args->market->name);
+        }else{
+            if(!check_position_order_mode(args->user_id, args->market)){// 如果之前没有下过单，或没有持有仓位，再可以修改
+                log_trace("position pattern %d %d", position_mode->pattern, args->pattern);
+                position_mode->pattern = args->pattern;
+                mpd_copy(position_mode->leverage, args->leverage, &mpd_ctx);
+            }
         }
         mpd_div(args->priAmount, args->volume, position_mode->leverage, &mpd_ctx);
     }
-
+    // 判断仓位模式
+    log_trace("position pattern %d %d", position_mode->pattern, args->pattern);
+    if(position_mode->pattern != args->pattern){
+        args->msg = "check position pattern fail";
+        return -1;
+    }
     log_debug("%s 需要保证金 %s", __FUNCTION__, mpd_to_sci(args->priAmount, 0));
 
     // 计算开仓手续费
@@ -2398,6 +2426,7 @@ order_t *market_get_order(market_t *m, uint64_t order_id)
 
 skiplist_t *market_get_order_list(market_t *m, uint32_t user_id)
 {
+    if(!m->users) return NULL;
     struct dict_user_key key = {.user_id = user_id};
     dict_entry *entry = dict_find(m->users, &key);
     if (entry)

@@ -2,6 +2,14 @@
 from confluent_kafka import Consumer, TopicPartition
 import time
 
+from robot.api.deco import keyword
+
+class MyKeywords:
+    @keyword
+    def my_keyword(self, arg1, arg2):
+        # 在这里实现你的关键字
+        pass
+        
 def read_increment_variable(file_path):
     try:
         with open(file_path, 'r') as file:
