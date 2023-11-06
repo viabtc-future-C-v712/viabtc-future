@@ -48,6 +48,7 @@ CREATE TABLE `order_history_example` (
     `deal_stock`    DECIMAL(35,16) NOT NULL,
     `deal_money`    DECIMAL(35,16) NOT NULL,
     `deal_fee`      DECIMAL(35,16) NOT NULL,
+    `pnl`      DECIMAL(35,16) NOT NULL,
     INDEX `idx_user_market` (`user_id`, `market`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
