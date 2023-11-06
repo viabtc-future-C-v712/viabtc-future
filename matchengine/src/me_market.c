@@ -1467,20 +1467,17 @@ int adjustOrder(deal_t *deal)
     mpd_sub(deal->taker->left, deal->taker->left, deal->amount, &mpd_ctx);
     mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
     mpd_add(deal->taker->deal_stock, deal->taker->deal_stock, deal_stock, &mpd_ctx);
-
     mpd_div(deal->taker_priAmount, deal->amount, deal->taker->leverage, &mpd_ctx);
-    mpd_add(deal->taker->deal_money, deal->taker->deal_money, deal->taker_priAmount, &mpd_ctx);
-
+    mpd_add(deal->taker->deal_money, deal->taker->deal_money, deal->deal, &mpd_ctx);
     mpd_mul(deal->taker_fee, deal->amount, deal->taker->taker_fee, &mpd_ctx);
     mpd_add(deal->taker->deal_fee, deal->taker->deal_fee, deal->taker_fee, &mpd_ctx);
+
     // maker order
     mpd_sub(deal->maker->left, deal->maker->left, deal->amount, &mpd_ctx);
     mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
     mpd_add(deal->maker->deal_stock, deal->maker->deal_stock, deal_stock, &mpd_ctx);
-
     mpd_div(deal->maker_priAmount, deal->amount, deal->maker->leverage, &mpd_ctx);
-    mpd_add(deal->maker->deal_money, deal->maker->deal_money, deal->maker_priAmount, &mpd_ctx);
-
+    mpd_add(deal->maker->deal_money, deal->maker->deal_money, deal->deal, &mpd_ctx);
     mpd_mul(deal->maker_fee, deal->amount, deal->maker->maker_fee, &mpd_ctx);
     mpd_add(deal->maker->deal_fee, deal->maker->deal_fee, deal->maker_fee, &mpd_ctx);
 
@@ -1564,6 +1561,8 @@ int adjustPosition(deal_t *deal)
             deal->taker_PNL = getPNL(position, deal->price);
             // 计算部分权益
             deal->t_PNL = getPartPNL(position, deal->price);
+
+            mpd_add(deal->taker->pnl, deal->taker->pnl, deal->t_PNL, &mpd_ctx);
             //
             // 计算交易部份权益
             mpd_mul(deal->taker_PNL, deal->taker_PNL, deal->amount, &mpd_ctx);
@@ -1643,6 +1642,8 @@ int adjustPosition(deal_t *deal)
             // 计算总权益
             deal->maker_PNL = getPNL(position, deal->price);
             deal->m_PNL = getPartPNL(position, deal->price);
+            mpd_add(deal->maker->pnl, deal->maker->pnl, deal->m_PNL, &mpd_ctx);
+
             // 计算交易部份权益
             mpd_mul(deal->maker_PNL, deal->maker_PNL, deal->amount, &mpd_ctx);
             mpd_div(deal->maker_PNL, deal->maker_PNL, amount, &mpd_ctx);
@@ -2041,6 +2042,7 @@ order_t *initOrder(args_t *args)
     order->freeze = mpd_new(&mpd_ctx);
     order->deal_stock = mpd_new(&mpd_ctx);
     order->deal_money = mpd_new(&mpd_ctx);
+    order->pnl = mpd_new(&mpd_ctx);
     order->deal_fee = mpd_new(&mpd_ctx);
     order->source = "";
     order->mm = 0;
