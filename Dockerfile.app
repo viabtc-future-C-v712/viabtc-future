@@ -2,11 +2,11 @@
 FROM viabtcdealbase
 
 COPY . /usr/src/myapp
-COPY ./gdbinit /root
+COPY ./.gdbinit /root
 WORKDIR /usr/src/myapp
 
 RUN apt-get update
- 
+
 # RUN apt-get -y install gcc g++ cmake make git wget libjansson-dev libssl-dev libev-dev libmysqlclient-dev libcurl4-nss-dev liblz4-dev mysql-client gdb redis-tools python python-pip python3 python3-pip iputils-ping psmisc nginx software-properties-common curl
 # RUN pip install requests==2.8.1
 # RUN pip3 install websockets==4.0.1
