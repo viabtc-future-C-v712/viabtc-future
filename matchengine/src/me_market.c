@@ -1886,9 +1886,10 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
     }
     while ((node = skiplist_next(iter)) != NULL)
     {
-        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
-
+        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0){
+            log_debug("处理完毕");
             break;
+        }
         order_t *maker = node->value;
         deal_t *deal = initDeal();
 
@@ -1920,6 +1921,7 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
                     }
                     else
                     {
+                        log_debug("价格不匹配");
                         break;
                     }
                 }
@@ -1931,6 +1933,7 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
                     }
                     else
                     {
+                        log_debug("价格不匹配");
                         break;
                     }
                 }

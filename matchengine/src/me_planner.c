@@ -56,7 +56,7 @@ void on_planner(uint32_t real)
             log_trace("order record %p", (void *)order_old);
             if( (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) >= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) <= 0) || // 市场价小于等于卖价
                 (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) <= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) >= 0)){// 市场价大于等于卖价
-                skiplist_delete(market->plan_asks, node);// 
+                skiplist_delete(market->plan_asks, node);//
                 push_order_message(ORDER_EVENT_FINISH, order_old, market);
                 order_t *order = copyOrder(order_old);
                 if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
@@ -113,9 +113,11 @@ void on_planner(uint32_t real)
                 }
                 else{//平仓，卖 （平空）
                     position_t *position = get_position(order->user_id, order->market, order->side);
-                    mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
-                    mpd_sub(position->position, position->position, order->left, &mpd_ctx);
-                    execute_order(real, market, BEAR, order);
+                    if(position){
+                        mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
+                        mpd_sub(position->position, position->position, order->left, &mpd_ctx);
+                        execute_order(real, market, BEAR, order);
+                    }
                 }
             }
         }

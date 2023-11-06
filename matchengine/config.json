@@ -6,7 +6,7 @@
     },
     "log": {
         "path": "/var/log/trade/matchengine",
-        "flag": "trace",
+        "flag": "debug,trace",
         "num": 10
     },
     "alert": {
@@ -167,5 +167,5 @@
     ],
     "brokers": "172.19.0.6:9092",
     "slice_interval": 3600,
-    "slice_keeptime": 259200 
+    "slice_keeptime": 259200
 }

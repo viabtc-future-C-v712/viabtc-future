@@ -4,3 +4,4 @@
 *.exe
 *.pyc
 file.txt
+nohup.out

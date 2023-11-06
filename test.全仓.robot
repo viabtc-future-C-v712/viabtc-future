@@ -18,22 +18,25 @@ Test Teardown   重启服务 并清理数据库
     check position mode    ${Carol}    BTCBCH    ${逐仓}    1
     put open     ${Carol}    ${空}    ${限价}    ${全仓}    5000
     check position mode    ${Carol}    BTCBCH    ${全仓}    100
-先下逐仓 再下全仓1
+先下逐仓 再下全仓
     check position mode    ${Carol}    BTCBCH    1    1
     put open     ${Carol}    ${空}    ${限价}    ${逐仓}    5000
     Run Keyword And Expect Error    *    put open     ${Carol}    ${空}    ${限价}    ${全仓}    5000
-先下逐仓 再下全仓2
+先下全仓 再下逐仓
     check position mode    ${Carol}    BTCBCH    1    1
     put open     ${Carol}    ${空}    ${限价}    ${全仓}    5000
     Run Keyword And Expect Error     *    put open     ${Carol}    ${空}    ${限价}    ${逐仓}    5000
-先下逐仓 再下全仓3
+下逐仓
     check position mode    ${Carol}    BTCBCH    1    1
     put open     ${Carol}    ${空}    ${限价}    ${逐仓}    5000
     put open     ${Carol}    ${空}    ${限价}    ${逐仓}    5000
-先下逐仓 再下全仓4
+下全仓
     check position mode    ${Carol}    BTCBCH    1    1
     put open     ${Carol}    ${空}    ${限价}    ${全仓}    5000
     put open     ${Carol}    ${空}    ${限价}    ${全仓}    5000
+全仓开仓
+    生成 order book
+    put open     ${Carol}    ${空}    ${限价}    ${全仓}    10000    7999
 
 *** Keywords ***
 生成 order book
