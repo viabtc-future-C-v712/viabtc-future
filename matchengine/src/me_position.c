@@ -123,6 +123,15 @@ int del_position(uint32_t user_id, char* market, uint32_t side){
     return 0;
 }
 
+int add_position_mode_2(uint32_t user_id, char* market, position_mode_t *position_mode){
+    struct position_mode_key key;
+    key.user_id = user_id;
+    strncpy(key.market, market, sizeof(key.market));
+
+    dict_add(dict_position_mode, &key, position_mode);
+    return 0;
+}
+
 int add_position_mode(uint32_t user_id, char* market, uint32_t pattern, mpd_t *leverage){
     struct position_mode_key key;
     key.user_id = user_id;

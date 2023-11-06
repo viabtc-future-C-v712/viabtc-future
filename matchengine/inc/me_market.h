@@ -86,16 +86,11 @@ int market_put_limit_order_extra(bool real, json_t *result, market_t *m, uint32_
 int market_cancel_all_order(market_t *m);
 int market_put_order(market_t *m, order_t *order);
 
-<<<<<<< HEAD
 int check_position_order_mode(uint32_t user_id, market_t *market);
 int market_put_order_common(void*);
 int market_put_order_open(void*);
 int market_put_order_close(void*);
-=======
-int market_put_order_common(void *);
-int market_put_order_open(void *);
-int market_put_order_close(void *);
->>>>>>> a99cb7e (fix create_trade_history.sql)
+
 int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee);
 
 json_t *get_order_info(order_t *order);

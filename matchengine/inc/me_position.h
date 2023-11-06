@@ -47,6 +47,7 @@ int init_position(void);
 int add_position(uint32_t user_id, char* market, uint32_t side, position_t *p);
 position_t* get_position(uint32_t user_id, char* market, uint32_t side);
 position_mode_t* get_position_mode(uint32_t user_id, char* market);
+int add_position_mode_2(uint32_t user_id, char* market, position_mode_t *position_mode);
 int del_position(uint32_t user_id, char* market, uint32_t side);
 position_t *initPosition(uint32_t user_id, const char* market, uint32_t pattern);
 # endif

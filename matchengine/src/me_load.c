@@ -187,7 +187,7 @@ int load_position_mode(MYSQL *conn, const char *table)
             position->pattern = strtoul(row[3], NULL, 0);
             position->leverage = decimal(row[4], 0);
             log_trace("%s %d %s %d", __FUNCTION__, user_id, position->market);
-            add_position_mode(user_id, position->market, position);
+            add_position_mode_2(user_id, position->market, position);
         }
         mysql_free_result(result);
 
