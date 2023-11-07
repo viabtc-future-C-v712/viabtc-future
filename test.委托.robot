@@ -14,10 +14,22 @@ Test Teardown   重启服务 并清理数据库
 *** Variables ***
 
 *** Test Cases ***
-计划委托
+计划委托市价
+    生成 order book
+    put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=0    触发价格=8000   #价格高于触发价后下单，
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
+    check order book    market=BTCUSDT    side=1    offset=0    limit=100
+计划委托限价
     生成 order book
     put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=9000    触发价格=8000   #价格高于触发价后下单，
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
+    check order book    market=BTCUSDT    side=1    offset=0    limit=100
+计划委托转市价
+    生成 order book
+    put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=0    触发价格=8000   #价格高于触发价后下单，
+    check order    ${Carol}    amount=15000    type=${委托}
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
+    check order    ${Carol}    amount=0    type=${限价}
     check order book    market=BTCUSDT    side=1    offset=0    limit=100
 计划委托转限价
     生成 order book
@@ -25,6 +37,14 @@ Test Teardown   重启服务 并清理数据库
     check order    ${Carol}    amount=15000    type=${委托}
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
     check order    ${Carol}    amount=15000    type=${限价}
+    check order book    market=BTCUSDT    side=1    offset=0    limit=100
+计划委托转市价 失败
+    生成 order book
+    put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=0    触发价格=8000   #价格高于触发价后下单，
+    check order    ${Carol}    amount=15000    type=${委托}
+    init balance    ${Carol}
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
+    check order    ${Carol}    amount=15000    type=${委托}
     check order book    market=BTCUSDT    side=1    offset=0    limit=100
 计划委托转限价 失败
     生成 order book

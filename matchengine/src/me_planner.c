@@ -53,7 +53,7 @@ void on_planner(uint32_t real)
         while ((node = skiplist_next(iter)) != NULL){
             order_t *order_old = node->value;
             //判断是否要下单
-            log_trace("order record %p", (void *)order_old);
+            // log_trace("order record %p", (void *)order_old);
             if( (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) >= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) <= 0) || // 市场价小于等于卖价
                 (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) <= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) >= 0)){// 市场价大于等于卖价
 
@@ -65,20 +65,27 @@ void on_planner(uint32_t real)
                 order->id = ++order_id_start;
                 if(order->oper_type == 1){//开仓，卖 （开空）
                     // 在此处冻结资金 仅限价单需要
+
+                    // 计算余额 是否大于保证金
+                    mpd_t *priAndFee = mpd_new(&mpd_ctx);
+                    mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
+                    mpd_t *balance = balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money);
+                    if(priAndFee)
+                        log_trace("on_planner %s", mpd_to_sci(priAndFee, 0));
+                    if(balance)
+                        log_trace("on_planner %s", mpd_to_sci(balance, 0));
+                    if(checkPriAndFee(order->pattern, order->user_id, balance, priAndFee)){
+                        log_trace("on_planner error checkPriAndFee order id %d", order->id);
+                        return -1;
+                    }
                     if (order->type == 1){
-                        // 计算余额 是否大于保证金
-                        mpd_t *priAndFee = mpd_new(&mpd_ctx);
-                        mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
-                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)){
-                            log_trace("on_planner error checkPriAndFee order id %d", order->id);
-                            return -1;
-                        }
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
                     if(!execute_order(real, market, BEAR, order)){
                         if(real)
                             push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        log_trace("on_planner success");
                         order_finish_future(real, market, order_old);
                     }
                 }
@@ -88,8 +95,10 @@ void on_planner(uint32_t real)
                         mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                         mpd_sub(position->position, position->position, order->left, &mpd_ctx);
                         if(!execute_order(real, market, BULL, order)){
+
                             if(real)
                                 push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            log_trace("on_planner success");
                             order_finish_future(real, market, order_old);
                         }
                     }else{
@@ -114,20 +123,22 @@ void on_planner(uint32_t real)
                 order->id = ++order_id_start;
                 if(order->oper_type == 1){//开仓，买 （开多）
                     // 在此处冻结资金 仅限价单需要
+
+                    // 计算余额 是否大于保证金
+                    mpd_t *priAndFee = mpd_new(&mpd_ctx);
+                    mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
+                    if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)){
+                        log_trace("on_planner error checkPriAndFee order id %d", order->id);
+                        return -1;
+                    }
                     if (order->type == 1){
-                        // 计算余额 是否大于保证金
-                        mpd_t *priAndFee = mpd_new(&mpd_ctx);
-                        mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
-                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)){
-                            log_trace("on_planner error checkPriAndFee order id %d", order->id);
-                            return -1;
-                        }
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
                     if(!execute_order(real, market, BULL, order)){
                         if(real)
                             push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        log_trace("on_planner success");
                         order_finish_future(real, market, order_old);
                     }
                 }
@@ -139,6 +150,7 @@ void on_planner(uint32_t real)
                         if(!execute_order(real, market, BEAR, order)){
                             if(real)
                                 push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            log_trace("on_planner success");
                             order_finish_future(real, market, order_old);
                         }
                     }else{
