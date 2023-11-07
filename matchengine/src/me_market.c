@@ -1302,29 +1302,19 @@ int market_put_order_common(void *args_)
 {
     args_t *args = (args_t *)args_;
     // 限价单及计划委托单需要输入委托价格
-    if (args->Type == 1 || args->Type == 2)
-    {
-        if (!args->entrustPrice || mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0)
-        {
-            args->msg = "限价单及计划委托单需要输入委托价格";
-            return -1;
-        }
-        if (args->Type == 2)
-        {
-            if (!args->triggerPrice || mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0)
-            {
-                args->msg = "限价单及计划委托单需要输入委托价格";
-                return -2;
-            }
-        }
+    if (args->Type == 1 && (!args->entrustPrice || mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0)){
+        args->msg = "限价单及计划委托单需要输入委托价格";
+        return -1;
+    }
+    if (args->Type == 2 && (!args->triggerPrice || mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0)){
+        args->msg = "限价单及计划委托单需要输入委托价格";
+        return -2;
     }
     int ret = 0;
-    if (args->bOpen)
-    {
+    if (args->bOpen){
         ret = market_put_order_open((void *)args);
     }
-    else
-    {
+    else{
         ret = market_put_order_close((void *)args);
     }
     on_planner(args->real);        // 处理计划委托
