@@ -14,6 +14,8 @@ Variables  test_variable.py
 *** Variables ***
 
 *** Test Cases ***
+aaaa
+    check order all    51324534    20000    0    10
 充值
     call    'balance.update'    1, "USDT", "deposit", 16983029630, "1282031", {"detail": "detail"}
 保存数据库

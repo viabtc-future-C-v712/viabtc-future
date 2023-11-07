@@ -1761,7 +1761,7 @@ int execute_order_open_imp(deal_t *deal)
     return 0;
 }
 
-static int order_finish_future(bool real, market_t *m, order_t *order)
+int order_finish_future(bool real, market_t *m, order_t *order)
 {
     if (order->side == 1 && order->oper_type == 1 || order->side == 2 && order->oper_type == 2)
     {

@@ -56,8 +56,7 @@ void on_planner(uint32_t real)
             log_trace("order record %p", (void *)order_old);
             if( (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) >= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) <= 0) || // 市场价小于等于卖价
                 (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) <= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) >= 0)){// 市场价大于等于卖价
-                skiplist_delete(market->plan_asks, node);//
-                push_order_message(ORDER_EVENT_FINISH, order_old, market);
+
                 order_t *order = copyOrder(order_old);
                 if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
                     order->type = 0;//变为市价单
@@ -70,17 +69,30 @@ void on_planner(uint32_t real)
                         // 计算余额 是否大于保证金
                         mpd_t *priAndFee = mpd_new(&mpd_ctx);
                         mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
-                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)) return -1;
+                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)){
+                            log_trace("on_planner error checkPriAndFee order id %d", order->id);
+                            return -1;
+                        }
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
-                    execute_order(real, market, BEAR, order);
+                    if(!execute_order(real, market, BEAR, order)){
+                        push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        order_finish_future(real, market, order_old);
+                    }
                 }
                 else{//平仓，卖 （平多）
                     position_t *position = get_position(order->user_id, order->market, order->side);
-                    mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
-                    mpd_sub(position->position, position->position, order->left, &mpd_ctx);
-                    execute_order(real, market, BULL, order);
+                    if(position){
+                        mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
+                        mpd_sub(position->position, position->position, order->left, &mpd_ctx);
+                        if(!execute_order(real, market, BULL, order)){
+                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            order_finish_future(real, market, order_old);
+                        }
+                    }else{
+                        log_trace("on_planner error order id %d", order->id);
+                    }
                 }
             }
         }
@@ -91,8 +103,7 @@ void on_planner(uint32_t real)
             //判断是否要下单
             if( (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) >= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) <= 0) || // 市场价小于等于卖价
                 (mpd_cmp(order_old->current_price, order_old->trigger, &mpd_ctx) <= 0 && mpd_cmp(market->latestPrice, order_old->trigger, &mpd_ctx) >= 0)){// 市场价大于等于卖价
-                skiplist_delete(market->plan_bids, node);
-                push_order_message(ORDER_EVENT_FINISH, order_old, market);
+
                 order_t *order = copyOrder(order_old);
                 if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
                     order->type = 0;//变为市价单
@@ -105,18 +116,29 @@ void on_planner(uint32_t real)
                         // 计算余额 是否大于保证金
                         mpd_t *priAndFee = mpd_new(&mpd_ctx);
                         mpd_div(priAndFee, order->left, order->leverage, &mpd_ctx);
-                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)) return -1;
+                        if(checkPriAndFee(order->pattern, order->user_id, balance_get(order->user_id, BALANCE_TYPE_AVAILABLE, market->money), priAndFee)){
+                            log_trace("on_planner error checkPriAndFee order id %d", order->id);
+                            return -1;
+                        }
                         if (balance_freeze(order->user_id, market->money, priAndFee) == NULL) break;
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
-                    execute_order(real, market, BULL, order);
+                    if(!execute_order(real, market, BULL, order)){
+                        push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        order_finish_future(real, market, order_old);
+                    }
                 }
                 else{//平仓，卖 （平空）
                     position_t *position = get_position(order->user_id, order->market, order->side);
                     if(position){
                         mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                         mpd_sub(position->position, position->position, order->left, &mpd_ctx);
-                        execute_order(real, market, BEAR, order);
+                        if(!execute_order(real, market, BEAR, order)){
+                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            order_finish_future(real, market, order_old);
+                        }
+                    }else{
+                        log_trace("on_planner error order id %d", order->id);
                     }
                 }
             }

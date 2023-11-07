@@ -10,7 +10,7 @@ Resource   test.kafka.resource
 Variables  test_variable.py
 
 Test Setup   init balance all
-# Test Teardown   重启
+Test Teardown   重启服务 并清理数据库
 *** Variables ***
 
 *** Test Cases ***
@@ -22,7 +22,7 @@ Test Setup   init balance all
 计划委托(取消)
     生成 order book
     put open     ${Carol}    ${空}    ${委托}    ${逐仓}    15000    价格=8000    触发价格=8000   #价格高于触发价后下单，
-    
+
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
 *** Keywords ***
 生成 order book
