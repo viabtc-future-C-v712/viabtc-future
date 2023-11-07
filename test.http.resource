@@ -37,7 +37,7 @@ init balance all
     ${max_offset}=    Evaluate    test.get_max_offset('balances')
     kafka balances    ${Carol}    800000    ${max_offset}
 init balance
-    [Arguments]  ${id}    ${asset}
+    [Arguments]  ${id}    ${asset}=BCH
     ${ret} =  call    'balance.query'    ${id}, "${asset}"
     IF    '${ret.json()["result"]["${asset}"]["freeze"]}' != '0'
         balance unfreeze    ${id}    ${asset}    ${ret.json()["result"]["${asset}"]["freeze"]}
@@ -58,12 +58,13 @@ check balance
         Should Be Equal As Numbers    ${ret.json()["result"]["${asset}"]["freeze"]}    ${amount}
     END
 check order
-    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${offset}=0    ${limit}=1
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${type}=${限价}    ${offset}=0    ${limit}=1
     ${ret} =  call    'order.pending'    ${id}, "${market}", ${offset}, ${limit}
     IF    '${ret.json()["result"]["total"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE
         Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["type"]}    ${type}
     END
 check order brief
     [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${offset}=0    ${limit}=1

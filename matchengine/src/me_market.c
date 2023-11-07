@@ -2069,6 +2069,8 @@ order_t *initOrder(args_t *args)
 
 int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee)
 {
+    if(!balance || !priAndFee)
+        return -1;
     if (pattern == 1)
     { // 逐仓
         if (mpd_cmp(balance, priAndFee, &mpd_ctx) < 0)
