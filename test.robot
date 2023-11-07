@@ -17,7 +17,10 @@ Variables  test_variable.py
 aaaa
     check order all    51324534    20000    0    10
 充值
-    call    'balance.update'    1, "USDT", "deposit", 16983029630, "1282031", {"detail": "detail"}
+    balance update    1282031    USDT    1000000
+    balance update    1282033    USDT    1000000
+    balance update    1293728    USDT    1000000
+    balance update    51324534    USDT    1000000
 保存数据库
     make slice
 重启服务 并清理数据库

@@ -11,7 +11,7 @@ sleep 5
 /viabtc-deal/bin/readhistory.exe /viabtc-deal/readhistory/config.json
 /viabtc-deal/bin/accesshttp.exe /viabtc-deal/accesshttp/config.json
 /viabtc-deal/bin/accessws.exe /viabtc-deal/accessws/config.json
-sleep 5
+sleep 10
 /viabtc-deal/bin/marketprice.exe /viabtc-deal/marketprice/config.json
 
 pushd /viabtc-deal/httpsServer

@@ -110,15 +110,23 @@ int order_unsubscribe(uint32_t user_id, nw_ses *ses)
         return 0;
 
     list_t *list = entry->val;
-    list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
+
+    list_iter *iter;
     list_node *node;
-    while ((node = list_next(iter)) != NULL) {
-        struct sub_unit *unit = node->value;
-        if (unit->ses == ses) {
-            list_del(list, node);
+    int flag = 0;
+    while(!flag){
+        flag = 1;
+        list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
+        while ((node = list_next(iter)) != NULL) {
+            struct sub_unit *unit = node->value;
+            if (unit->ses == (void*)ses) {
+                list_del(list, node);
+                flag = 0;
+                break;
+            }
         }
+        list_release_iterator(iter);
     }
-    list_release_iterator(iter);
 
     if (list->len == 0) {
         dict_delete(dict_sub, key);

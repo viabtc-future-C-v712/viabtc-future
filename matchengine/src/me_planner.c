@@ -77,7 +77,8 @@ void on_planner(uint32_t real)
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
                     if(!execute_order(real, market, BEAR, order)){
-                        push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        if(real)
+                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
                         order_finish_future(real, market, order_old);
                     }
                 }
@@ -87,7 +88,8 @@ void on_planner(uint32_t real)
                         mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                         mpd_sub(position->position, position->position, order->left, &mpd_ctx);
                         if(!execute_order(real, market, BULL, order)){
-                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            if(real)
+                                push_order_message(ORDER_EVENT_FINISH, order_old, market);
                             order_finish_future(real, market, order_old);
                         }
                     }else{
@@ -110,7 +112,7 @@ void on_planner(uint32_t real)
                 else
                     order->type = 1;//变为限价单
                 order->id = ++order_id_start;
-                if(order->oper_type == 0){//开仓，买 （开多）
+                if(order->oper_type == 1){//开仓，买 （开多）
                     // 在此处冻结资金 仅限价单需要
                     if (order->type == 1){
                         // 计算余额 是否大于保证金
@@ -124,7 +126,8 @@ void on_planner(uint32_t real)
                         mpd_copy(order->freeze, priAndFee, &mpd_ctx);
                     }
                     if(!execute_order(real, market, BULL, order)){
-                        push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                        if(real)
+                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
                         order_finish_future(real, market, order_old);
                     }
                 }
@@ -134,7 +137,8 @@ void on_planner(uint32_t real)
                         mpd_add(position->frozen, position->frozen, order->left, &mpd_ctx);
                         mpd_sub(position->position, position->position, order->left, &mpd_ctx);
                         if(!execute_order(real, market, BEAR, order)){
-                            push_order_message(ORDER_EVENT_FINISH, order_old, market);
+                            if(real)
+                                push_order_message(ORDER_EVENT_FINISH, order_old, market);
                             order_finish_future(real, market, order_old);
                         }
                     }else{
