@@ -47,5 +47,6 @@ Test Teardown   退出
     wscall send    ${my_websocket}    server.auth    "${Alice}",""
 退出
     wscall end    ${my_websocket}
-    # {"method": "server.auth","params": ["1",""],"id": 1}
+    # {"method": "server.auth","params": ["3",""],"id": 1}
     # {"method": "position.subscribe","params": ["BTCBCH",1,"BTCBCH",2],"id": 1}
+    # {"method": "order.subscribe","params": ["BTCBCH"],"id": 1}

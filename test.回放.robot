@@ -27,7 +27,13 @@ Test Teardown   重启服务 并清理数据库
     sleep    3    # 等待服务启完毕
     check order book    side=${空}    limit=10
     check order book    side=${多}    limit=10
-
+仓位
+    生成 order book
+    put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001
+    重启服务
+    sleep    3    # 等待服务启完毕
+    check position    ${Alice}    BTCBCH    ${多}    ${可用仓位}    10000
+    check position    ${Alice}    BTCBCH    ${多}    ${冻结仓位}    0
 *** Keywords ***
 生成 order book
     put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=12010

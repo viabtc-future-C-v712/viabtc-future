@@ -1,5 +1,5 @@
 /*
- * Description: 
+ * Description:
  *     History: yang@haipo.me, 2017/04/27, create
  */
 
@@ -69,6 +69,7 @@ int order_subscribe(uint32_t user_id, nw_ses *ses, const char *market)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d %p", (void*)entry, user_id, ses->id, (void*)ses);
     if (entry == NULL) {
         list_type lt;
         memset(&lt, 0, sizeof(lt));
@@ -106,6 +107,7 @@ int order_unsubscribe(uint32_t user_id, nw_ses *ses)
 {
     void *key = (void *)(uintptr_t)user_id;
     dict_entry *entry = dict_find(dict_sub, key);
+    log_trace("user_entry: %p user_id: %d ses id: %d", (void*)entry, user_id, ses->id);
     if (entry == NULL)
         return 0;
 
@@ -137,6 +139,7 @@ int order_unsubscribe(uint32_t user_id, nw_ses *ses)
 
 int order_on_update(uint32_t user_id, int event, json_t *order)
 {
+    log_trace("user_id: %d", user_id);
     const char *market = json_string_value(json_object_get(order, "market"));
     if (market == NULL)
         return -__LINE__;
@@ -145,7 +148,7 @@ int order_on_update(uint32_t user_id, int event, json_t *order)
     dict_entry *entry = dict_find(dict_sub, key);
     if (entry == NULL)
         return 0;
-
+    log_trace("user_id: %d", user_id);
     json_t *params = json_array();
     json_array_append_new(params, json_integer(event));
     json_array_append(params, order);
@@ -156,9 +159,12 @@ int order_on_update(uint32_t user_id, int event, json_t *order)
     while ((node = list_next(iter)) != NULL) {
         struct sub_unit *unit = node->value;
         if (unit->type == ORDER_SUB_TYPE_ALL) {
+            log_trace("user_id: %d ses %d %p %s", user_id, ((nw_ses *)(unit->ses))->id, (void*)unit->ses, unit->market);
             send_notify(unit->ses, "order.update", params);
         } else {
+            log_trace("market: %s", market);
             if (strcmp(unit->market, market) == 0) {
+                log_trace("user_id: %d ses %d %p %s", user_id, ((nw_ses *)(unit->ses))->id, (void*)unit->ses, unit->market);
                 send_notify(unit->ses, "order.update", params);
             }
         }

@@ -1038,14 +1038,14 @@ decode_error:
 
 static void on_upgrade(nw_ses *ses, const char *remote)
 {
-    log_trace("remote: %"PRIu64":%s upgrade to websocket", ses->id, remote);
+    log_debug("remote: %"PRIu64":%s upgrade to websocket", ses->id, remote);
     struct clt_info *info = ws_ses_privdata(ses);
     memset(info, 0, sizeof(struct clt_info));
 }
 
 static void on_close(nw_ses *ses, const char *remote)
 {
-    log_trace("remote: %"PRIu64":%s websocket connection close", ses->id, remote);
+    log_debug("remote: %"PRIu64":%s websocket connection close", ses->id, remote);
 
     kline_unsubscribe(ses);
     depth_unsubscribe(ses);

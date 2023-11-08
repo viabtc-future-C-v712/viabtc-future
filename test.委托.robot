@@ -37,6 +37,7 @@ Test Teardown   重启服务 并清理数据库
     check order    ${Carol}    amount=15000    type=${委托}
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
     check order    ${Carol}    amount=15000    type=${限价}
+    order cancel    ${Carol}    BTCBCH    23
     check order book    market=BTCUSDT    side=1    offset=0    limit=100
 计划委托转市价 失败
     生成 order book

@@ -25,7 +25,7 @@ order_t * copyOrder(order_t *order_old){
     order->deal_stock = mpd_new(&mpd_ctx);
     order->deal_money = mpd_new(&mpd_ctx);
     order->deal_fee = mpd_new(&mpd_ctx);
-
+    order->market = strdup(order_old->market);
     mpd_copy(order->price, order_old->price, &mpd_ctx);
     mpd_copy(order->amount, order_old->amount, &mpd_ctx);
     mpd_copy(order->leverage, order_old->leverage, &mpd_ctx);

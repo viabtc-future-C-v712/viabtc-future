@@ -1,10 +1,10 @@
 /*
- * Description: 
+ * Description:
  *     History: yang@haipo.me, 2017/04/26, create
  */
 
 # include <stdbool.h>
-# include <openssl/sha.h>  
+# include <openssl/sha.h>
 
 # include "ut_log.h"
 # include "ut_misc.h"
@@ -114,7 +114,7 @@ static int on_http_message_complete(http_parser* parser)
     dict_entry *entry;
     dict_iterator *iter = dict_get_iterator(info->request->headers);
     while ((entry = dict_next(iter)) != NULL) {
-        log_trace("Header: %s: %s", (char *)entry->key, (char *)entry->val);
+        log_debug("Header: %s: %s", (char *)entry->key, (char *)entry->val);
     }
     dict_release_iterator(iter);
 
@@ -134,7 +134,7 @@ static int on_http_message_complete(http_parser* parser)
     else {
         bool found_upgrade = false;
         int count;
-        sds *tokens = sdssplitlen(connection, strlen(connection), ",", 1, &count); 
+        sds *tokens = sdssplitlen(connection, strlen(connection), ",", 1, &count);
         if (tokens == NULL)
             goto error;
         for (int i = 0; i < count; i++) {
