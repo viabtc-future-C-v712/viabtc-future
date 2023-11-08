@@ -1280,20 +1280,22 @@ static int execute_market_bid_order(bool real, market_t *m, order_t *taker)
     return 0;
 }
 
-
-int check_position_order_mode(uint32_t user_id, market_t *market){
-    //检查order
+int check_position_order_mode(uint32_t user_id, market_t *market)
+{
+    // 检查order
 
     skiplist_t *order_list = market_get_order_list(market, user_id);
-    if(order_list){
+    if (order_list)
+    {
         skiplist_iter *iter = skiplist_get_iterator(order_list);
         skiplist_node *node;
-        if (iter && (node = skiplist_next(iter)) != NULL){// 如果有order存在，就不能设置
+        if (iter && (node = skiplist_next(iter)) != NULL)
+        { // 如果有order存在，就不能设置
             return -1;
         }
     }
-    //检查position
-    if(get_position(user_id, market->name, BULL) || get_position(user_id, market->name, BEAR))// 如果有position存在，就不能设置
+    // 检查position
+    if (get_position(user_id, market->name, BULL) || get_position(user_id, market->name, BEAR)) // 如果有position存在，就不能设置
         return -1;
     return 0;
 }
@@ -1302,19 +1304,23 @@ int market_put_order_common(void *args_)
 {
     args_t *args = (args_t *)args_;
     // 限价单及计划委托单需要输入委托价格
-    if (args->Type == 1 && (!args->entrustPrice || mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0)){
+    if (args->Type == 1 && (!args->entrustPrice || mpd_cmp(args->entrustPrice, mpd_zero, &mpd_ctx) <= 0))
+    {
         args->msg = "限价单及计划委托单需要输入委托价格";
         return -1;
     }
-    if (args->Type == 2 && (!args->triggerPrice || mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0)){
+    if (args->Type == 2 && (!args->triggerPrice || mpd_cmp(args->triggerPrice, mpd_zero, &mpd_ctx) <= 0))
+    {
         args->msg = "限价单及计划委托单需要输入委托价格";
         return -2;
     }
     int ret = 0;
-    if (args->bOpen){
+    if (args->bOpen)
+    {
         ret = market_put_order_open((void *)args);
     }
-    else{
+    else
+    {
         ret = market_put_order_close((void *)args);
     }
     on_planner(args->real);        // 处理计划委托
@@ -1581,10 +1587,12 @@ int adjustPosition(deal_t *deal)
             }
         }
     }
-    if (deal->real){
+    if (deal->real)
+    {
         push_position_message(position);
     }
-    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
+    {
         del_position(position->user_id, position->market, position->side);
     }
     // maker position
@@ -1660,10 +1668,12 @@ int adjustPosition(deal_t *deal)
             }
         }
     }
-    if (deal->real){
+    if (deal->real)
+    {
         push_position_message(position);
     }
-    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0){
+    if (mpd_cmp(position->position, mpd_zero, &mpd_ctx) == 0 && mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) == 0)
+    {
         del_position(position->user_id, position->market, position->side);
     }
     mpd_del(sum);
@@ -1877,7 +1887,8 @@ int execute_order(uint32_t real, market_t *market, uint32_t direction, order_t *
     }
     while ((node = skiplist_next(iter)) != NULL)
     {
-        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0){
+        if (mpd_cmp(taker->left, mpd_zero, &mpd_ctx) == 0)
+        {
             log_debug("处理完毕");
             break;
         }
@@ -2053,13 +2064,15 @@ order_t *initOrder(args_t *args)
     mpd_copy(order->deal_stock, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_money, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_fee, mpd_zero, &mpd_ctx);
+    mpd_copy(order->pnl, mpd_zero, &mpd_ctx);
+
     log_debug("order record %p", (void *)order);
     return order;
 }
 
 int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee)
 {
-    if(!balance || !priAndFee)
+    if (!balance || !priAndFee)
         return -1;
     if (pattern == 1)
     { // 逐仓
@@ -2104,7 +2117,8 @@ int market_put_order_open(void *args_)
         return -1;
     }
     // 检查买入数量
-    if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume)){
+    if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume))
+    {
         args->msg = "volume error";
         return -1;
     }
@@ -2114,7 +2128,8 @@ int market_put_order_open(void *args_)
     // 计算保证金 如果以前有仓位，参照以前的仓位？
     position_t *position = NULL;
     position = get_position(args->user_id, args->market->name, BULL);
-    if(!position) position = get_position(args->user_id, args->market->name, BEAR);
+    if (!position)
+        position = get_position(args->user_id, args->market->name, BEAR);
 
     if (position)
     {
@@ -2123,11 +2138,15 @@ int market_put_order_open(void *args_)
     }
     else
     {
-        if(!position_mode){
+        if (!position_mode)
+        {
             add_position_mode(args->user_id, args->market->name, args->pattern, args->leverage);
             position_mode = get_position_mode(args->user_id, args->market->name);
-        }else{
-            if(!check_position_order_mode(args->user_id, args->market)){// 如果之前没有下过单，或没有持有仓位，再可以修改
+        }
+        else
+        {
+            if (!check_position_order_mode(args->user_id, args->market))
+            { // 如果之前没有下过单，或没有持有仓位，再可以修改
                 log_trace("position pattern %d %d", position_mode->pattern, args->pattern);
                 position_mode->pattern = args->pattern;
                 mpd_copy(position_mode->leverage, args->leverage, &mpd_ctx);
@@ -2137,7 +2156,8 @@ int market_put_order_open(void *args_)
     }
     // 判断仓位模式
     log_trace("position pattern %d %d", position_mode->pattern, args->pattern);
-    if(position_mode->pattern != args->pattern){
+    if (position_mode->pattern != args->pattern)
+    {
         args->msg = "check position pattern fail";
         return -1;
     }
@@ -2148,7 +2168,8 @@ int market_put_order_open(void *args_)
 
     // 计算余额 是否大于保证金
     mpd_copy(args->priAndFee, args->priAmount, &mpd_ctx);
-    if (checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee)){
+    if (checkPriAndFee(args->pattern, args->user_id, balance, args->priAndFee))
+    {
         args->msg = "checkPriAndFee fail";
         return -1;
     }
@@ -2423,7 +2444,8 @@ order_t *market_get_order(market_t *m, uint64_t order_id)
 
 skiplist_t *market_get_order_list(market_t *m, uint32_t user_id)
 {
-    if(!m->users) return NULL;
+    if (!m->users)
+        return NULL;
     struct dict_user_key key = {.user_id = user_id};
     dict_entry *entry = dict_find(m->users, &key);
     if (entry)
