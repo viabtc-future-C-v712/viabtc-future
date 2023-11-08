@@ -64,8 +64,9 @@ void on_planner(uint32_t real)
             { // 市场价大于等于卖价
 
                 order_t *order = copyOrder(order_old);
-                if (mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
-                    order->type = 0; // 变为市价单
+                if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0){
+                    order->type = 0;//变为市价单
+                }
                 else
                     order->type = 1; // 变为限价单
                 order->id = ++order_id_start;
@@ -134,8 +135,9 @@ void on_planner(uint32_t real)
             { // 市场价大于等于卖价
 
                 order_t *order = copyOrder(order_old);
-                if (mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0)
-                    order->type = 0; // 变为市价单
+                if(mpd_cmp(order->price, mpd_zero, &mpd_ctx) == 0){
+                    order->type = 0;//变为市价单
+                }
                 else
                     order->type = 1; // 变为限价单
                 order->id = ++order_id_start;
