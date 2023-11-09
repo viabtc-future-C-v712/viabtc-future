@@ -471,7 +471,7 @@ int append_order_history(order_t *order)
     append_user_order(order);
     append_order_detail(order);
     // 需要提前建order_history_BTCUSDT表
-    append_market_order(order);
+    // append_market_order(order);
     return 0;
 }
 
