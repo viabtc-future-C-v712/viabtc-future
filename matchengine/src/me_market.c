@@ -1722,7 +1722,7 @@ int adjustBalance(deal_t *deal)
         // 如果是开仓余额需要减去
         if (deal->real)
         {
-            append_balance_trade_add(deal->maker, deal->market->money, deal->amount, deal->price, deal->amount, deal->taker);
+            append_balance_trade_sub(deal->maker, deal->market->money, deal->maker_priAmount, deal->price, deal->amount, deal->taker);
         }
     }
     else
