@@ -238,7 +238,7 @@ static int append_market_order(order_t *order)
     if (sdslen(sql) == 0)
     {
         sql = sdscatprintf(sql, "INSERT INTO `order_history_%s` (`id`, `create_time`, `finish_time`, `user_id`, "
-                                "`market`, `source`, `t`, `side`, `oper_type`, `price`, `amount`, `leverage`, `trigger`, `taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`) VALUES ",
+                                "`market`, `source`, `t`, `side`, `oper_type`, `price`, `amount`, `leverage`, `trigger`, `taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`, `pnl`) VALUES ",
                            order->market);
     }
     else
@@ -256,7 +256,9 @@ static int append_market_order(order_t *order)
     sql = sql_append_mpd(sql, order->maker_fee, true);
     sql = sql_append_mpd(sql, order->deal_stock, true);
     sql = sql_append_mpd(sql, order->deal_money, true);
-    sql = sql_append_mpd(sql, order->deal_fee, false);
+    sql = sql_append_mpd(sql, order->deal_fee, true);
+    sql = sql_append_mpd(sql, order->pnl, false);
+
     sql = sdscatprintf(sql, ")");
 
     set_sql(&key, sql);
