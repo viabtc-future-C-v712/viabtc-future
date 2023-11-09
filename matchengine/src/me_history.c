@@ -218,6 +218,7 @@ static int append_user_order(order_t *order)
     sql = sql_append_mpd(sql, order->deal_money, true);
     sql = sql_append_mpd(sql, order->deal_fee, false);
     sql = sdscatprintf(sql, ")");
+    log_trace("exec sql: %s", sql);
 
     set_sql(&key, sql);
 
@@ -294,6 +295,7 @@ static int append_order_detail(order_t *order)
     sql = sql_append_mpd(sql, order->deal_money, true);
     sql = sql_append_mpd(sql, order->deal_fee, false);
     sql = sdscatprintf(sql, ")");
+    log_trace("exec sql: %s", sql);
 
     set_sql(&key, sql);
 
@@ -325,6 +327,8 @@ static int append_order_deal_future(double t, uint32_t user_id, uint64_t deal_id
     sql = sql_append_mpd(sql, fee, true);
     sql = sql_append_mpd(sql, deal_fee, false);
     sql = sdscatprintf(sql, ")");
+
+    log_trace("exec sql: %s", sql);
 
     set_sql(&key, sql);
 
@@ -389,6 +393,8 @@ static int append_user_deal_future(double t, uint32_t user_id, const char *marke
     sql = sql_append_mpd(sql, pnl, false);
     sql = sdscatprintf(sql, ")");
 
+    log_trace("exec sql: %s", sql);
+
     set_sql(&key, sql);
 
     return 0;
@@ -419,6 +425,7 @@ static int append_user_deal(double t, uint32_t user_id, const char *market, uint
     sql = sql_append_mpd(sql, fee, true);
     sql = sql_append_mpd(sql, deal_fee, false);
     sql = sdscatprintf(sql, ")");
+    log_trace("exec sql: %s", sql);
 
     set_sql(&key, sql);
 
@@ -449,6 +456,7 @@ static int append_user_balance(double t, uint32_t user_id, const char *asset, co
     sql = sql_append_mpd(sql, balance, true);
     mysql_real_escape_string(mysql_conn, buf, detail, strlen(detail));
     sql = sdscatprintf(sql, "'%s')", buf);
+    log_trace("exec sql: %s", sql);
 
     set_sql(&key, sql);
 
@@ -459,7 +467,7 @@ int append_order_history(order_t *order)
 {
     append_user_order(order);
     append_order_detail(order);
-    //需要提前建order_history_BTCUSDT表
+    // 需要提前建order_history_BTCUSDT表
     append_market_order(order);
     return 0;
 }
