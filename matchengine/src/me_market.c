@@ -1458,23 +1458,32 @@ mpd_t *getSumPNL(uint32_t user_id)
 int adjustOrder(deal_t *deal)
 {
     mpd_t *deal_stock = mpd_new(&mpd_ctx);
-    // taker order
+
+    // taker order left
     mpd_sub(deal->taker->left, deal->taker->left, deal->amount, &mpd_ctx);
-    mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
-    mpd_add(deal->taker->deal_stock, deal->taker->deal_stock, deal_stock, &mpd_ctx);
-    mpd_div(deal->taker_priAmount, deal->amount, deal->taker->leverage, &mpd_ctx);
-    mpd_add(deal->taker->deal_money, deal->taker->deal_money, deal->deal, &mpd_ctx);
+    // taker deal_fee的计算
     mpd_mul(deal->taker_fee, deal->amount, deal->taker->taker_fee, &mpd_ctx);
     mpd_add(deal->taker->deal_fee, deal->taker->deal_fee, deal->taker_fee, &mpd_ctx);
+    // taker deal_stock 用于(保证金-手续费)的累加
+    mpd_div(deal->taker_priAmount, deal->amount, deal->taker->leverage, &mpd_ctx);
+    mpd_sub(deal_stock, deal->taker_priAmount, deal->taker_fee, &mpd_ctx);
+    mpd_add(deal->taker->deal_stock, deal->taker->deal_stock, deal_stock, &mpd_ctx);
+    // taker deal_money 用于计算交易价格 ...
+    mpd_add(deal->taker->deal_money, deal->taker->deal_money, deal->deal, &mpd_ctx);
 
-    // maker order
+    // =======
+
+    // maker order left
     mpd_sub(deal->maker->left, deal->maker->left, deal->amount, &mpd_ctx);
-    mpd_div(deal_stock, deal->amount, deal->price, &mpd_ctx);
-    mpd_add(deal->maker->deal_stock, deal->maker->deal_stock, deal_stock, &mpd_ctx);
-    mpd_div(deal->maker_priAmount, deal->amount, deal->maker->leverage, &mpd_ctx);
-    mpd_add(deal->maker->deal_money, deal->maker->deal_money, deal->deal, &mpd_ctx);
+    // maker -> deal_fee
     mpd_mul(deal->maker_fee, deal->amount, deal->maker->maker_fee, &mpd_ctx);
     mpd_add(deal->maker->deal_fee, deal->maker->deal_fee, deal->maker_fee, &mpd_ctx);
+    // maker deal_stock
+    mpd_div(deal->maker_priAmount, deal->amount, deal->maker->leverage, &mpd_ctx);
+    mpd_sub(deal_stock, deal->maker_priAmount, deal->maker_fee, &mpd_ctx);
+    mpd_add(deal->maker->deal_stock, deal->maker->deal_stock, deal_stock, &mpd_ctx);
+    // makder deal_mooney
+    mpd_add(deal->maker->deal_money, deal->maker->deal_money, deal->deal, &mpd_ctx);
 
     mpd_del(deal_stock);
     return 0;

@@ -47,9 +47,9 @@ typedef struct order_t
     mpd_t *maker_fee;
     mpd_t *left;
     mpd_t *freeze;
-    mpd_t *deal_stock;
-    mpd_t *deal_money;
-    mpd_t *pnl; // 平仓 产生的利润
+    mpd_t *deal_stock; // 计算累计保证金使用 使用 是 priAmount1 + priAmount2 ...
+    mpd_t *deal_money; // 计算平均交易价格使用 是 amount1 * price1 + amount2 * price2 ...
+    mpd_t *pnl;        // 平仓 产生的利润
     mpd_t *deal_fee;
     char *source;
     int mm; // market maker type
@@ -87,9 +87,9 @@ int market_cancel_all_order(market_t *m);
 int market_put_order(market_t *m, order_t *order);
 int order_finish_future(bool real, market_t *m, order_t *order);
 int check_position_order_mode(uint32_t user_id, market_t *market);
-int market_put_order_common(void*);
-int market_put_order_open(void*);
-int market_put_order_close(void*);
+int market_put_order_common(void *);
+int market_put_order_open(void *);
+int market_put_order_close(void *);
 
 int checkPriAndFee(uint32_t pattern, uint32_t user_id, mpd_t *balance, mpd_t *priAndFee);
 
