@@ -1370,6 +1370,7 @@ mpd_t *getPartPNL(mpd_t *amount, mpd_t *latestPrice)
 {
 
     mpd_t *PNL = mpd_new(&mpd_ctx);
+    mpd_copy(PNL, mpd_zero, &mpd_ctx);
 
     if (position->side == BULL) // 平多
     {
