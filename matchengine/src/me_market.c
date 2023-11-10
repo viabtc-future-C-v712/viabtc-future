@@ -1366,7 +1366,7 @@ int getSumCrossCount(uint32_t user_id)
     return count;
 }
 
-mpd_t *getPartPNL(mpd_t *amount, mpd_t *latestPrice)
+mpd_t *getPartPNL(position_t *position, mpd_t *amount, mpd_t *latestPrice)
 {
 
     mpd_t *PNL = mpd_new(&mpd_ctx);
@@ -1555,7 +1555,7 @@ int adjustPosition(deal_t *deal)
             // 计算总权益
             deal->taker_PNL = getPNL(position, deal->price);
             // 计算部分权益
-            deal->t_PNL = getPartPNL(deal->amount, deal->price);
+            deal->t_PNL = getPartPNL(position, deal->amount, deal->price);
 
             mpd_add(deal->taker->pnl, deal->taker->pnl, deal->t_PNL, &mpd_ctx);
             //
@@ -1639,7 +1639,7 @@ int adjustPosition(deal_t *deal)
             // 计算总权益
             deal->maker_PNL = getPNL(position, deal->price);
 
-            deal->m_PNL = getPartPNL(deal->amount, deal->price);
+            deal->m_PNL = getPartPNL(position, deal->amount, deal->price);
             mpd_add(deal->maker->pnl, deal->maker->pnl, deal->m_PNL, &mpd_ctx);
 
             // 计算交易部份权益
