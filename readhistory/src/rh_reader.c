@@ -100,7 +100,7 @@ json_t *get_user_order_finished(MYSQL *conn, uint32_t user_id,
 
     sds sql = sdsempty();
     sql = sdscatprintf(sql, "SELECT `id`, `create_time`, `finish_time`, `user_id`, `market`, `source`, `t`, `side`, `price`, `amount`, "
-                            "`taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`, `oper_type` FROM `order_history_%u` WHERE `user_id` = %u "
+                            "`taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`, `oper_type`, `leverage`, `trigger`, `pnl` FROM `order_history_%u` WHERE `user_id` = %u "
                             "AND `market` = '%s'",
                        user_id % HISTORY_HASH_NUM, user_id, _market);
     if (side)
@@ -168,6 +168,10 @@ json_t *get_user_order_finished(MYSQL *conn, uint32_t user_id,
         uint32_t oper_type = atoi(row[15]);
         json_object_set_new(record, "oper_type", json_integer(oper_type));
 
+        json_object_set_new(record, "leverage", json_string(rstripzero(row[16])));
+        json_object_set_new(record, "trigger", json_string(rstripzero(row[17])));
+        json_object_set_new(record, "pnl", json_string(rstripzero(row[18])));
+
         json_array_append_new(records, record);
     }
     mysql_free_result(result);
@@ -180,7 +184,7 @@ json_t *get_user_order_finished_all(MYSQL *conn, uint32_t user_id,
 {
     sds sql = sdsempty();
     sql = sdscatprintf(sql, "SELECT `id`, `create_time`, `finish_time`, `user_id`, `market`, `source`, `t`, `side`, `price`, `amount`, "
-                            "`taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`, `oper_type`  FROM `order_history_%u` WHERE `user_id` = %u ",
+                            "`taker_fee`, `maker_fee`, `deal_stock`, `deal_money`, `deal_fee`, `oper_type`, `leverage`, `trigger`, `pnl`  FROM `order_history_%u` WHERE `user_id` = %u ",
                        user_id % HISTORY_HASH_NUM, user_id);
     if (side)
     {
@@ -246,6 +250,9 @@ json_t *get_user_order_finished_all(MYSQL *conn, uint32_t user_id,
 
         uint32_t oper_type = atoi(row[15]);
         json_object_set_new(record, "oper_type", json_integer(oper_type));
+        json_object_set_new(record, "leverage", json_string(rstripzero(row[16])));
+        json_object_set_new(record, "trigger", json_string(rstripzero(row[17])));
+        json_object_set_new(record, "pnl", json_string(rstripzero(row[18])));
 
         json_array_append_new(records, record);
     }
