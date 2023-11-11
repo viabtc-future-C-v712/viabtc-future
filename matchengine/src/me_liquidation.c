@@ -8,8 +8,9 @@ extern market_t *get_market(const char *name);
 extern mpd_t *getSumPNL(uint32_t user_id);
 extern mpd_t *getPNL(position_t *position, mpd_t *latestPrice);
 
-static order_t *initOrder(position_t *position){
-   order_t *order = malloc(sizeof(order_t));
+static order_t *initOrder(position_t *position)
+{
+    order_t *order = malloc(sizeof(order_t));
     order->id = ++order_id_start;
     order->type = 0;
     order->isblast = 1;
@@ -45,8 +46,8 @@ static order_t *initOrder(position_t *position){
     mpd_copy(order->trigger, mpd_zero, &mpd_ctx);
     mpd_copy(order->current_price, mpd_zero, &mpd_ctx);
     // mpd_copy(order->trigger, args->triggerPrice, &mpd_ctx);
-    mpd_copy(order->taker_fee, decimal("0.001", 0), &mpd_ctx);
-    mpd_copy(order->maker_fee, decimal("0.002", 0), &mpd_ctx);
+    mpd_copy(order->taker_fee, decimal("0.0001", 0), &mpd_ctx);
+    mpd_copy(order->maker_fee, decimal("0.0001", 0), &mpd_ctx);
     mpd_copy(order->left, order->amount, &mpd_ctx);
     mpd_copy(order->freeze, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_stock, mpd_zero, &mpd_ctx);
@@ -55,32 +56,48 @@ static order_t *initOrder(position_t *position){
     return order;
 }
 
-int force_liquidation(uint32_t real){
+int force_liquidation(uint32_t real)
+{
     // 通过遍历仓位，检查逐仓
     dict_iterator *iter = dict_get_iterator(dict_position);
     if (iter == NULL)
         return -1;
     dict_entry *entry;
-    struct position_key* key = NULL;
-    while ((entry = dict_next(iter)) != NULL) {
+    struct position_key *key = NULL;
+    while ((entry = dict_next(iter)) != NULL)
+    {
         key = entry->key;
         position_t *position = entry->val;
-        if(position->pattern == 1){//逐仓
+        if (position->pattern == 1)
+        { // 逐仓
             market_t *market = get_market(position->market);
-            if(mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0) continue;
+            if (mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0)
+                continue;
             mpd_t *pnl = getPNL(position, market->latestPrice);
-            if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
+            /*
+                这个地方还需要减去 维持保证金率  和 市价 平仓手续费
+                maintenance = (position + frozen) * maintenance_fee == 0.05
+
+                closeFee = (position + frozen) * taker_fee
+
+            */
+            if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0)
+            { // 爆仓
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);
                 log_trace("force_liquidation %d", order->id);
                 execute_order(real, market, order->side, order);
             }
-        }else{//全仓
+        }
+        else
+        { // 全仓
             market_t *market = get_market(position->market);
-            if(mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0) continue;
+            if (mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0)
+                continue;
             mpd_t *pnl = getSumPNL(position->user_id);
-            if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0){//爆仓
+            if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0)
+            { // 爆仓
                 order_t *order = initOrder(position);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_sub(position->position, position->position, position->position, &mpd_ctx);

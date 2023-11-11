@@ -1388,6 +1388,13 @@ mpd_t *getPartPNL(position_t *position, mpd_t *amount, mpd_t *latestPrice)
     return PNL;
 }
 
+/*
+
+  todo: 如果是逐仓 ，如果是爆仓单，返回值为 0
+
+        如果是全仓， 如果是爆仓单，不好处理 ....
+
+*/
 mpd_t *getPNL(position_t *position, mpd_t *latestPrice)
 {
     mpd_t *positionTotal = mpd_new(&mpd_ctx);
@@ -1576,6 +1583,7 @@ int adjustPosition(deal_t *deal)
             mpd_div(deal->taker_priAmount, amount, totalPosition, &mpd_ctx);
 
             mpd_del(amount);
+
             mpd_sub(position->principal, position->principal, deal->taker_priAmount, &mpd_ctx);
 
             mpd_sub(totalPosition, totalPosition, deal->amount, &mpd_ctx);
