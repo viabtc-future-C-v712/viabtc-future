@@ -76,11 +76,15 @@ int force_liquidation(uint32_t real)
             mpd_t *pnl = getPNL(position, market->latestPrice);
             /*
                 这个地方还需要减去 维持保证金率  和 市价 平仓手续费
-                maintenance = (position + frozen) * maintenance_fee == 0.05
+
+                maintenance = (position -> principal) * leve * maintenance_fee
 
                 closeFee = (position + frozen) * taker_fee
 
+                pnl - closeFee - naintenance < 0  ==> 爆仓
+
             */
+
             if (mpd_cmp(pnl, mpd_zero, &mpd_ctx) <= 0)
             { // 爆仓
                 order_t *order = initOrder(position);
