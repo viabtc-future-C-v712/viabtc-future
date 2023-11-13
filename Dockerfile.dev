@@ -7,5 +7,7 @@ RUN cd depends/hiredis && make install && cd ../../
 
 # git clone https://github.com/confluentinc/librdkafka.git
 # RUN export http_proxy=socks5://172.26.96.209:1082 && export https_proxy=socks5://172.26.96.209:1082 && cd librdkafka && mkdir build && cd build && cmake .. -DRDKAFKA_BUILD_STATIC=ON && make -j && make install && cd ../../
-WORKDIR /viabtc-deal
+RUN mkdir -p /viabtc-deal/build
+WORKDIR /viabtc-deal/build
+
 LABEL Name=viabtcdealdev Version=0.0.1

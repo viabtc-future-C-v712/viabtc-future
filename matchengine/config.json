@@ -6,7 +6,7 @@
     },
     "log": {
         "path": "/var/log/trade/matchengine",
-        "flag": "trace",
+        "flag": "fatal,error,warn,info,debug,trace",
         "num": 10
     },
     "alert": {

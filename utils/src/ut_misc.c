@@ -89,6 +89,7 @@ int process_keepalive(void)
                 exit(EXIT_FAILURE);
             }
         }
+        usleep(1000 * 1000);
     }
 
     return -1;

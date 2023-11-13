@@ -126,8 +126,8 @@ int main(int argc, char *argv[])
     ret = init_from_db();
     if (ret < 0)
     {
-        exit(0);
         error(EXIT_FAILURE, errno, "init from db fail: %d", ret);
+        exit(-1);
     }
     ret = init_operlog();
     if (ret < 0)

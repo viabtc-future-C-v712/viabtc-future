@@ -11,6 +11,7 @@ services:
   viabtcdealdev:
     image: viabtcdealdev
     tty: true
+    entrypoint: ["bash", "-c", "/usr/src/myapp/build.sh"]
     build:
       context: .
       dockerfile: ./Dockerfile.dev
@@ -19,6 +20,11 @@ services:
       #   - https_proxy=socks5://172.26.96.209:1082
     volumes:
       - .:/viabtc-deal
+    healthcheck:
+      test: ["CMD", "test", "-e", "/viabtc-deal/bin/readhistory.exe"]
+      interval: 5s
+      timeout: 1s
+      retries: 30
     networks:
       viabtcdealnetwork:
         ipv4_address: 172.19.0.255  # 指定静态 IPv4 地址
@@ -40,8 +46,8 @@ services:
       - "8080:8080"
       - "8090:8090"
     depends_on:
-      viabtcdealbase:
-        condition: service_started
+      viabtcdealdev:
+        condition: service_healthy
       sentinel: 
         condition: service_healthy
       viabtcdb:
