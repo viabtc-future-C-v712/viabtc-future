@@ -65,6 +65,10 @@ init oper Log
     FOR    ${ret}    IN    @{rets}
         Execute Sql String  drop table ${ret}[0]
     END
+    ${rets} =  query    SHOW TABLES LIKE 'slice_market_1%';
+    FOR    ${ret}    IN    @{rets}
+        Execute Sql String  drop table ${ret}[0]
+    END
     Execute Sql String  delete from slice_history;
     Disconnect From Database
 mysql

@@ -10,7 +10,7 @@ Resource   test.kafka.resource
 Variables  test_variable.py
 
 Test Setup   init balance all
-# Test Teardown   重启
+Test Teardown   重启服务 并清理数据库
 *** Variables ***
 
 *** Test Cases ***
@@ -22,7 +22,7 @@ Test Setup   init balance all
 全仓
     生成 order book
     put open     ${Carol}    ${多}    ${市价}    ${全仓}    10000
-    put open     ${Alice}    ${空}    ${市价}    ${全仓}    30000    价格=8001  #成交后的市场价格为8001 
+    put open     ${Alice}    ${空}    ${市价}    ${逐仓}    30000    价格=8001  #成交后的市场价格为8001 
     make slice
 *** Keywords ***
 生成 order book

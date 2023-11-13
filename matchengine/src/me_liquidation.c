@@ -1,5 +1,6 @@
 #include "me_config.h"
 #include "me_market.h"
+#include "me_balance.h"
 #include "me_position.h"
 #include "me_args.h"
 
@@ -78,25 +79,25 @@ int force_liquidation(uint32_t real)
             if (mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0)
                 continue;
             mpd_t *pnl = getPNL(position, market->latestPrice);
-            log_trace("force_liquidation pnl %s", mpd_to_sci(pnl, 0));
+            log_trace("pnl %s", mpd_to_sci(pnl, 0));
 
             // maintenance = 持仓总量 * maintenance_fee
             mpd_t *maintenance = mpd_new(&mpd_ctx);
             mpd_add(maintenance, position->position, position->frozen, &mpd_ctx);
             mpd_mul(maintenance, maintenance, decimal("0.0003", 0), &mpd_ctx);
-            log_trace("force_liquidation maintenance %s", mpd_to_sci(maintenance, 0));
+            log_trace("maintenance %s", mpd_to_sci(maintenance, 0));
             
             // closeFee = 持仓总量 * taker_fee
             mpd_t *closeFee = mpd_new(&mpd_ctx);
             mpd_add(closeFee, position->position, position->frozen, &mpd_ctx);
             mpd_mul(closeFee, closeFee, decimal("0.0001", 0), &mpd_ctx);
-            log_trace("force_liquidation closeFee %s", mpd_to_sci(closeFee, 0));
+            log_trace("closeFee %s", mpd_to_sci(closeFee, 0));
 
             // pnl - closeFee - naintenance < 0  ==> 爆仓
             mpd_t *condition = mpd_new(&mpd_ctx);
             mpd_sub(condition, pnl, closeFee, &mpd_ctx);
             mpd_sub(condition, condition, maintenance, &mpd_ctx);
-            log_trace("force_liquidation condition %s", mpd_to_sci(condition, 0));
+            log_trace("condition %s", mpd_to_sci(condition, 0));
 
             if (mpd_cmp(condition, mpd_zero, &mpd_ctx) <= 0)
             { // 爆仓
@@ -123,9 +124,9 @@ int force_liquidation(uint32_t real)
                 order_t *order = initOrder(position);
                 order->isblast = 1;
                 if (mpd_cmp(position->frozen, mpd_zero, &mpd_ctx) > 0){
-                    log_trace("force_liquidation frozen not empty error %d", position->id);
+                    log_trace("frozen not empty error %d", position->id);
                 }
-                log_trace("force_liquidation %d", order->id);
+                log_trace("order id:%d", order->id);
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
                 execute_order(real, market, order->side, order);
@@ -141,12 +142,25 @@ int force_liquidation(uint32_t real)
             if (mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0)
                 continue;
             mpd_t *pnl = getSumPNL(position->user_id);
+            log_trace("pnl %s", mpd_to_sci(pnl, 0));
+
             mpd_t *closeFee = getSumCloseFee(position->user_id);
+            log_trace("closeFee %s", mpd_to_sci(closeFee, 0));
+
             mpd_t *maintenance = getSumMaintenance(position->user_id);
+            log_trace("maintenance %s", mpd_to_sci(maintenance, 0));
+
+            mpd_t *balance = balance_get(position->user_id, BALANCE_TYPE_AVAILABLE, market->money);
+            mpd_t *frozen = balance_get(position->user_id, BALANCE_TYPE_FREEZE, market->money);
+            mpd_t *totalMoney = mpd_new(&mpd_ctx);
+            mpd_add(totalMoney, balance, frozen, &mpd_ctx);
+            log_trace("totalMoney %s", mpd_to_sci(totalMoney, 0));
 
             mpd_t *condition = mpd_new(&mpd_ctx);
-            mpd_sub(condition, pnl, closeFee, &mpd_ctx);
+            mpd_add(condition, totalMoney, pnl, &mpd_ctx);
+            mpd_sub(condition, condition, closeFee, &mpd_ctx);
             mpd_sub(condition, condition, maintenance, &mpd_ctx);
+            log_trace("condition %s", mpd_to_sci(condition, 0));
 
             if (mpd_cmp(condition, mpd_zero, &mpd_ctx) <= 0)
             { // 爆仓
@@ -154,7 +168,7 @@ int force_liquidation(uint32_t real)
                 order->isblast = 1;
                 mpd_add(position->frozen, position->frozen, position->position, &mpd_ctx);
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
-                log_trace("force_liquidation %d", order->id);
+                log_trace("order id:%d", order->id);
                 execute_order(real, market, order->side, order);
             }
             mpd_del(pnl);
