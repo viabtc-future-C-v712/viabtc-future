@@ -1462,6 +1462,62 @@ mpd_t *getSumPNL(uint32_t user_id)
     return totalPNL;
 }
 
+mpd_t *getSumCloseFee(uint32_t user_id)
+{
+    mpd_t *totalCloseFee = mpd_new(&mpd_ctx);
+    mpd_t *closeFee = mpd_new(&mpd_ctx);
+    mpd_copy(totalCloseFee, mpd_zero, &mpd_ctx);
+    for (size_t i = 0; i < settings.market_num; ++i)
+    {
+        position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
+        if (position && position->pattern == 2)
+        {
+            market_t *market = get_market(settings.markets[i].name);
+            mpd_add(closeFee, position->position, position->frozen, &mpd_ctx);
+            mpd_mul(closeFee, closeFee, decimal("0.0001", 0), &mpd_ctx);
+            mpd_add(totalCloseFee, totalCloseFee, closeFee, &mpd_ctx);
+        }
+        position = get_position(user_id, settings.markets[i].name, BULL);
+        if (position && position->pattern == 2)
+        {
+            market_t *market = get_market(settings.markets[i].name);
+            mpd_add(closeFee, position->position, position->frozen, &mpd_ctx);
+            mpd_mul(closeFee, closeFee, decimal("0.0001", 0), &mpd_ctx);
+            mpd_add(totalCloseFee, totalCloseFee, closeFee, &mpd_ctx);
+        }
+    }
+    mpd_del(closeFee);
+    return totalCloseFee;
+}
+
+mpd_t *getSumMaintenance(uint32_t user_id)
+{
+    mpd_t *totalMaintenance = mpd_new(&mpd_ctx);
+    mpd_t *Maintenance = mpd_new(&mpd_ctx);
+    mpd_copy(totalMaintenance, mpd_zero, &mpd_ctx);
+    for (size_t i = 0; i < settings.market_num; ++i)
+    {
+        position_t *position = get_position(user_id, settings.markets[i].name, BEAR);
+        if (position && position->pattern == 2)
+        {
+            market_t *market = get_market(settings.markets[i].name);
+            mpd_add(Maintenance, position->position, position->frozen, &mpd_ctx);
+            mpd_mul(Maintenance, Maintenance, decimal("0.0003", 0), &mpd_ctx);
+            mpd_add(totalMaintenance, totalMaintenance, Maintenance, &mpd_ctx);
+        }
+        position = get_position(user_id, settings.markets[i].name, BULL);
+        if (position && position->pattern == 2)
+        {
+            market_t *market = get_market(settings.markets[i].name);
+            mpd_add(Maintenance, position->position, position->frozen, &mpd_ctx);
+            mpd_mul(Maintenance, Maintenance, decimal("0.0003", 0), &mpd_ctx);
+            mpd_add(totalMaintenance, totalMaintenance, Maintenance, &mpd_ctx);
+        }
+    }
+    mpd_del(Maintenance);
+    return totalMaintenance;
+}
+
 int adjustOrder(deal_t *deal)
 {
     mpd_t *deal_stock = mpd_new(&mpd_ctx);
@@ -1718,14 +1774,16 @@ int adjustBalance(deal_t *deal)
     }
     else
     { // close
-        log_debug("%s 余额加上权益 %s 减去费用 %s", __FUNCTION__, mpd_to_sci(deal->taker_PNL, 0), mpd_to_sci(deal->taker_fee, 0));
-        balance_add(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_PNL);
-        balance_sub(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_fee);
-        // 如果是平仓余额需要加上保证金，盈利和扣除手续费
-        if (deal->real)
-        {
-            append_balance_trade_add(deal->taker, deal->market->money, deal->taker_PNL, deal->price, deal->amount, deal->maker);
-            append_balance_trade_fee(deal->taker, deal->market->money, deal->taker_fee, deal->price, deal->amount, deal->maker->maker_fee, deal->maker);
+        if(!deal->taker->isblast){// 爆仓不处理余额
+            log_debug("%s 余额加上权益 %s 减去费用 %s", __FUNCTION__, mpd_to_sci(deal->taker_PNL, 0), mpd_to_sci(deal->taker_fee, 0));
+            balance_add(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_PNL);
+            balance_sub(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_fee);
+            // 如果是平仓余额需要加上保证金，盈利和扣除手续费
+            if (deal->real)
+            {
+                append_balance_trade_add(deal->taker, deal->market->money, deal->taker_PNL, deal->price, deal->amount, deal->maker);
+                append_balance_trade_fee(deal->taker, deal->market->money, deal->taker_fee, deal->price, deal->amount, deal->maker->maker_fee, deal->maker);
+            }
         }
     }
 

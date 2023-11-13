@@ -14,10 +14,15 @@ Test Setup   init balance all
 *** Variables ***
 
 *** Test Cases ***
-强制平仓
+逐仓
     生成 order book
     put open     ${Carol}    ${多}    ${市价}    ${逐仓}    10000
     put open     ${Alice}    ${空}    ${市价}    ${逐仓}    30000    价格=8001  #成交后的市场价格为8001 
+    make slice
+全仓
+    生成 order book
+    put open     ${Carol}    ${多}    ${市价}    ${全仓}    10000
+    put open     ${Alice}    ${空}    ${市价}    ${全仓}    30000    价格=8001  #成交后的市场价格为8001 
     make slice
 *** Keywords ***
 生成 order book
