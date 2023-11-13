@@ -8,6 +8,7 @@
 # include "aw_server.h"
 
 static dict_t *dict_sub;
+static dict_t *dict_ses;
 static rpc_clt *matchengine;
 static nw_state *state_context;
 
@@ -176,6 +177,22 @@ static int dict_user_key_compare(const void *key1, const void *key2)
     return 1;
 }
 
+static uint32_t dict_ses_hash_func(const void *key)
+{
+    return (uintptr_t)key;
+}
+
+static int dict_ses_key_compare(const void *key1, const void *key2)
+{
+    return (uintptr_t)key1 == (uintptr_t)key2 ? 0 : 1;
+}
+
+static void dict_ses_val_free(void *val)
+{
+    list_release(val);
+}
+
+
 int init_position(void)
 {
     dict_types dt;
@@ -186,6 +203,15 @@ int init_position(void)
 
     dict_sub = dict_create(&dt, 1024);
     if (dict_sub == NULL)
+        return -__LINE__;
+
+    memset(&dt, 0, sizeof(dt));
+    dt.hash_function = dict_ses_hash_func;
+    dt.key_compare = dict_ses_key_compare;
+    dt.val_destructor = dict_ses_val_free;
+
+    dict_ses = dict_create(&dt, 1024);
+    if (dict_ses == NULL)
         return -__LINE__;
 
     rpc_clt_type ct;
@@ -216,6 +242,7 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
     log_trace("user_entry: %p user_id: %d ses id: %d %p", (void*)entry, user_id, ses->id, (void*)ses);
+
     if (entry == NULL) {
         list_type lt;
         memset(&lt, 0, sizeof(lt));
@@ -228,6 +255,14 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
         entry = dict_add(dict_sub, key, list);
         if (entry == NULL)
             return -__LINE__;
+    }
+
+    // 删除僵尸数据
+    dict_entry *entry_ses = dict_find(dict_ses, ses);
+    if(entry_ses){
+        position_unsubscribe(entry_ses->key, ses);
+    }else{
+        dict_add(dict_ses, ses, entry);
     }
 
     list_t *list = entry->val;
