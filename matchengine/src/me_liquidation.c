@@ -152,8 +152,12 @@ int force_liquidation(uint32_t real)
 
             mpd_t *balance = balance_get(position->user_id, BALANCE_TYPE_AVAILABLE, market->money);
             mpd_t *frozen = balance_get(position->user_id, BALANCE_TYPE_FREEZE, market->money);
-            mpd_t *totalMoney = mpd_new(&mpd_ctx);
-            mpd_add(totalMoney, balance, frozen, &mpd_ctx);
+            mpd_t *totalMoney = decimal("0.0", 0);
+
+            if(balance)
+                mpd_add(totalMoney, totalMoney, balance, &mpd_ctx);
+            if(frozen)
+                mpd_add(totalMoney, totalMoney, frozen, &mpd_ctx);
             log_trace("totalMoney %s", mpd_to_sci(totalMoney, 0));
 
             mpd_t *condition = mpd_new(&mpd_ctx);
