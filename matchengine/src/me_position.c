@@ -10,6 +10,8 @@
 dict_t *dict_position;
 dict_t *dict_position_mode;
 
+uint64_t position_id_start;
+
 static uint32_t position_dict_hash_function(const void *key){
     return dict_generic_hash_function(key, sizeof(struct position_key));
 }
@@ -176,7 +178,7 @@ position_t* get_position(uint32_t user_id, char* market, uint32_t side){
 position_t* initPosition(uint32_t user_id, const char* market, uint32_t pattern){
     position_t *position = malloc(sizeof(position_t));
     memset(position, 0, sizeof(position_t));
-    position->id = 0;
+    position->id = ++position_id_start;
     position->user_id = user_id;
     position->market = strdup(market);
     position->side = 0;

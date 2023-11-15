@@ -9,6 +9,7 @@
 #include "me_market.h"
 #include "me_load.h"
 #include "me_dump.h"
+#include "me_position.h"
 
 static time_t last_slice_time;
 static time_t last_run_slice_time;
@@ -55,6 +56,7 @@ static int get_last_slice(MYSQL *conn, time_t *timestamp, uint64_t *last_oper_id
     *last_oper_id = strtoull(row[1], NULL, 0);
     *last_order_id = strtoull(row[2], NULL, 0);
     *last_deals_id = strtoull(row[3], NULL, 0);
+    *last_position_id = strtoull(row[4], NULL, 0);
     mysql_free_result(result);
 
     return 0;
@@ -184,6 +186,7 @@ int init_from_db(void)
 
     order_id_start = last_order_id;
     deals_id_start = last_deals_id;
+    position_id_start = last_position_id;
 
     user_orders_list_create();
 
@@ -315,7 +318,7 @@ int update_slice_history(MYSQL *conn, time_t end)
 {
     sds sql = sdsempty();
     sql = sdscatprintf(sql, "INSERT INTO `slice_history` (`id`, `time`, `end_oper_id`, `end_order_id`, `end_deals_id`, `end_position_id`, `end_market_id`) VALUES (NULL, %ld, %" PRIu64 ", %" PRIu64 ", %" PRIu64", %" PRIu64", %" PRIu64 ")",
-                       end, operlog_id_start, order_id_start, deals_id_start, 0, 0);
+                       end, operlog_id_start, order_id_start, deals_id_start, position_id_start, 0);
     log_info("update slice history to: %ld", end);
     log_trace("exec sql: %s", sql);
     int ret = mysql_real_query(conn, sql, sdslen(sql));

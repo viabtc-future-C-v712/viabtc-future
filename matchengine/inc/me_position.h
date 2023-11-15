@@ -10,6 +10,7 @@
 
 extern dict_t *dict_position;
 extern dict_t *dict_position_mode;
+extern uint64_t position_id_start;
 
 typedef struct position_mode_t{
     uint32_t        id;

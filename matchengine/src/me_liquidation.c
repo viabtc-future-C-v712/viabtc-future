@@ -132,6 +132,7 @@ int cross_liquidation(bool real, position_t *position){
     market_t *market = get_market(position->market);
     if (mpd_cmp(market->latestPrice, mpd_zero, &mpd_ctx) <= 0)
         return ret;
+    log_trace("position id %d", position->id);
     mpd_t *pnl = getSumPNL(position->user_id);
     log_trace("pnl %s", mpd_to_sci(pnl, 0));
 

@@ -1315,6 +1315,8 @@ int market_put_order_common(void *args_)
         return -2;
     }
     int ret = 0;
+    mpd_t *latestPrice = mpd_new(&mpd_ctx);
+    mpd_copy(latestPrice, args->market->latestPrice, &mpd_ctx);
     if (args->bOpen)
     {
         ret = market_put_order_open((void *)args);
@@ -1323,8 +1325,10 @@ int market_put_order_common(void *args_)
     {
         ret = market_put_order_close((void *)args);
     }
-    on_planner(args->real);        // 处理计划委托
-    force_liquidation(args->real); // 处理爆仓
+    if(mpd_cmp(latestPrice, args->market->latestPrice, &mpd_ctx)!=0){
+        on_planner(args->real);        // 处理计划委托
+        force_liquidation(args->real); // 处理爆仓
+    }
     return ret;
 }
 
