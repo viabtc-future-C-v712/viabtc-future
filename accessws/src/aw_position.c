@@ -91,7 +91,8 @@ static int on_position_query_reply(struct state_data *state, json_t *result)
         return 0 ;
 
     json_t *params = json_array();
-    json_array_append(params, result);
+    if(result)
+        json_array_append(params, result);
 
     list_t *list = entry->val;
     list_iter *iter = list_get_iterator(list, LIST_START_HEAD);
@@ -241,7 +242,7 @@ int position_subscribe(uint32_t user_id, nw_ses *ses, const char *market, uint32
     struct dict_user_key *key = (struct dict_user_key*)malloc(sizeof(struct dict_user_key));
     key->user_id = user_id;
     dict_entry *entry = dict_find(dict_sub, key);
-    log_trace("user_entry: %p user_id: %d ses id: %d %p", (void*)entry, user_id, ses->id, (void*)ses);
+    log_trace("user_entry: %p user_id: %d market: %s side: %d ses id: %d %p", (void*)entry, user_id, market, side, ses->id, (void*)ses);
 
     if (entry == NULL) {
         list_type lt;

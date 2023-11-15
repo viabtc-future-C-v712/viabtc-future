@@ -163,6 +163,17 @@
                 "prec": 8
             },
             "min_amount": "0.001"
+        }, {
+            "name": "ETHUSDT",
+            "stock": {
+                "name": "ETH",
+                "prec": 8
+            },
+            "money": {
+                "name": "USDT",
+                "prec": 8
+            },
+            "min_amount": "0.001"
         }
     ],
     "brokers": "172.19.0.6:9092",

@@ -2595,35 +2595,8 @@ static int on_cmd_position_mode_adjust(nw_ses *ses, rpc_pkg *pkg, json_t *params
     reply_success(ses, pkg);
 }
 
-static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
-{
-    size_t request_size = json_array_size(params);
-    if (request_size != 3)
-        return reply_error_invalid_argument(ses, pkg);
-
-    if (!json_is_integer(json_array_get(params, 0)))
-        return reply_error_invalid_argument(ses, pkg);
-    uint32_t user_id = json_integer_value(json_array_get(params, 0));
-    if (user_id == 0)
-        return reply_error_invalid_argument(ses, pkg);
-
-    // market
-    if (!json_is_string(json_array_get(params, 1)))
-        return reply_error_invalid_argument(ses, pkg);
-    const char *market_name = json_string_value(json_array_get(params, 1));
+json_t * dump_positionToJson(uint32_t user_id, const char *market_name,  uint32_t side){
     market_t *market = get_market(market_name);
-    if (market == NULL)
-        return reply_error_other(ses, pkg, "market不存在");
-
-    if (!json_is_integer(json_array_get(params, 2)))
-        return reply_error_invalid_argument(ses, pkg);
-    uint32_t side = json_integer_value(json_array_get(params, 2));
-    if (side == 0)
-        return reply_error_invalid_argument(ses, pkg);
-
-    json_t *result = json_object();
-    json_t *positions = json_array();
-
     position_t *position = get_position(user_id, market_name, side);
     if (position)
     {
@@ -2639,16 +2612,95 @@ static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
         mpd_rescale(show, show, -market->money_prec, &mpd_ctx);
         json_object_set_new_mpd(unit, "price", show);
         json_object_set_new_mpd(unit, "principal", position->principal);
-        json_array_append_new(positions, unit);
-        json_object_set_new(result, "count", json_integer(1));
+        return unit;
     }
-    else
-    {
-        json_object_set_new(result, "market", json_string(market_name));
+    return NULL;
+}
+
+static int on_cmd_position_query(nw_ses *ses, rpc_pkg *pkg, json_t *params)
+{
+    size_t request_size = json_array_size(params);
+    if (request_size == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    if (!json_is_integer(json_array_get(params, 0)))
+        return reply_error_invalid_argument(ses, pkg);
+    uint32_t user_id = json_integer_value(json_array_get(params, 0));
+    if (user_id == 0)
+        return reply_error_invalid_argument(ses, pkg);
+
+    // market
+    const char *market_name = NULL;
+    market_t *market = NULL;
+    if(request_size >= 2){
+        if (!json_is_string(json_array_get(params, 1)))
+            return reply_error_invalid_argument(ses, pkg);
+        market_name = json_string_value(json_array_get(params, 1));
+        market = get_market(market_name);
+    }
+
+    uint32_t side = 0;
+    if(request_size == 3){
+        if (!json_is_integer(json_array_get(params, 2)))
+            return reply_error_invalid_argument(ses, pkg);
+        side = json_integer_value(json_array_get(params, 2));
+    }
+    json_t *result = json_object();
+    json_t *positions = json_array();
+    int count = 0;
+    if(market == NULL){
+        for (size_t i = 0; i < settings.market_num; ++i) {
+            if(side == 0){
+                json_t * unit = dump_positionToJson(user_id, settings.markets[i].name, BULL);
+                if(unit) {
+                    json_array_append_new(positions, unit);
+                    count++;
+                }
+                unit = dump_positionToJson(user_id, settings.markets[i].name, BEAR);
+                if(unit) {
+                    json_array_append_new(positions, unit);
+                    count++;
+                }
+            }else{
+                json_t * unit = dump_positionToJson(user_id, settings.markets[i].name, side);
+                if(unit) {
+                    json_array_append_new(positions, unit);
+                    count++;
+                }
+            }
+        }
+    }else{
+        if(side == 0){
+            json_t * unit = dump_positionToJson(user_id, market_name, BULL);
+            if(unit) {
+                json_array_append_new(positions, unit);
+                count++;
+            }
+            unit = dump_positionToJson(user_id, market_name, BEAR);
+            if(unit) {
+                json_array_append_new(positions, unit);
+                count++;
+            }
+        }else{
+            json_t * unit = dump_positionToJson(user_id, market_name, side);
+            if(unit) {
+                json_array_append_new(positions, unit);
+                count++;
+            }
+        }
+    }
+
+    json_object_set_new(result, "positions", positions);
+    if(count){
+        json_object_set_new(result, "count", json_integer(count));
+    }else{
+        if(!market)
+            json_object_set_new(result, "market", json_string(""));
+        else
+            json_object_set_new(result, "market", json_string(market_name));
         json_object_set_new(result, "side", json_integer(side));
         json_object_set_new(result, "count", json_integer(0));
     }
-    json_object_set_new(result, "positions", positions);
     int ret = reply_result(ses, pkg, result);
     json_decref(result);
     return ret;
