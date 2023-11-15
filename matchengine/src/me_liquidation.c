@@ -190,6 +190,7 @@ int cross_liquidation(bool real, position_t *position){
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
                 log_trace("order id:%d", order->id);
                 execute_order(real, market, order->side, order);
+                ret = 1;
             }
             tmp = get_position(position->user_id, settings.markets[i].name, BULL);
             if (tmp && tmp->pattern == 2){
@@ -200,9 +201,9 @@ int cross_liquidation(bool real, position_t *position){
                 mpd_copy(position->position, mpd_zero, &mpd_ctx);
                 log_trace("order id:%d", order->id);
                 execute_order(real, market, order->side, order);
+                ret = 1;
             }
         }
-        ret = 1;
     }
     mpd_del(pnl);
     mpd_del(closeFee);
@@ -227,9 +228,11 @@ int force_liquidation(uint32_t real)
             position_t *position = entry->val;
             if (position->pattern == 1){ // 逐仓
                 goThroughAgain = isolated_liquidation(real, position);
+                break;
             }
             else{ // 全仓
                 goThroughAgain = cross_liquidation(real, position);
+                break;
             }
         }
     }
