@@ -59,6 +59,10 @@ CREATE TABLE `slice_order_example` (
     `current_price`       DECIMAL(35,16) NOT NULL, -- current price
     `taker_fee`     DECIMAL(8,6) NOT NULL,
     `maker_fee`     DECIMAL(8,6) NOT NULL,
+    `tpPrice`       DECIMAL(35,16) NOT NULL,
+    `tpAmount`      DECIMAL(35,16) NOT NULL,
+    `slPrice`       DECIMAL(35,16) NOT NULL,
+    `slAmount`      DECIMAL(35,16) NOT NULL,
     `left`          DECIMAL(35,16) NOT NULL, -- 买卖的单位 U 既 volume
     `freeze`        DECIMAL(35,16) NOT NULL, -- 买卖的单位 U 既 volume
     `deal_stock`    DECIMAL(35,16) NOT NULL, -- 已交易的币

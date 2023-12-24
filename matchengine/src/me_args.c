@@ -59,7 +59,7 @@ args_t* initOpenArgs(json_t *params){
 }
 
 args_t* initCloseArgs(json_t *params){
-    if (json_array_size(params) != 11) return NULL;
+    if (json_array_size(params) != 15) return NULL;
     CODE_PIECES_CHECK_JSON_INTEGER(params, 0, user_id)
     CODE_PIECES_CHECK_JSON_STRING(params, 1, market_name)
     CODE_PIECES_CHECK_JSON_INTEGER(params, 2, direction)
@@ -71,6 +71,10 @@ args_t* initCloseArgs(json_t *params){
     CODE_PIECES_CHECK_JSON_MDP(params, 8, volume)
     CODE_PIECES_CHECK_JSON_MDP(params, 9, taker_fee)
     CODE_PIECES_CHECK_JSON_MDP(params, 10, maker_fee)
+    CODE_PIECES_CHECK_JSON_MDP(params, 11, tpPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 12, tpAmount)
+    CODE_PIECES_CHECK_JSON_MDP(params, 13, slPrice)
+    CODE_PIECES_CHECK_JSON_MDP(params, 14, slAmount)
 
         // 检查币对
     CODE_PIECES_CHECK_MARKET(market_name, market)
@@ -88,6 +92,10 @@ args_t* initCloseArgs(json_t *params){
     args->volume = volume;
     args->taker_fee_rate = taker_fee;
     args->maker_fee_rate = maker_fee;
+    args->tpPrice = tpPrice;
+    args->tpAmount = tpAmount;
+    args->slPrice = slPrice;
+    args->slAmount = slAmount;
     args->priAmount = mpd_new(&mpd_ctx);
     args->fee = mpd_new(&mpd_ctx);
     args->priAndFee = mpd_new(&mpd_ctx);

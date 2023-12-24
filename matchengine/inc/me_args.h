@@ -36,6 +36,10 @@ typedef struct args_t{
     mpd_t *priAndFee;
     order_t *taker;
     order_t *maker;
+    mpd_t *tpPrice;
+    mpd_t *tpAmount;
+    mpd_t *slPrice;
+    mpd_t *slAmount;
     char *msg;
 }args_t;
 

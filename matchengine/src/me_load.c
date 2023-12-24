@@ -35,6 +35,10 @@ int load_orders(MYSQL *conn, const char *table)
         `current_price`, \
         `taker_fee`, \
         `maker_fee`, \
+        `tpPrice`, \
+        `tpAmount`, \
+        `slPrice`, \
+        `slAmount`, \
         `left`, \
         `freeze`, \
         `deal_stock`, \
@@ -79,12 +83,16 @@ int load_orders(MYSQL *conn, const char *table)
             order->current_price = decimal(row[14], market->money_prec);
             order->taker_fee = decimal(row[15], market->fee_prec);
             order->maker_fee = decimal(row[16], market->fee_prec);
-            order->left = decimal(row[17], market->money_prec);
-            order->freeze = decimal(row[18], 0);
-            order->deal_stock = decimal(row[19], 0);
-            order->deal_money = decimal(row[20], 0);
-            order->deal_fee = decimal(row[21], 0);
-            order->source = strdup(row[22]);
+            order->tpPrice = decimal(row[17], market->fee_prec);
+            order->tpAmount = decimal(row[18], market->fee_prec);
+            order->slPrice = decimal(row[19], market->fee_prec);
+            order->slAmount = decimal(row[20], market->fee_prec);
+            order->left = decimal(row[21], market->money_prec);
+            order->freeze = decimal(row[22], 0);
+            order->deal_stock = decimal(row[23], 0);
+            order->deal_money = decimal(row[24], 0);
+            order->deal_fee = decimal(row[25], 0);
+            order->source = strdup(row[26]);
             // order->mm = (strncmp(order->source, MM_SOURCE_STR, MM_SOURCE_STR_LEN) == 0) ? true : false;
             order->mm = get_mm_order_type_by_source(order->source);
 

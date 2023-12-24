@@ -1314,6 +1314,12 @@ int market_put_order_common(void *args_)
         args->msg = "限价单及计划委托单需要输入委托价格";
         return -2;
     }
+    if (args->Type == 3){
+        if( (!args->tpPrice || mpd_cmp(args->tpPrice, mpd_zero, &mpd_ctx) <= 0) && (!args->slPrice || mpd_cmp(args->slPrice, mpd_zero, &mpd_ctx) <= 0)){
+            args->msg = "止盈止损单tpPrice 和 slPrice 至少需要一个";
+            return -3;
+        }
+    }
     int ret = 0;
     mpd_t *latestPrice = mpd_new(&mpd_ctx);
     mpd_copy(latestPrice, args->market->latestPrice, &mpd_ctx);
@@ -2133,6 +2139,10 @@ order_t *initOrder(args_t *args)
     order->current_price = mpd_new(&mpd_ctx);
     order->taker_fee = mpd_new(&mpd_ctx);
     order->maker_fee = mpd_new(&mpd_ctx);
+    order->tpPrice = mpd_new(&mpd_ctx);
+    order->tpAmount = mpd_new(&mpd_ctx);
+    order->slPrice = mpd_new(&mpd_ctx);
+    order->slAmount = mpd_new(&mpd_ctx);
     order->left = mpd_new(&mpd_ctx);
     order->freeze = mpd_new(&mpd_ctx);
     order->deal_stock = mpd_new(&mpd_ctx);
@@ -2150,6 +2160,10 @@ order_t *initOrder(args_t *args)
     mpd_copy(order->current_price, args->market->latestPrice, &mpd_ctx);
     mpd_copy(order->taker_fee, args->taker_fee_rate, &mpd_ctx);
     mpd_copy(order->maker_fee, args->maker_fee_rate, &mpd_ctx);
+    mpd_copy(order->tpPrice, args->tpPrice, &mpd_ctx);
+    mpd_copy(order->tpAmount, args->tpAmount, &mpd_ctx);
+    mpd_copy(order->slPrice, args->slPrice, &mpd_ctx);
+    mpd_copy(order->slAmount, args->slAmount, &mpd_ctx);
     mpd_copy(order->left, args->volume, &mpd_ctx);
     mpd_copy(order->freeze, mpd_zero, &mpd_ctx);
     mpd_copy(order->deal_stock, mpd_zero, &mpd_ctx);
@@ -2300,6 +2314,36 @@ int market_put_order_close(void *args_)
     {
         args->msg = "volume 需大于0，且是整数";
         return -3;
+    }
+    if (args->Type == 3){
+        if(args->tpPrice && (!args->tpAmount || mpd_cmp(args->tpAmount, mpd_zero, &mpd_ctx) <= 0)){
+            args->msg = "tpPrice 需要同时设置tpAmount";
+            return -4;
+        }
+        if(args->slPrice && (!args->slAmount || mpd_cmp(args->slAmount, mpd_zero, &mpd_ctx) <= 0)){
+            args->msg = "slPrice 需要同时设置slAmount";
+            return -5;
+        }
+        //检查价格
+        if(args->direction == BULL){
+            if(args->tpPrice && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) < 0){
+                args->msg = "tpPrice 需要大于当前价格";
+                return -4;
+            }
+            if(args->slPrice && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) > 0){
+                args->msg = "slPrice 需要小于当前价格";
+                return -5;
+            }
+        }else{
+            if(args->tpPrice && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) > 0){
+                args->msg = "tpPrice 需要小于当前价格";
+                return -4;
+            }
+            if(args->slPrice && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) < 0){
+                args->msg = "slPrice 需要大于当前价格";
+                return -5;
+            }
+        }
     }
 
     // 检查仓位

@@ -45,6 +45,10 @@ typedef struct order_t
     mpd_t *current_price;
     mpd_t *taker_fee;
     mpd_t *maker_fee;
+    mpd_t           *tpPrice;
+    mpd_t           *tpAmount;
+    mpd_t           *slPrice;
+    mpd_t           *slAmount;
     mpd_t *left;
     mpd_t *freeze;
     mpd_t *deal_stock; // 计算累计保证金使用 使用 是 priAmount1 + priAmount2 ...
