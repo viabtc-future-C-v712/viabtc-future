@@ -52,18 +52,19 @@ order_t *copyOrder(order_t *order_old)
     return order;
 }
 
-bool checkConditionAsk(order_t *order_old, market_t *market){
+int checkConditionAsk(order_t *order_old, market_t *market){
     if(order_old->tpPrice && mpd_cmp(market->latestPrice, order_old->tpPrice, &mpd_ctx) >= 0)
-        return true;
+        return 1;
     if(order_old->slPrice && mpd_cmp(market->latestPrice, order_old->slPrice, &mpd_ctx) <= 0)
-        return true;
-    return false;
+        return 2;
+    return 0;
 }
 
 void on_tpslPlannerAsk(order_t *order_old, market_t *market, uint32_t real){
     // 判断是否要下单
     //  log_trace("order record %p", (void *)order_old);
-    if (checkConditionAsk(order_old, market))
+    int bret = checkConditionAsk(order_old, market);
+    if (bret)
     { // 市场价大于等于卖价
 
         order_t *order = copyOrder(order_old);
@@ -73,6 +74,14 @@ void on_tpslPlannerAsk(order_t *order_old, market_t *market, uint32_t real){
         else
             order->type = 1; // 变为限价单
         order->id = ++order_id_start;
+        if(bret == 1){
+            mpd_copy(order->amount, order->tpAmount, &mpd_ctx);
+            mpd_copy(order->left, order->amount, &mpd_ctx);
+        }
+        else{
+            mpd_copy(order->amount, order->slAmount, &mpd_ctx);
+            mpd_copy(order->left, order->amount, &mpd_ctx);
+        }
         // 平仓，卖 （平多）
         position_t *position = get_position(order->user_id, order->market, order->side);
         if (position)
@@ -95,17 +104,18 @@ void on_tpslPlannerAsk(order_t *order_old, market_t *market, uint32_t real){
     }
 }
 
-bool checkConditionBid(order_t *order_old, market_t *market){
+int checkConditionBid(order_t *order_old, market_t *market){
     if(order_old->tpPrice && mpd_cmp(market->latestPrice, order_old->tpPrice, &mpd_ctx) <= 0)
-        return true;
+        return 1;
     if(order_old->slPrice && mpd_cmp(market->latestPrice, order_old->slPrice, &mpd_ctx) >= 0)
-        return true;
-    return false;
+        return 2;
+    return 0;
 }
 
 void on_tpslPlannerBid(order_t *order_old, market_t *market, uint32_t real){
     // 判断是否要下单
-    if (checkConditionBid(order_old, market))
+    int bret = checkConditionBid(order_old, market);
+    if (bret)
     { // 市场价大于等于卖价
 
         order_t *order = copyOrder(order_old);
@@ -115,6 +125,14 @@ void on_tpslPlannerBid(order_t *order_old, market_t *market, uint32_t real){
         else
             order->type = 1; // 变为限价单
         order->id = ++order_id_start;
+        if(bret == 1){
+            mpd_copy(order->amount, order->tpAmount, &mpd_ctx);
+            mpd_copy(order->left, order->amount, &mpd_ctx);
+        }
+        else{
+            mpd_copy(order->amount, order->slAmount, &mpd_ctx);
+            mpd_copy(order->left, order->amount, &mpd_ctx);
+        }
         // 平仓，卖 （平空）
         position_t *position = get_position(order->user_id, order->market, order->side);
         if (position)

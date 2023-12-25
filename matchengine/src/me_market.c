@@ -1773,7 +1773,8 @@ int adjustBalance(deal_t *deal)
     if (deal->taker->oper_type == 1)
     { // open
         log_debug("%s 余额减去 %s", __FUNCTION__, mpd_to_sci(deal->taker_priAmount, 0));
-        balance_unfreeze(deal->taker->user_id, deal->market->money, deal->taker_priAmount);
+        if(deal->taker->type == 1)
+            balance_unfreeze(deal->taker->user_id, deal->market->money, deal->taker_priAmount);
         balance_sub(deal->taker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->taker_priAmount);
         mpd_sub(deal->taker->freeze, deal->taker->freeze, deal->taker_priAmount, &mpd_ctx);
         // 如果是开仓余额需要减去
@@ -1801,7 +1802,8 @@ int adjustBalance(deal_t *deal)
     if (deal->maker->oper_type == 1)
     { // open
         log_debug("%s 余额减去 %s", __FUNCTION__, mpd_to_sci(deal->maker_priAmount, 0));
-        balance_unfreeze(deal->maker->user_id, deal->market->money, deal->maker_priAmount);
+        if(deal->maker->type == 1)
+            balance_unfreeze(deal->maker->user_id, deal->market->money, deal->maker_priAmount);
         balance_sub(deal->maker->user_id, BALANCE_TYPE_AVAILABLE, deal->market->money, deal->maker_priAmount);
         mpd_sub(deal->maker->freeze, deal->maker->freeze, deal->maker_priAmount, &mpd_ctx);
         // 如果是开仓余额需要减去
@@ -2310,7 +2312,7 @@ int market_put_order_close(void *args_)
 {
     args_t *args = (args_t *)args_;
     // 检查买入数量
-    if (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume))
+    if (args->Type !=3 && (mpd_cmp(args->volume, mpd_one, &mpd_ctx) < 0 || !mpd_isinteger(args->volume)))
     {
         args->msg = "volume 需大于0，且是整数";
         return -3;
@@ -2353,7 +2355,7 @@ int market_put_order_close(void *args_)
         args->msg = "仓位不存在";
         return -4;
     }
-    if (mpd_cmp(position->position, args->volume, &mpd_ctx) < 0)
+    if (args->Type !=3 && mpd_cmp(position->position, args->volume, &mpd_ctx) < 0)
     {
         args->msg = "仓位不足";
         return -5;

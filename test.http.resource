@@ -17,8 +17,8 @@ put open
     [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH
     call    'order.open'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "0", "${触发价格}", "${价格}", "100", "${张}", "0.002", "0.001"
 put close
-    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH
-    call    'order.close'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "${触发价格}", "${价格}", "${张}", "0.002", "0.001"
+    [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH    ${tpPrice}=7999    ${tpAmount}=10000    ${slPrice}=8001    ${slAmount}=10000
+    call    'order.close'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "${触发价格}", "${价格}", "${张}", "0.002", "0.001", "${tpPrice}", "${tpAmount}", "${slPrice}", "${slAmount}"
 make slice
     call    'matchengine.makeslice'    ""
     sleep    1

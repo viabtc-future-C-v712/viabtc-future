@@ -51,6 +51,10 @@ args_t* initOpenArgs(json_t *params){
     args->volume = volume;
     args->taker_fee_rate = taker_fee;
     args->maker_fee_rate = maker_fee;
+    args->tpPrice = mpd_new(&mpd_ctx);;
+    args->tpAmount = mpd_new(&mpd_ctx);;
+    args->slPrice = mpd_new(&mpd_ctx);;
+    args->slAmount = mpd_new(&mpd_ctx);;
     args->priAmount = mpd_new(&mpd_ctx);
     args->fee = mpd_new(&mpd_ctx);
     args->priAndFee = mpd_new(&mpd_ctx);
