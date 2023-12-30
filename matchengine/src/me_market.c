@@ -2318,30 +2318,30 @@ int market_put_order_close(void *args_)
         return -3;
     }
     if (args->Type == 3){
-        if(args->tpPrice && (!args->tpAmount || mpd_cmp(args->tpAmount, mpd_zero, &mpd_ctx) <= 0)){
+        if(args->tpPrice && mpd_cmp(args->tpPrice, mpd_zero, &mpd_ctx) > 0 && (!args->tpAmount || mpd_cmp(args->tpAmount, mpd_zero, &mpd_ctx) <= 0)){
             args->msg = "tpPrice 需要同时设置tpAmount";
             return -4;
         }
-        if(args->slPrice && (!args->slAmount || mpd_cmp(args->slAmount, mpd_zero, &mpd_ctx) <= 0)){
+        if(args->slPrice && mpd_cmp(args->slPrice, mpd_zero, &mpd_ctx) > 0 && (!args->slAmount || mpd_cmp(args->slAmount, mpd_zero, &mpd_ctx) <= 0)){
             args->msg = "slPrice 需要同时设置slAmount";
             return -5;
         }
         //检查价格
         if(args->direction == BULL){
-            if(args->tpPrice && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) < 0){
+            if(args->tpPrice && mpd_cmp(args->tpPrice, mpd_zero, &mpd_ctx) > 0 && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) < 0){
                 args->msg = "tpPrice 需要大于当前价格";
                 return -4;
             }
-            if(args->slPrice && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) > 0){
+            if(args->slPrice && mpd_cmp(args->slPrice, mpd_zero, &mpd_ctx) > 0 && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) > 0){
                 args->msg = "slPrice 需要小于当前价格";
                 return -5;
             }
         }else{
-            if(args->tpPrice && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) > 0){
+            if(args->tpPrice && mpd_cmp(args->tpPrice, mpd_zero, &mpd_ctx) > 0 && mpd_cmp(args->tpPrice, args->market->latestPrice, &mpd_ctx) > 0){
                 args->msg = "tpPrice 需要小于当前价格";
                 return -4;
             }
-            if(args->slPrice && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) < 0){
+            if(args->slPrice && mpd_cmp(args->slPrice, mpd_zero, &mpd_ctx) > 0 && mpd_cmp(args->slPrice, args->market->latestPrice, &mpd_ctx) < 0){
                 args->msg = "slPrice 需要大于当前价格";
                 return -5;
             }

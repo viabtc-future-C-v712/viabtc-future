@@ -13,9 +13,18 @@ Variables  test_variable.py
 put limit
     [Arguments]  ${data}
     call    'order.put_limit'    ${data}
+市价逐仓开多
+    [Arguments]  ${用户}    ${张}    ${market}=BTCBCH
+    put open     ${用户}    ${多}    ${市价}    ${逐仓}    ${张}    价格=8001    market=${market}  #成交后的市场价格为8001
+市价逐仓开空
+    [Arguments]  ${用户}    ${张}    ${market}=BTCBCH
+    put open     ${用户}    ${空}    ${市价}    ${逐仓}    ${张}    价格=9000    market=${market}  #价格高于触发价后下单，
 put open
     [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH
     call    'order.open'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "0", "${触发价格}", "${价格}", "100", "${张}", "0.002", "0.001"
+止盈止损逐仓平空
+    [Arguments]  ${用户}    ${market}=BTCBCH    ${tpPrice}=7999    ${tpAmount}=10000    ${slPrice}=8001    ${slAmount}=10000
+    put close     ${用户}    ${空}    ${止盈止损}    ${逐仓}    0    价格=0    触发价格=8000   market=${market}    tpPrice=${tpPrice}    tpAmount=${tpAmount}    slPrice=${slPrice}    slAmount=${slAmount}
 put close
     [Arguments]  ${用户}    ${买或卖}    ${市价或限价}     ${逐仓或全仓}    ${张}    ${价格}=8000    ${触发价格}=8000    ${market}=BTCBCH    ${tpPrice}=7999    ${tpAmount}=10000    ${slPrice}=8001    ${slAmount}=10000
     call    'order.close'    ${用户}, "${market}", ${买或卖}, ${市价或限价}, ${逐仓或全仓}, "8000", "${触发价格}", "${价格}", "${张}", "0.002", "0.001", "${tpPrice}", "${tpAmount}", "${slPrice}", "${slAmount}"
@@ -58,13 +67,13 @@ check balance
         Should Be Equal As Numbers    ${ret.json()["result"]["${asset}"]["freeze"]}    ${amount}
     END
 check order
-    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${type}=${限价}    ${offset}=0    ${limit}=1
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${type}=${限价}    ${offset}=0    ${limit}=100   ${index}=0
     ${ret} =  call    'order.pending'    ${id}, "${market}", ${offset}, ${limit}
     IF    '${ret.json()["result"]["total"]}' == '0'
         Should Be Equal As Numbers    0    ${amount}
     ELSE
-        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["left"]}    ${amount}
-        Should Be Equal As Numbers    ${ret.json()["result"]["records"][0]["type"]}    ${type}
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][${index}]["left"]}    ${amount}
+        Should Be Equal As Numbers    ${ret.json()["result"]["records"][${index}]["type"]}    ${type}
     END
 check order brief
     [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH    ${offset}=0    ${limit}=1
@@ -113,6 +122,12 @@ balance update
 balance unfreeze
     [Arguments]  ${user}    ${asset}    ${amount}
     call    'balance.unfreeze'    ${user}, "${asset}", "${amount}"
+检查空仓冻结
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH
+    check position    ${id}    market=${market}    side=${空}    type=${冻结仓位}    amount=${amount}
+检查空仓可用
+    [Arguments]  ${id}    ${amount}=0    ${market}=BTCBCH
+    check position    ${id}    market=${market}    side=${空}    type=${可用仓位}    amount=${amount}
 check position
     [Arguments]  ${id}    ${market}=BTCBCH    ${side}=${多}    ${type}=${可用仓位}    ${amount}=0
     ${ret} =  call    'position.query'    ${id}, "${market}", ${side}

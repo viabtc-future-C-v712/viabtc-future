@@ -10,7 +10,7 @@ Resource   test.kafka.resource
 Variables  test_variable.py
 
 Test Setup   init balance all
-# Test Teardown   重启服务 并清理数据库
+Test Teardown   重启服务 并清理数据库
 *** Variables ***
 
 *** Test Cases ***
@@ -62,10 +62,44 @@ Test Setup   init balance all
     put open     ${Alice}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
 止盈
     生成 order book
-    put open     ${Carol}    ${多}    ${市价}    ${逐仓}    10000    价格=8001  #成交后的市场价格为8001
-    put close     ${Alice}    ${空}    ${止盈止损}    ${逐仓}    0    价格=0    触发价格=8000   #价格高于触发价后下单，
-    put open     ${Carol}    ${空}    ${市价}    ${逐仓}    10000    价格=9000   #价格高于触发价后下单，
-    check order book    market=BTCUSDT    side=1    offset=0    limit=100
+    检查空仓可用    ${Alice}    amount=0
+    市价逐仓开多     ${Carol}    10000  #成交后的市场价格为8001
+    检查空仓可用    ${Alice}    amount=10000
+    止盈止损逐仓平空     ${Alice}    market=BTCBCH    tpPrice=7999    tpAmount=2000    slPrice=0    slAmount=3000
+    市价逐仓开空     ${Carol}    10000  #把价格打到7999
+    检查空仓可用    ${Alice}    amount=8000  # 10000 - 2000
+止盈(不生效)
+    生成 order book
+    检查空仓可用    ${Alice}    amount=0
+    市价逐仓开多     ${Carol}    30000  #成交后的市场价格为8001
+    检查空仓可用    ${Alice}    amount=20000
+    止盈止损逐仓平空     ${Alice}    market=BTCBCH    tpPrice=8004    tpAmount=2000    slPrice=8004    slAmount=3000
+    市价逐仓开空     ${Carol}    10000  #把价格打到7999
+    检查空仓可用    ${Alice}    amount=8000  # 10000 - 2000
+止损
+    生成 order book
+    检查空仓可用    ${Alice}    amount=0
+    市价逐仓开多     ${Carol}    10000  #成交后的市场价格为8001
+    检查空仓可用    ${Alice}    amount=10000
+    止盈止损逐仓平空     ${Alice}    market=BTCBCH    tpPrice=0    tpAmount=2000    slPrice=8001    slAmount=3000
+    市价逐仓开多     ${Carol}    20000  #把价格拉到8002
+    检查空仓可用    ${Alice}    amount=17000  # 10000 + 10000 - 3000
+止损(不生效)
+    生成 order book
+    检查空仓可用    ${Alice}    amount=0
+    市价逐仓开多     ${Carol}    10000  #成交后的市场价格为8001
+    检查空仓可用    ${Alice}    amount=10000
+    止盈止损逐仓平空     ${Alice}    market=BTCBCH    tpPrice=7999    tpAmount=2000    slPrice=7999    slAmount=3000
+    市价逐仓开多     ${Carol}    20000  #把价格拉到8002
+    检查空仓可用    ${Alice}    amount=17000  # 10000 + 10000 - 3000
+止盈止损
+    生成 order book
+    检查空仓可用    ${Alice}    amount=0
+    市价逐仓开多     ${Carol}    10000  #成交后的市场价格为8001
+    检查空仓可用    ${Alice}    amount=10000
+    止盈止损逐仓平空     ${Alice}    market=BTCBCH    tpPrice=7999    tpAmount=2000    slPrice=7999    slAmount=3000
+    市价逐仓开空     ${Carol}    10000  #把价格打到7999
+    检查空仓可用    ${Alice}    amount=8000  # 10000 - 2000
 *** Keywords ***
 生成 order book
     put open     ${Alice}    ${空}    ${限价}    ${逐仓}    10000    价格=8009
